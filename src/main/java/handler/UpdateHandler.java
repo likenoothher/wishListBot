@@ -2,8 +2,11 @@ package handler;
 
 import data.NotFoundUserNameException;
 import data.Storage;
+import data.UserIsBotException;
 import menu.AppMenu;
+import menu.Icon;
 import model.BotUser;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -24,47 +27,44 @@ public class UpdateHandler {
         this.messageHandler = new MessageHandler(storage, menu);
     }
 
-    public synchronized List<SendMessage> handleUpdate(Update update) {
+    public synchronized List<BotApiMethod> handleUpdate(Update update) {
+        String chatId = extractChatId(update);
         BotUser updateSender = null;
         try {
             updateSender = storage.identifyUser(update);
         } catch (NotFoundUserNameException e) {
             e.printStackTrace();
-            return List.of(new SendMessage(extractChatId(update), "К сожалению, для пользования нашим ботом" +
-                    " тебе необходимо изменить настройки приватности и открыть видимость для имени пользователя @{user_name}"));
+            return List.of(new SendMessage(chatId, "К сожалению, для пользования нашим ботом" +
+                " тебе необходимо изменить настройки приватности и открыть видимость для имени пользователя @{user_name}"));
+        } catch (UserIsBotException e) {
+            e.printStackTrace();
+            return List.of(new SendMessage(chatId, "Ботам здесь не рады"));
         }
-        List<SendMessage> messagesToSend = new ArrayList<>();
+        List<BotApiMethod> messagesToSend = new ArrayList<>();
 
-//        ReplyKeyboardMarkup replyKeyboard = ReplyKeyboard.ReplyKeyboardBuilder.newReplyKeyboard().withRow()
-//                .button("Главное меню").endRow().build();
-//        replyKeyboard.setOneTimeKeyboard(true);
-//        replyKeyboard.setResizeKeyboard(true);
-
-        if (update.hasCallbackQuery()) {
+        if (update.hasCallbackQuery() && updateSender != null) {
             messagesToSend.addAll(handleCallBackQuery(update, updateSender));
         }
 
-        if (update.hasMessage()) {
+        if (update.hasMessage() && updateSender != null) {
             messagesToSend.addAll(handleMessage(update, updateSender));
         }
 
-        SendMessage main_menu = new SendMessage(extractChatId(update), "");
-//        main_menu.setReplyMarkup(replyKeyboard);
-//        messagesToSend.add(main_menu);
         if (!messagesToSend.isEmpty()) {
             return messagesToSend;
         }
 
-        SendMessage message = menu.showMainMenu(extractChatId(update));
+        SendMessage message = menu.showMainMenu(chatId);
+        message.setText(Icon.DISAPPOINTED_ICON + " Не знаю такой команды, попробуй ещё раз из главного меню");
 
-        return List.of(message, main_menu);
+        return List.of(message);
     }
 
-    private List<SendMessage> handleMessage(Update update, BotUser updateSender) {
+    private List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
         return messageHandler.handleMessage(update, updateSender);
     }
 
-    private List<SendMessage> handleCallBackQuery(Update update, BotUser updateSender) {
+    private List<BotApiMethod> handleCallBackQuery(Update update, BotUser updateSender) {
         return callbackHandler.handleCallBackQuery(update, updateSender);
 
     }
@@ -78,6 +78,5 @@ public class UpdateHandler {
         }
         return "";
     }
-
 
 }

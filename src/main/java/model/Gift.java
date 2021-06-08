@@ -1,18 +1,16 @@
 package model;
 
-import java.net.URL;
-
 public class Gift {
     private static int currentId = 1;
 
     private int id;
     private String name;
-    private URL url;
+    private String url;
     private BotUser occupiedBy;
     private int price;
     private String description;
 
-    private Gift(int id, String name, URL url, BotUser occupiedBy, int price, String description) {
+    private Gift(int id, String name, String url, BotUser occupiedBy, int price, String description) {
         this.id = currentId;
         currentId++;
         this.name = name;
@@ -46,8 +44,12 @@ public class Gift {
         return name;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public BotUser occupiedBy() {
@@ -62,22 +64,26 @@ public class Gift {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "Gift{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", url=" + url +
-                ", occupiedBy=" + occupiedBy +
-                ", price=" + price +
-                ", description='" + description + '\'' +
-                '}';
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", url=" + url +
+            ", occupiedBy=" + occupiedBy +
+            ", price=" + price +
+            ", description='" + description + '\'' +
+            '}';
     }
 
     public static final class GiftBuilder {
         private int id;
         private String name;
-        private URL url;
+        private String url;
         private BotUser occupiedBy;
         private int price;
         private String description;
@@ -100,7 +106,7 @@ public class Gift {
             return this;
         }
 
-        public GiftBuilder withUrl(URL url) {
+        public GiftBuilder withUrl(String url) {
             this.url = url;
             return this;
         }
