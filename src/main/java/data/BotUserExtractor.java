@@ -6,20 +6,25 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 public class BotUserExtractor {
 
-    public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException {
+    public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
         return createUserFromUpdateInfo(update);
     }
 
-    private BotUser createUserFromUpdateInfo(Update update) throws NotFoundUserNameException {
+    private BotUser createUserFromUpdateInfo(Update update) throws NotFoundUserNameException, UserIsBotException {
         User gotFrom = extractUserInfoFromUpdate(update);
-        if (gotFrom.getUserName() == null) {throw new NotFoundUserNameException("Имя пользователя null");}
+        if (gotFrom.getUserName() == null) {
+            throw new NotFoundUserNameException("Имя пользователя null");
+        }
+        if (gotFrom.getIsBot() == true) {
+            throw new UserIsBotException("Бот пытается получить доступ к сервису");
+        }
         return BotUser.UserBuilder.newUser()
-                .withTgAccountId(gotFrom.getId())
-                .withTgChatId(extractChatIdFromUpdate(update))
-                .withFirstName(gotFrom.getFirstName())
-                .withLastName(gotFrom.getLastName())
-                .withUserName(gotFrom.getUserName())
-                .build();
+            .withTgAccountId(gotFrom.getId())
+            .withTgChatId(extractChatIdFromUpdate(update))
+            .withFirstName(gotFrom.getFirstName())
+            .withLastName(gotFrom.getLastName())
+            .withUserName(gotFrom.getUserName())
+            .build();
     }
 
     private User extractUserInfoFromUpdate(Update update) { // описаны не все типы ответа! доделать

@@ -20,10 +20,20 @@ public class WishList {
         return false;
     }
 
+    public boolean updateGift(Gift gift) {
+        Gift updatedGift = giftList.stream().filter(iteratedGift -> iteratedGift.getId() == gift.getId())
+            .findAny()
+            .orElse(null);
+        if (updatedGift != null) {
+            return (giftList.remove(updatedGift) && giftList.add(gift));
+        }
+        return false;
+    }
+
     public boolean deleteGift(int id) {
         Gift giftForDelete = giftList.stream().filter(gift -> id == gift.getId())
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
         if (giftForDelete != null) {
             return giftList.remove(giftForDelete);
         }
@@ -32,8 +42,8 @@ public class WishList {
 
     public boolean donate(int giftId, BotUser donor) {
         Gift giftForDonate = giftList.stream().filter(gift -> giftId == gift.getId())
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
         if (giftForDonate != null) {
             return giftForDonate.donate(donor);
         }
@@ -42,8 +52,8 @@ public class WishList {
 
     public boolean refuseFromDonate(int giftId, BotUser donor) {
         Gift giftForDelete = giftList.stream().filter(gift -> giftId == gift.getId())
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
         if (giftForDelete != null) {
             return giftForDelete.refuseFromDonate(donor);
         }
@@ -53,7 +63,7 @@ public class WishList {
     public boolean setFreeGiftOccupationFromDeletedSubscriber(BotUser subscriber) {
         if (subscriber != null) {
             giftList.stream().filter(iteratedGift -> subscriber.equals(iteratedGift.occupiedBy()))
-                    .forEach(giftOccupiedBySubscriber -> giftOccupiedBySubscriber.refuseFromDonate(subscriber));
+                .forEach(giftOccupiedBySubscriber -> giftOccupiedBySubscriber.refuseFromDonate(subscriber));
             return true;
         }
         return false;
@@ -65,8 +75,8 @@ public class WishList {
 
     public Gift findGiftById(int id) {
         return giftList.stream().filter(gift -> id == gift.getId())
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
     }
 
     public int getId() {

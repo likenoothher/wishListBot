@@ -14,14 +14,14 @@ public class Storage {
     private List<BotUser> users = new ArrayList<>();
 
 
-    public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException {
+    public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
         BotUser currentUpdateUser = botUserExtractor.identifyUser(update);
 
         if (isUserSigned(currentUpdateUser)) {
             return users.stream().filter(iteratedUser ->
-                    currentUpdateUser.getTgAccountId() == iteratedUser.getTgAccountId())
-                    .findAny()
-                    .orElse(currentUpdateUser);
+                currentUpdateUser.getTgAccountId() == iteratedUser.getTgAccountId())
+                .findAny()
+                .orElse(currentUpdateUser);
         } else {
             addUser(currentUpdateUser);
             return currentUpdateUser;
@@ -39,6 +39,17 @@ public class Storage {
         return false;
     }
 
+    public boolean updateGiftOfUser(Gift gift, BotUser botUser) {
+        if (gift != null && botUser != null) {
+            int index = users.indexOf(botUser);
+            if (index == -1) {
+                return false;
+            }
+            return users.get(index).updateGift(gift);
+        }
+        return false;
+    }
+
     public boolean deleteGiftOfUser(int id, BotUser botUser) {
         if (botUser != null) {
             int index = users.indexOf(botUser);
@@ -52,18 +63,18 @@ public class Storage {
 
     public Optional<BotUser> findUserByUserName(String userName) {
         return users.stream().filter(iteratedUser -> userName.equals(iteratedUser.getUserName()))
-                .findAny();
+            .findAny();
     }
 
     public Optional<BotUser> findUserByTelegramId(long id) {
         return users.stream().filter(iteratedUser -> id == iteratedUser.getTgAccountId())
-                .findAny();
+            .findAny();
     }
 
     public Optional<Gift> findGiftById(int id) {
         BotUser giftHolder = users.stream().filter(iteratedBotUser -> iteratedBotUser.findGiftById(id) != null)
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
         if (giftHolder != null) {
             return Optional.of(giftHolder.findGiftById(id));
         }
@@ -99,8 +110,8 @@ public class Storage {
     public List<BotUser> getUserSubscriptions(BotUser user) {
         if (user != null) {
             return users.stream()
-                    .filter(iteratedUser -> iteratedUser.getSubscribers().contains(user))
-                    .collect(Collectors.toList());
+                .filter(iteratedUser -> iteratedUser.getSubscribers().contains(user))
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
@@ -114,8 +125,8 @@ public class Storage {
 
     public boolean updateUser(BotUser user) {
         BotUser updatedUser = users.stream().filter(iteratedUser -> user.getId() == iteratedUser.getId())
-                .findAny()
-                .orElse(null);
+            .findAny()
+            .orElse(null);
         if (updatedUser != null) {
             return (users.remove(updatedUser) && users.add(user));
         }
@@ -125,20 +136,20 @@ public class Storage {
     public List<Gift> getUserPresentsList(BotUser user) {
         if (user != null) {
             return users.stream()
-                    .map(BotUser::getWishList)
-                    .map(WishList::getGiftList)
-                    .flatMap(Collection::stream)
-                    .filter(gift -> user.equals(gift.occupiedBy()))
-                    .collect(Collectors.toList());
+                .map(BotUser::getWishList)
+                .map(WishList::getGiftList)
+                .flatMap(Collection::stream)
+                .filter(gift -> user.equals(gift.occupiedBy()))
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
 
     public boolean donate(int giftId, BotUser donor) {
         BotUser giftHolder = users.stream()
-                .filter(iteratedUser -> iteratedUser.findGiftById(giftId) != null)
-                .findAny()
-                .orElse(null);
+            .filter(iteratedUser -> iteratedUser.findGiftById(giftId) != null)
+            .findAny()
+            .orElse(null);
         if (giftHolder != null) {
             return giftHolder.donate(giftId, donor);
         }
@@ -147,13 +158,21 @@ public class Storage {
 
     public boolean refuseFromDonate(int giftId, BotUser donor) {
         BotUser giftHolder = users.stream()
-                .filter(iteratedUser -> iteratedUser.findGiftById(giftId) != null)
-                .findAny()
-                .orElse(null);
+            .filter(iteratedUser -> iteratedUser.findGiftById(giftId) != null)
+            .findAny()
+            .orElse(null);
         if (giftHolder != null) {
             return giftHolder.refuseFromDonate(giftId, donor);
         }
         return false;
+    }
+
+    public List<Gift> findAvailableToDonatePresents(BotUser donateTo) {
+        if (users.contains(donateTo)) {
+            int userIndex = users.indexOf(donateTo);
+            return users.get(userIndex).findAvailableToDonatePresents();
+        }
+        return Collections.emptyList();
     }
 
     private boolean isUserSigned(BotUser user) {
@@ -163,12 +182,12 @@ public class Storage {
     private BotUser createUserFromUpdateInfo(Update update) {
         User gotFrom = extractUserInfoFromUpdate(update);
         return BotUser.UserBuilder.newUser()
-                .withTgAccountId(gotFrom.getId())
-                .withTgChatId(extractChatIdFromUpdate(update))
-                .withFirstName(gotFrom.getFirstName())
-                .withLastName(gotFrom.getLastName())
-                .withUserName(gotFrom.getUserName())
-                .build();
+            .withTgAccountId(gotFrom.getId())
+            .withTgChatId(extractChatIdFromUpdate(update))
+            .withFirstName(gotFrom.getFirstName())
+            .withLastName(gotFrom.getLastName())
+            .withUserName(gotFrom.getUserName())
+            .build();
     }
 
     private User extractUserInfoFromUpdate(Update update) { // описаны не все типы ответа! доделать

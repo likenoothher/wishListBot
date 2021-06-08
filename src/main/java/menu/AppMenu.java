@@ -12,25 +12,48 @@ import static menu.Icon.*;
 
 public class AppMenu {
 
-    public SendMessage showMainMenu(String chatId) {
+    public SendMessage showGreetingMenu(String chatId) {
         SendMessage message = new SendMessage();
-        message.setText("Ты в главном меню\n");
+        message.setText("Привет" + HI_ICON + "\nСудя по всему ты здесь в первый раз. Этот бот позволяет создавать" +
+            " свой WishList" + WISH_LIST_ICON + " и делиться им с друзьями " + TWO_GUYS_ICON + " Ты можешь отмечать подарки" + I_PRESENT_ICON + " своих друзей, которые ты планируешь " +
+            "им подарить, после чего они исчезнут из поля видимости остальных подписчиков\n " + POINT_RIGHT_ICON + " Таким образом," +
+            " не случиться ситуации, когда вы с друзьями подарите несколько одинаковых подарков" + SCREAM_CAT_ICON + ", и что более важно," +
+            " твой подарок никогда не будет пылиться на полке человека, которому ты его подарил" + ROCK_ICON + "\nЧтобы начать, кликай на кнопку \n" + RECYCLE_ICON +
+            " \"Открыть главное меню\"\n Более подробно в разделе \n \"" + SETTINGS_ICON + " Настройки -> Помощь\"");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData("Мой WishList " + WISH_LIST_ICON, "/my_wish_list")
-                .buttonWithCallbackData("Я дарю " + I_PRESENT_ICON, "/i_present")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Мои подписчики" + ARROW_LOWER_LEFT_ICON, "/my_subscribers")
-                .buttonWithCallbackData("Мои подписки" + ARROW_UPPER_RIGHT_ICON, "/my_subscriptions")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Найти друга " + FIND_FRIEND_ICON, "/find_friend")
-                .buttonWithCallbackData("Настройки " + SETTINGS_ICON, "/settings")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(RECYCLE_ICON + " Открыть главное меню ", "/main_menu")
+            .endRow()
+
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
+
+        message.setChatId(chatId);
+        return message;
+    }
+
+    public SendMessage showMainMenu(String chatId) {
+        SendMessage message = new SendMessage();
+        message.setText(RECYCLE_ICON + " Ты в главном меню\n");
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Мой WishList " + WISH_LIST_ICON, "/my_wish_list")
+            .buttonWithCallbackData("Я дарю " + I_PRESENT_ICON, "/i_present")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Мои подписчики" + ARROW_LOWER_LEFT_ICON, "/my_subscribers")
+            .buttonWithCallbackData("Мои подписки" + ARROW_UPPER_RIGHT_ICON, "/my_subscriptions")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Найти друга " + FIND_FRIEND_ICON, "/find_friend")
+            .buttonWithCallbackData("Настройки " + SETTINGS_ICON, "/settings")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -43,16 +66,24 @@ public class AppMenu {
         message.setText("Ты сейчас в меню из которого можешь управлять своим WishList'ом");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData("Добавить подарок для себя" + PLUS_MARK_ICON,
-                        "/add_present_for_me")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Удалить подарок из WishList" + MINUS_MARK_ICON,
-                        "/delete_one_of_my_present")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Добавить подарок" + PLUS_MARK_ICON,
+                "/my_wish_list/add_present")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Редактирование подарков " + MANAGING_ICON,
+                "/my_wish_list/manage_list")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Удалить подарок " + MINUS_MARK_ICON,
+                "/my_wish_list/delete_present")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -60,12 +91,57 @@ public class AppMenu {
         return message;
     }
 
-    public SendMessage showAddPresentForMeAddPresentNameMenu(String chatId) {
+    public SendMessage showManagingPresentsInWishListMenu(List<Gift> gifts, String chatId) {
         SendMessage message = new SendMessage();
-        message.setText("Введи название подарка в формате:\n" +
-                "${название подарка}\n" +
-                "(например, $iPhone 125)");
 
+        if (!gifts.isEmpty()) {
+            message.setText(MANAGING_ICON + "Нажми на подарок из списка, который хочешь изменить");
+
+            InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromList(gifts, "/my_wish_list/edit_my_present_under/id/")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_wish_list")
+                .endRow()
+                .build();
+
+            message.setReplyMarkup(replyKeyboard);
+        } else {
+            message.setText("Чтобы что-то изменять сначала нужно что-то добавить " + UPSIDE_DOWN_FACE_ICON);
+        }
+
+        message.setChatId(chatId);
+        return message;
+    }
+
+    public SendMessage showGiftRepresentationMenu(Gift gift, String chatId) {
+        SendMessage message = new SendMessage();
+        String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
+        String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+        message.setText(MANAGING_ICON + " В этом меню ты можешь отредактировать описание и ссылку на подарок \"" +
+            gift.getName() + "\"" +
+            "\nНа текущий момент:" +
+            "\n- описание: " + description +
+            "\n- ссылка: " + url);
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(DESCRIPTION_ICON + " Редактировать описание подарка",
+                "/my_wish_list/edit_description_of_present_under/id/" + gift.getId())
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData(URL_ICON + " Редактировать ссылку на подарок",
+                "/my_wish_list/edit_url_of_present_under/id/" + gift.getId())
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/my_wish_list/manage_list")
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
         message.setChatId(chatId);
         return message;
     }
@@ -77,13 +153,17 @@ public class AppMenu {
             message.setText("Нажми на подарок из списка, который ты хочешь удалить");
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromList(gifts, "/delete_my_present_under/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromList(gifts, "/my_wish_list/delete_my_present_under/id/")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_wish_list")
+                .endRow()
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
-            message.setText("Чтобы что-то удалить сначала нужно что-то добавить" + UPSIDE_DOWN_FACE_ICON);
+            message.setText("Чтобы что-то удалить сначала нужно что-то добавить " + UPSIDE_DOWN_FACE_ICON);
         }
 
         message.setChatId(chatId);
@@ -92,9 +172,10 @@ public class AppMenu {
 
     public SendMessage showUserDeletedPresentYouGoingToDonateMenu(Gift deletedGift, BotUser deletedByUser) {
         SendMessage message = new SendMessage();
-        message.setText(MINUS_MARK_ICON + "Пользователь " + deletedByUser.getUserName() +
-                " удалил подарок \"" + deletedGift.getName() + "\", который ты хотел ему подарить " + MAN_SHRUGGING_ICON + "\n" +
-                "Попробуй выбрать для подарка что-нибудь ещё");
+        message.setText(EXCLAMATION_ICON + "Пользователь " + deletedByUser.getUserName() +
+            " удалил из списка желаний подарок \"" + deletedGift.getName()
+            + "\", который ты хотел ему подарить " + MAN_SHRUGGING_ICON + "\n" +
+            "Попробуй выбрать другой подарок");
 
         message.setChatId(String.valueOf(deletedGift.occupiedBy().getTgChatId()));
         return message;
@@ -105,17 +186,30 @@ public class AppMenu {
 
         if (!gifts.isEmpty()) {
             message.setText("Это подарки, которые ты планируешь подарить." + WISH_LIST_ICON +
-                    "Нажми на подарок из списка, который ты передумал дарить");
+                "Нажми на подарок из списка, который ты передумал дарить");
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromList(gifts, "/delete_i_present_under_number/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromList(gifts, "i_present/delete_gift_under/id/")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/main_menu")
+                .endRow()
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
             message.setText("Это список подарков, который ты мог бы кому-то подарить, но, " +
-                    "к сожалению, здесь пока ничего нет " + MAN_SHRUGGING_ICON);
+                "к сожалению, здесь пока ничего нет " + MAN_SHRUGGING_ICON);
+            InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+                .newInlineKeyboardMarkup()
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/main_menu")
+                .endRow()
+                .build();
+
+            message.setReplyMarkup(replyKeyboard);
         }
 
         message.setChatId(chatId);
@@ -127,14 +221,18 @@ public class AppMenu {
         message.setText("Ты сейчас в меню из которого можешь управлять своими подписчиками");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData(SEE_ICON + "Посмотреть подписчиков", "/show_my_subscribers")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData(MINUS_MARK_ICON + "Удалить подписчиков", "/delete_subscribers")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(SEE_ICON + "Посмотреть подписчиков", "/my_subscribers/show")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData(MINUS_MARK_ICON + "Удалить подписчиков", "/my_subscribers/delete")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -145,20 +243,31 @@ public class AppMenu {
     public SendMessage showMySubscribersListMenu(List<BotUser> subscribers, String chatId) {
         StringBuilder textMessage = new StringBuilder();
         if (!subscribers.isEmpty()) {
-            textMessage.append(TWO_GUYS_ICON + "Список твоих друзей:\n");
+            textMessage.append(TWO_GUYS_ICON + " Список твоих подписчиков:\n");
             for (int i = 0; i < subscribers.size(); i++) {
                 BotUser user = subscribers.get(i);
+                String firstName = user.getFirstName() == null ? "не указано" : user.getFirstName();
                 textMessage.append(i + 1)
-                        .append(".")
-                        .append("User name - " + user.getUserName())
-                        .append("\n")
-                        .append("Имя - " + user.getFirstName());  // Добавить для кого дарит
+                    .append(".")
+                    .append("User name - " + user.getUserName())
+                    .append("\n")
+                    .append("Имя - " + firstName);  // Добавить для кого дарит
             }
         } else {
             textMessage.append(" Кажется на тебя пока никто не подписан" + MAN_SHRUGGING_ICON);
         }
         SendMessage message = new SendMessage();
         message.setText(textMessage.toString());
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/my_subscribers")
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
 
         message.setChatId(chatId);
         return message;
@@ -170,17 +279,21 @@ public class AppMenu {
 
         if (!subscribers.isEmpty()) {
             message.setText(WISH_LIST_ICON + "Это список твоих подписчиков.\n" +
-                    "Нажми на того кто больше тебе не друг и он больше не сможет получить доступ к твоему WishList'у");
+                "Нажми на того кто больше тебе не друг и он больше не сможет получить доступ к твоему WishList'у");
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromUserList(subscribers, "/delete_my_subscriber_with/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromUserList(subscribers, "/my_subscribers/delete_under/id")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscribers")
+                .endRow()
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
-            message.setText("Если хочешь кого-то удалить, то сначала было бы неплохо кого-то добавить"
-                    + UPSIDE_DOWN_FACE_ICON);
+            message.setText("Если хочешь кого-то удалить, то сначала было бы неплохо кого-то добавить "
+                + UPSIDE_DOWN_FACE_ICON);
         }
 
         message.setChatId(chatId);
@@ -189,8 +302,8 @@ public class AppMenu {
 
     public SendMessage showNotificationToDeletedSubscriberMenu(BotUser deletedUser, BotUser deletedByUser) {
         SendMessage message = new SendMessage();
-        message.setText(BROKEN_HEART_ICON + "Пользователь " + deletedByUser.getUserName() +
-                " удалил тебя из списка друзей");
+        message.setText(BROKEN_HEART_ICON + "Пользователь @" + deletedByUser.getUserName() +
+            " удалил тебя из списка друзей");
 
         message.setChatId(String.valueOf(deletedUser.getTgChatId()));
         return message;
@@ -202,14 +315,18 @@ public class AppMenu {
         message.setText("Ты сейчас в меню из которого можешь управлять своими подписками");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData(SEE_ICON + "Посмотреть подписки", "/show_my_subscriptions")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData(MINUS_MARK_ICON + "Отписаться", "/delete_subscriptions")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(SEE_ICON + "Посмотреть подписки", "/my_subscriptions/show")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData(MINUS_MARK_ICON + "Отписаться", "/my_subscriptions/delete")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -221,67 +338,87 @@ public class AppMenu {
         SendMessage message = new SendMessage();
         if (!subscriptions.isEmpty()) {
             message.setText("Это список людей на которых ты подписан.\n" +
-                    "Нажми на имя юзера, чтобы увидеть его WishList" + WISH_LIST_ICON);
+                "Нажми на имя юзера, чтобы увидеть его WishList" + WISH_LIST_ICON);
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromUserList(subscriptions, "/see_wish_list_of_user/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromUserList(subscriptions, "/my_subscriptions/show/id")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscriptions/show")
+                .endRow()
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
-            message.setText("Кажется ты пока ни накого не подписан" + MAN_SHRUGGING_ICON);
+            message.setText("Кажется ты пока ни на кого не подписан" + MAN_SHRUGGING_ICON);
+            InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+                .newInlineKeyboardMarkup()
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscriptions")
+                .endRow()
+                .build();
+
+            message.setReplyMarkup(replyKeyboard);
         }
 
         message.setChatId(chatId);
         return message;
     }
 
-    public SendMessage showUserWishListMenu(BotUser wishListHolder, String chatId) { // поменять бот юзера на лист как и везде
+    public SendMessage showUserWishListMenu(BotUser wishListHolder, String chatId) {
         SendMessage message = new SendMessage();
-        if (wishListHolder != null && !wishListHolder.getWishList().getGiftList().isEmpty()) {
-            List<Gift> gifts = wishListHolder.getWishList().getGiftList();
+        List<Gift> gifts = wishListHolder.findAvailableToDonatePresents();
+        if (!gifts.isEmpty()) {
             message.setText("Это список доступных подарков из WishList'а @" + wishListHolder.getUserName() + "\n" +
-                    "Нажми на подарок, который хочешь подарить");
+                "Нажми на подарок, который хочешь подарить");
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromGiftsList(gifts, "/i_gonna_present/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromGiftsList(gifts, "/my_subscriptions/going_donate/gift_id")
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
             message.setText("Упс... Кажется, @" + wishListHolder.getUserName() + " ничего не добавил в свой WishList," +
-                    "либо все его подарки уже заняты" + MAN_SHRUGGING_ICON);
+                " либо все его подарки уже заняты" + MAN_SHRUGGING_ICON);
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withRow()
-                    .buttonWithCallbackData(ANONIM_ICON +
-                            " Попросить добавить подарок анонимно ", "ask-add-gift-anonym/id/" + wishListHolder.getTgAccountId())
-                    .endRow()
-                    .withRow()
-                    .buttonWithCallbackData(ONE_GUY_ICON +
-                            " Попросить добавить подарок открыто ", "ask-add-gift-explicitly/id/" + wishListHolder.getTgAccountId())
-                    .endRow()
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withRow()
+                .buttonWithCallbackData(ANONIM_ICON +
+                        " Попросить добавить подарок анонимно ",
+                    "/my_subscriptions/ask_add_gift_anonymously/id/" + wishListHolder.getTgAccountId())
+                .endRow()
+                .withRow()
+                .buttonWithCallbackData(ONE_GUY_ICON +
+                        " Попросить добавить подарок открыто ",
+                    "/my_subscriptions/ask_add_gift_explicitly/id/" + wishListHolder.getTgAccountId())
+                .endRow()
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscriptions/show")
+                .endRow()
+                .build();
             message.setReplyMarkup(replyKeyboard);
         }
 
-        message.setChatId(chatId);
-        return message;
-    }
-
-    public SendMessage showAnonimAskAddGiftMenu(String chatId) {
-        SendMessage message = new SendMessage();
-        message.setText(EXCLAMATION_ICON + "Привет" + HI_ICON+ " Кто-то просит добавить какой-нибудь подарок в твой WishList");
 
         message.setChatId(chatId);
         return message;
     }
 
-    public SendMessage showExplicitAskAddGiftMenu( BotUser askedUser) {
+    public SendMessage showAnonymouslyAskAddGiftMenu(BotUser askedUser) {
         SendMessage message = new SendMessage();
-        message.setText(EXCLAMATION_ICON + "Привет" + HI_ICON + "@" + askedUser.getUserName()+" просит добавить подарок в твой WishList");
+        message.setText(EXCLAMATION_ICON + " Кто-то просит добавить подарок в твой WishList");
+
+        message.setChatId(String.valueOf(askedUser.getTgChatId()));
+        return message;
+    }
+
+    public SendMessage showExplicitAskAddGiftMenu(BotUser askedUser) {
+        SendMessage message = new SendMessage();
+        message.setText(EXCLAMATION_ICON + " @" + askedUser.getUserName() + " просит добавить подарок в твой WishList");
 
         message.setChatId(String.valueOf(askedUser.getTgChatId()));
         return message;
@@ -292,38 +429,59 @@ public class AppMenu {
         SendMessage message = new SendMessage();
         if (!subscriptions.isEmpty()) {
             message.setText("Это список людей на которых ты подписан.\n" +
-                    "Нажми на имя юзера, чтобы удалить его из своих подписок" + WISH_LIST_ICON);
+                "Нажми на имя пользователя, чтобы удалить его из своих подписок" + WISH_LIST_ICON);
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                    .newInlineKeyboardMarkup()
-                    .withCallBackButtonsFromUserList(subscriptions, "/delete_my_subscription_with/id")
-                    .build();
+                .newInlineKeyboardMarkup()
+                .withCallBackButtonsFromUserList(subscriptions, "/my_subscriptions/delete_under/id")
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscriptions")
+                .endRow()
+                .build();
 
             message.setReplyMarkup(replyKeyboard);
         } else {
-            message.setText("Кажется ты пока ни накого не подписан" + MAN_SHRUGGING_ICON);
+            message.setText("Чтобы кого-то удалить нужно сначала кого-то добавить" + UPSIDE_DOWN_FACE_ICON);
+            InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+                .newInlineKeyboardMarkup()
+                .withRow()
+                .buttonWithCallbackData("« Назад",
+                    "/my_subscriptions")
+                .endRow()
+                .build();
+
+            message.setReplyMarkup(replyKeyboard);
         }
 
         message.setChatId(chatId);
         return message;
     }
 
-
-    public SendMessage showFindFriendMenu(String chatId) {
-        SendMessage message = new SendMessage();
-        message.setText("Ты сейчас в меню в котором можешь найти своих друзей\n"
-                + "Введи @user_name своего друга по которому его можно найти в Telegram" +
-                " в формате @{user_name} и, если он зарегестрирован в боте, мы отправим " +
-                "ему запрос на добавления тебя в друзья");
-
-        message.setChatId(chatId);
-        return message;
-    }
+//
+//    public SendMessage showFindFriendMenu(String chatId) {
+//        SendMessage message = new SendMessage();
+//        message.setText("Ты сейчас в меню в котором можешь найти своих друзей\n"
+//                + "Введи @user_name своего друга по которому его можно найти в Telegram" +
+//                " в формате @{user_name} и, если он зарегестрирован в боте, мы отправим " +
+//                "ему запрос на добавления тебя в друзья");
+//
+//        message.setChatId(chatId);
+//        return message;
+//    }
 
     public SendMessage showSendRequestMenu(String chatId) {
         SendMessage message = new SendMessage();
         message.setText(CHECK_MARK_ICON
-                + "Запрос отправлен. После принятия заявки WishList будет доступен для просмотра");
+            + "Запрос отправлен. После принятия заявки WishList будет доступен для просмотра");
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .buttonWithCallbackData("« " + RECYCLE_ICON + " В главное меню",
+                "/main_menu")
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
 
         message.setChatId(chatId);
         return message;
@@ -332,22 +490,22 @@ public class AppMenu {
     public SendMessage showFriendShipRequestTo(BotUser toUserName, BotUser fromUserName) {
         SendMessage message = new SendMessage();
         message.setText(PAPERCLIPS_ICON + "️ЗАПРОС НА ДРУЖБУ! " + PAPERCLIPS_ICON + " \n" +
-                HI_ICON + "Привет, " + toUserName.getUserName()
-                + "! Пользователь " + fromUserName.getUserName() + " хочет добавить тебя в друзья");
+            HI_ICON + "Привет, " + toUserName.getUserName()
+            + "! Это @" + fromUserName.getUserName() + ", добавь меня в друзья!");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData(CHECK_MARK_ICON + "Принять",
-                        "/accept_friendship/" + fromUserName.getTgAccountId()
-                                + "/" + toUserName.getTgAccountId())
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData(CROSS_MARK_ICON + "Отклонить",
-                        "/deny_friendship/" + fromUserName.getTgAccountId()
-                                + "/" + toUserName.getTgAccountId())
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(CHECK_MARK_ICON + "Принять",
+                "/find_friend/accept_friendship/" + fromUserName.getTgAccountId()
+                    + "/" + toUserName.getTgAccountId())
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData(CROSS_MARK_ICON + "Отклонить",
+                "/find_friend/deny_friendship/" + fromUserName.getTgAccountId()
+                    + "/" + toUserName.getTgAccountId())
+            .endRow()
+            .build();
 
 
         message.setReplyMarkup(replyKeyboard);
@@ -356,39 +514,48 @@ public class AppMenu {
         return message;
     }
 
-    public SendMessage showAcceptedFriendshipMenu(BotUser acceptedUser, BotUser byUserAccepted) {
+    public SendMessage showFriendShipAcceptedMenu(BotUser byUserAccepted, String chatId) {
         SendMessage message = new SendMessage();
-        message.setText(CHECK_MARK_ICON + "Запрос на дружбу был принят пользователем " + byUserAccepted.getUserName() +
-                ". Его WishList доступен для просмотра");
+        message.setText(CHECK_MARK_ICON + " @" + byUserAccepted.getUserName() + " принял предложение дружбы" +
+            ". Его WishList доступен для просмотра");
 
-        message.setChatId(String.valueOf(acceptedUser.getTgChatId()));
-        return message;
-    }
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Посмотреть " + SEE_ICON,
+                "/my_subscriptions/show/id/" + byUserAccepted.getTgAccountId())
+            .endRow()
+            .build();
 
+        message.setReplyMarkup(replyKeyboard);
 
-    public SendMessage showDeniedFriendshipMenu(BotUser byUserDenied, BotUser userDenied) {
-        SendMessage message = new SendMessage();
-        message.setText(CROSS_MARK_ICON + "Запрос на дружбу был отклонён пользователем " + byUserDenied.getUserName());
-
-        message.setChatId(String.valueOf(userDenied.getTgChatId()));
+        message.setChatId(chatId);
         return message;
     }
 
     public SendMessage showSettingsMenu(String chatId) {
         SendMessage message = new SendMessage();
-        message.setText(SETTINGS_ICON + "Настройки");
+        message.setText(SETTINGS_ICON + "Ты в меню настроек");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData("Настройка уведомлений" + NOTIFICATION_ICON,
-                        "/set_is_ready_receive_update")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Видимость моего WishList'a" + SEE_ICON,
-                        "/set_visibility")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Настройка уведомлений " + NOTIFICATION_ICON,
+                "/settings/set_is_ready_receive_update")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Видимость моего WishList'a" + SEE_ICON,
+                "/settings/set_visibility")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Помощь " + SOS_ICON,
+                "/settings/help")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -399,19 +566,23 @@ public class AppMenu {
     public SendMessage showIsReadyReceiveUpdateMenu(String chatId) {
         SendMessage message = new SendMessage();
         message.setText(NOTIFICATION_ICON + " Хочешь получать уведомления, когда кто-то из твоих друзей " +
-                "добавит новый подарок в свой WishList?");
+            "добавит новый подарок в свой WishList?");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData("Хочу " + THUMB_UP_ICON,
-                        "/set_is_ready_receive_update_true")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Не хочу " + THUMB_DOWN_ICON,
-                        "/set_is_ready_receive_update_false")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Хочу " + THUMB_UP_ICON,
+                "/settings/set_is_ready_receive_update/true")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Не хочу " + THUMB_DOWN_ICON,
+                "/settings/set_is_ready_receive_update/false")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/settings")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
@@ -424,21 +595,39 @@ public class AppMenu {
         message.setText(SEE_ICON + " Кто может видеть твой WishList?");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-                .newInlineKeyboardMarkup()
-                .withRow()
-                .buttonWithCallbackData("Только подписчики " + TWO_GUYS_ICON,
-                        "/set_visibility_subscribers_all_false")
-                .endRow()
-                .withRow()
-                .buttonWithCallbackData("Любой пользователь " + LOT_PEOPLE_ICON,
-                        "/set_visibility_subscribers_all_true")
-                .endRow()
-                .build();
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("Только подписчики " + TWO_GUYS_ICON,
+                "/settings/set_visibility_subscribers_only/false")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Любой пользователь " + LOT_PEOPLE_ICON,
+                "/set_visibility_subscribers_all_true")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/settings")
+            .endRow()
+            .build();
 
         message.setReplyMarkup(replyKeyboard);
 
         message.setChatId(chatId);
         return message;
+    }
+
+    public SendMessage showOkStatusMenu(String text, String chatId) {
+        if (text != null) {
+            return new SendMessage(chatId, CHECK_MARK_ICON + " " + text);
+        }
+        return new SendMessage(chatId, CHECK_MARK_ICON + " Успешно!");
+    }
+
+    public SendMessage showErrorStatusMenu(String text, String chatId) {
+        if (text != null) {
+            return new SendMessage(chatId, CROSS_MARK_ICON + " " + text);
+        }
+        return new SendMessage(chatId, CROSS_MARK_ICON + " Возникла ошибка, операция не выполнена");
     }
 
     public SendMessage showStatusMenu(boolean status, String chatId) {
@@ -471,6 +660,23 @@ public class AppMenu {
             message.setText(CROSS_MARK_ICON + statusError);
         }
 
+        return message;
+    }
+
+    public SendMessage showCustomSingleInlineButton(String text, String buttonText, String callbackData, String chatId) {
+        SendMessage message = new SendMessage();
+        message.setText(text);
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData(buttonText, callbackData)
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
+
+        message.setChatId(chatId);
         return message;
     }
 
