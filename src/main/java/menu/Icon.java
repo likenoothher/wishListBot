@@ -17,6 +17,7 @@ public class Icon {
     public final static String BROKEN_HEART_ICON = " 💔 ";
     public final static String SEE_ICON = " \uD83D\uDC40 ";
     public final static String LOCK_ICON = " \uD83D\uDD10 ";
+    public final static String DIAMOND_ICON = "\uD83D\uDD39";
 
     public final static String MAN_SHRUGGING_ICON = " \uD83E\uDD37\u200D♂ ";
     public final static String MAN_HAND_OVER_MONTH_ICON = " \uD83E\uDD2D ";
@@ -45,4 +46,5 @@ public class Icon {
     public final static String URL_ICON = "\uD83C\uDF0D";
     public final static String KEYBOARD_ICON = "⌨";
     public final static String SOS_ICON = "\uD83C\uDD98";
+    public final static String THUMB_DOWN_POINTER_ICON = "\uD83D\uDC47";
 }

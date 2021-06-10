@@ -67,8 +67,14 @@ public class MessageHandler {
         Optional<BotUser> searchedUser = storage.findUserByUserName(messageText);
         Optional<BotUser> userSearchedTo = storage.findUserByTelegramId(updateSender.getTgAccountId());
 
-        if (searchedUser.isPresent()) {
-            if (!isRequestedUserAlreadyFriend(searchedUser.get(), searchedUser.get())) {
+        if(!searchedUser.isPresent()) {
+            messagesToSend.add(new SendMessage(chatId, "Мы не смогли найти данного пользователя"
+                + DISAPPOINTED_ICON));
+            return messagesToSend;
+        }
+
+        if (!searchedUser.equals(userSearchedTo)) {
+            if (!isRequestedUserAlreadyFriend(updateSender, searchedUser.get())) {
                 messagesToSend.add(menu.showFriendShipRequestTo(searchedUser.get(), userSearchedTo.get())); // message to request receiver
                 messagesToSend.add(menu.showSendRequestMenu(chatId)); // message to request sender
             } else {
@@ -77,7 +83,7 @@ public class MessageHandler {
             }
         } else {
             messagesToSend.add(new SendMessage(chatId,
-                "Мы не нашли пользователя с таким именем " + DISAPPOINTED_ICON + " Но ты можешь его пригласить из главного меню!"));
+                "Ты не помжешь подписаться сам на себя" + UPSIDE_DOWN_FACE_ICON));
         }
 
         BotUser updatedUser = userSearchedTo.get();
@@ -86,6 +92,36 @@ public class MessageHandler {
 
         return messagesToSend;
 
+    }
+
+    private List<BotApiMethod> handleAddingGiftNameRequest(Update update, BotUser updateSender) {
+        List<BotApiMethod> messagesToSend = new ArrayList<>();
+        String chatId = extractChatId(update);
+        String messageText = update.getMessage().getText();
+        String inlineMessageId = updateSender.getCarryingUpdate().getCallbackQuery().getInlineMessageId();
+        int messageId = updateSender.getCarryingUpdate().getCallbackQuery().getMessage().getMessageId();
+
+        Gift gift = Gift.GiftBuilder.newGift().withName(messageText).build();
+
+        boolean isAdded = storage.addGiftToUser(gift, updateSender);
+        updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
+        storage.updateUser(updateSender);
+
+        if (isAdded) {
+            List<Gift> gifts = updateSender.getWishList().getGiftList();
+
+            messagesToSend.add(menu.showMyWishListMenu(gifts, chatId, messageId, inlineMessageId));
+            List<BotUser> subscribers = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getSubscribers();
+            for (BotUser subscriber : subscribers) {
+                if (subscriber.isReadyReceiveUpdated()) {
+                    messagesToSend.add(new SendMessage(String.valueOf(subscriber.getTgChatId()),
+                        EXCLAMATION_ICON + "Пользователь @" + updateSender.getUserName() +
+                            " добавил новый подарок в свой WishList"));
+                }
+            }
+        }
+
+        return messagesToSend;
     }
 
     private List<BotApiMethod> handleAddingGiftDescriptionRequest(Update update, BotUser updateSender) {
@@ -102,7 +138,9 @@ public class MessageHandler {
             giftHolder.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
             storage.updateUser(giftHolder);
             if (isDescriptionAdded) {
-                messagesToSend.add(menu.showOkStatusMenu("Описание подарка \"" + updatedGift.getName() + "\" изменено", chatId));
+                int messageId = giftHolder.getCarryingUpdate().getCallbackQuery().getMessage().getMessageId();
+                String inlineMessageId = giftHolder.getCarryingUpdate().getCallbackQuery().getInlineMessageId();
+                messagesToSend.add(menu.showGiftRepresentationMenu(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.showErrorStatusMenu("Описание подарка не изменено. Произошла ошибка", chatId));
             }
@@ -112,39 +150,6 @@ public class MessageHandler {
         return messagesToSend;
     }
 
-    private List<BotApiMethod> handleAddingGiftNameRequest(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        String chatId = extractChatId(update);
-        String messageText = update.getMessage().getText();
-
-        Gift gift = Gift.GiftBuilder.newGift().withName(messageText).build();
-
-        boolean isAdded = storage.addGiftToUser(gift, updateSender);
-        updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
-        storage.updateUser(updateSender);
-
-        if (isAdded) {
-            messagesToSend.add(menu.showCustomSingleInlineButton("Подарок добавлен в твой WishList. Добавить " +
-                    "описание и ссылку на подарок, можно в  " + WISH_LIST_ICON + " \"Мой WishList \"->"
-                    + MANAGING_ICON + " Редактирование подарков\"", "Редактирование подарков " + MANAGING_ICON,
-                "/my_wish_list/manage_list", chatId));
-//            messagesToSend.add(menu.showOkStatusMenu("Подарок добавлен в твой WishList. Добавить " +
-//                    "описание и ссылку на подарок, можно в  " + WISH_LIST_ICON + " \"Мой WishList \"->"
-//                    + MANAGING_ICON + " Редактирование подарков\"",
-//                chatId));
-
-            List<BotUser> subscribers = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getSubscribers();
-            for (BotUser subscriber : subscribers) {
-                if (subscriber.isReadyReceiveUpdated()) {
-                    messagesToSend.add(new SendMessage(String.valueOf(subscriber.getTgChatId()),
-                        EXCLAMATION_ICON + "Пользователь @" + updateSender.getUserName() +
-                            " добавил новый подарок в свой WishList"));
-                }
-            }
-        }
-
-        return messagesToSend;
-    }
 
     private List<BotApiMethod> handleAddingGiftURLRequest(Update update, BotUser updateSender) {
         List<BotApiMethod> messagesToSend = new ArrayList<>();
@@ -160,7 +165,9 @@ public class MessageHandler {
             giftHolder.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
             storage.updateUser(giftHolder);
             if (isDescriptionAdded) {
-                messagesToSend.add(menu.showOkStatusMenu("Ссылка подарка \"" + updatedGift.getName() + "\" изменена", chatId));
+                int messageId = giftHolder.getCarryingUpdate().getCallbackQuery().getMessage().getMessageId();
+                String inlineMessageId = giftHolder.getCarryingUpdate().getCallbackQuery().getInlineMessageId();
+                messagesToSend.add(menu.showGiftRepresentationMenu(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.showErrorStatusMenu("Ссылка подарка не изменена. Произошла ошибка", chatId));
             }
@@ -177,7 +184,7 @@ public class MessageHandler {
         String messagePrefix = messageText.substring(0, 1);
 
         if (messageText.equals("/start")) {
-            messagesToSend.add(menu.showGreetingMenu(chatId));
+            messagesToSend.add(menu.showGreetingMenu(chatId, updateSender));
             //return messages to send?
         }
 
@@ -186,14 +193,6 @@ public class MessageHandler {
             //return messages to send?
         }
 
-//        if (messagePrefix.equals("@")) {
-//            if (messageText.substring(1).equals(updateSender.getUserName())) {
-//                messagesToSend.addAll(List.of(new SendMessage(chatId,
-//                    "Извини, я не могу добавить тебя в друзья к самому себе" + MAN_SHRUGGING_ICON)));
-//            } else {
-//                messagesToSend.addAll(handleAddSubscriberPrefixMessage(messageText, updateSender, chatId));
-//            }
-//        }
         return messagesToSend;
     }
 
