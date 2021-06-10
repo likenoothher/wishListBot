@@ -1,5 +1,7 @@
 package model;
 
+import org.telegram.telegrambots.meta.api.objects.Update;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,8 @@ public class BotUser {
     private boolean isAllCanSeeMyWishList;
     private BotUserStatus botUserStatus;
     private int updateGiftId;
+    private Update preCarryingUpdate;
+    private Update carryingUpdate;
 
     private BotUser(long id, String userName, String firstName, String lastName, long tgAccountId,
                     long thChatId, String phoneNumber) {
@@ -171,6 +175,22 @@ public class BotUser {
 
     public void setUpdateGiftId(int updateGiftId) {
         this.updateGiftId = updateGiftId;
+    }
+
+    public Update getPreCarryingUpdate() {
+        return preCarryingUpdate;
+    }
+
+    public void setPreCarryingUpdate(Update preCarryingUpdate) {
+        this.preCarryingUpdate = preCarryingUpdate;
+    }
+
+    public Update getCarryingUpdate() {
+        return carryingUpdate;
+    }
+
+    public void setCarryingUpdate(Update carryingUpdate) {
+        this.carryingUpdate = carryingUpdate;
     }
 
     @Override

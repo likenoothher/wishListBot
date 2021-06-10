@@ -2,7 +2,6 @@ package data;
 
 import model.BotUser;
 import model.Gift;
-import model.WishList;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
@@ -81,6 +80,11 @@ public class Storage {
         return Optional.empty();
     }
 
+    public Optional<BotUser> findGiftHolderByGiftId(int id) {
+        return users.stream().filter(iteratedBotUser -> iteratedBotUser.findGiftById(id) != null)
+            .findAny();
+    }
+
     public boolean addSubscriberToSubscriptions(BotUser subscriber, BotUser subscribedTo) {
         if (subscriber != null && subscribedTo != null) {
             int indexOfSubscribedTo = users.indexOf(subscribedTo);
@@ -133,16 +137,19 @@ public class Storage {
         return false;
     }
 
-    public List<Gift> getUserPresentsList(BotUser user) {
+    public Map<BotUser, List<Gift>> getUserPresentsMap(BotUser user) {
+        Map<BotUser, List<Gift>> iPresentMap = new HashMap<>();
         if (user != null) {
-            return users.stream()
-                .map(BotUser::getWishList)
-                .map(WishList::getGiftList)
-                .flatMap(Collection::stream)
-                .filter(gift -> user.equals(gift.occupiedBy()))
-                .collect(Collectors.toList());
+            users.stream()
+                .forEach(iteratedUser -> {
+                    List<Gift> iteratedUserGiftsUserDonates = iteratedUser.getWishList().getGiftList().stream()
+                        .filter(gift -> user.equals(gift.occupiedBy())).collect(Collectors.toList());
+                    if (!iteratedUserGiftsUserDonates.isEmpty()) {
+                        iPresentMap.put(iteratedUser, iteratedUserGiftsUserDonates);
+                    }
+                });
         }
-        return Collections.emptyList();
+        return iPresentMap;
     }
 
     public boolean donate(int giftId, BotUser donor) {
