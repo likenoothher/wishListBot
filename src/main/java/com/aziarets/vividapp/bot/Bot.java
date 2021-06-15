@@ -1,0 +1,44 @@
+package com.aziarets.vividapp.bot;
+
+import com.aziarets.vividapp.handler.UpdateHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.List;
+
+@Component
+public class Bot extends TelegramLongPollingBot {
+
+    private UpdateHandler handler;
+
+    @Autowired
+    public Bot(UpdateHandler handler) {
+        this.handler = handler;
+    }
+
+    public String getBotUsername() {
+        return "Vivid";
+    }
+
+    public String getBotToken() {
+        return "1899375504:AAE-M6_miu3OytFn9pt_otNdniFK82Pb7Kg";
+    }
+
+    public void onUpdateReceived(Update update) {
+        List<BotApiMethod> messages = handler.handleUpdate(update);
+        EditMessageText editMessageText = new EditMessageText();
+        for (BotApiMethod message : messages) {
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+}
