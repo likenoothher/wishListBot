@@ -23,7 +23,8 @@ public class AppMenu {
             "им подарить, после чего они исчезнут из поля видимости остальных подписчиков\n " + POINT_RIGHT_ICON + " Таким образом" +
             " не случиться ситуации, когда вы с друзьями подарите несколько одинаковых подарков" + SCREAM_CAT_ICON + ", и что более важно," +
             " твой подарок никогда не будет пылиться на полке человека, которому ты его подарил" + ROCK_ICON + "\nЧтобы начать, кликай на кнопку \n" + RECYCLE_ICON +
-            " \"Открыть главное меню\"\n Более подробно в разделе \n \"" + SETTINGS_ICON + " Настройки -> Помощь\"");
+            " \"Открыть главное меню\"\n Если ты нашёл баг или хочешь оставить отзыв о пользовании ботом, то в \n \"" + SETTINGS_ICON + " Настройки -> Написать разработчику\" ты можешь написать об этом " +
+            "разработчику - он всё исправит" + UPSIDE_DOWN_FACE_ICON);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -625,10 +626,10 @@ public class AppMenu {
             .buttonWithCallbackData("Видимость моего WishList'a" + SEE_ICON,
                 "/settings/set_visibility")
             .endRow()
-//            .withRow()
-//            .buttonWithCallbackData("Помощь " + SOS_ICON,
-//                "/settings/help")
-//            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Написать разработчику " + SOS_ICON,
+                "/settings/contact_developer")
+            .endRow()
             .withRow()
             .buttonWithCallbackData("« Назад",
                 "/main_menu")

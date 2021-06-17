@@ -83,8 +83,6 @@ public class Storage {
     }
 
     public boolean removeSubscriberFromSubscriptions(BotUser subscriber, BotUser subscribedTo) {
-        System.out.println("from remove - " + subscriber.tString());
-        System.out.println("from remove - " + subscribedTo.tString());
         if (subscriber != null && subscribedTo != null) {
             List<Gift> subscribedToGifts = subscribedTo.getWishList().getGiftList();
             for(Gift gift: subscribedToGifts) {

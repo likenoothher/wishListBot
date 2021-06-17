@@ -46,9 +46,7 @@ public class GiftRepoImpl implements GiftRepo{
         Transaction transaction = null;
         try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
-            System.out.println("in update gift before");
             session.merge(gift);
-            System.out.println("in update gift after");
             transaction.commit();
             session.close();
             return true;

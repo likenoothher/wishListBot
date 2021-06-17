@@ -48,7 +48,6 @@ public class BotUserRepoImpl implements BotUserRepo {
         Transaction transaction = null;
         try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
-            System.out.println("from update" + botUser.tString());
             session.merge(botUser);
             transaction.commit();
             session.close();

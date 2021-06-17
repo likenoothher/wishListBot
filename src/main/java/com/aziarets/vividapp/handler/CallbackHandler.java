@@ -438,6 +438,14 @@ public class CallbackHandler {
 //            messagesToSend.add(new SendMessage(chatId, "Серьёзно планировала здесь что то увидеть?\uD83D\uDE06"));
 //        }
 
+        if (callbackData.equals("/settings/contact_developer")) {
+            updateSender.setBotUserStatus(BotUserStatus.CONTACTING_DEVELOPER);
+            storage.updateUser(updateSender);
+            messagesToSend.add(callbackAnswer(update));
+            messagesToSend.add(new SendMessage(chatId, "Напиши своё обращение к разработчику и отправь"));
+        }
+
+
         if (callbackData.equals("/settings/set_is_ready_receive_update")) {
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.showIsReadyReceiveUpdateMenu(chatId, messageId, inlineMessageId));
