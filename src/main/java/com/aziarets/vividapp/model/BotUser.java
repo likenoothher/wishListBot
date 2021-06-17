@@ -135,8 +135,6 @@ public class BotUser {
     }
 
     public boolean removeSubscriber(BotUser subscriber) {
-        System.out.println("from remive sub -" + subscribers);
-        System.out.println("from remive sub -" + subscriber.tString());
         if (subscribers.contains(subscriber)) {
             return (subscribers.remove(subscriber) && setFreeGiftOccupationFromDeletedSubscriber(subscriber));
         }

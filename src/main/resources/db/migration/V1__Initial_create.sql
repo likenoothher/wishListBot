@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS wishlists
 (
     id serial primary key not null,
     wishlist_holder bigint,
-    FOREIGN KEY (wishlist_holder) REFERENCES users(wishlist_id)
+    FOREIGN KEY (wishlist_holder) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS gifts

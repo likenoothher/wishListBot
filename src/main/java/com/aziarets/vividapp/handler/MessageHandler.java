@@ -56,6 +56,10 @@ public class MessageHandler {
             messagesToSend.addAll(handleSearchingFriendRequest(update, updateSender));
         }
 
+        if (updateSender.getBotUserStatus().equals(BotUserStatus.CONTACTING_DEVELOPER)) {
+            messagesToSend.addAll(handleContactDeveloperRequest(update, updateSender));
+        }
+
         if (!messagesToSend.isEmpty()) {
             return messagesToSend;
         }
@@ -89,6 +93,23 @@ public class MessageHandler {
             messagesToSend.add(new SendMessage(chatId,
                 "Ты не можешь подписаться сам на себя" + UPSIDE_DOWN_FACE_ICON));
         }
+        BotUser updatedUser = userSearchedTo.get();
+        updatedUser.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
+        storage.updateUser(updatedUser);
+        return messagesToSend;
+
+    }
+
+    private List<BotApiMethod> handleContactDeveloperRequest(Update update, BotUser updateSender) {
+        List<BotApiMethod> messagesToSend = new ArrayList<>();
+        String chatId = extractChatId(update);
+        String messageText = update.getMessage().getText();
+
+        messagesToSend.add(new SendMessage("988800148", "Сообщение от @" + updateSender.getUserName() +
+            ":" + messageText));
+        messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Твоё сообщение отправлено разработчику"));
+
+        Optional<BotUser> userSearchedTo = storage.findUserByTelegramId(updateSender.getTgAccountId());
         BotUser updatedUser = userSearchedTo.get();
         updatedUser.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
         storage.updateUser(updatedUser);
