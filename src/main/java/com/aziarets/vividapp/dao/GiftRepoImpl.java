@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,97 +25,54 @@ public class GiftRepoImpl implements GiftRepo{
 
     @Override
     public long save(Gift gift) {
-        Transaction transaction = null;
-        long id = 0;
-        try (Session session = factory.openSession()) {
-            transaction = session.beginTransaction();
-            id = (Long)session.save(gift);
-            transaction.commit();
-            session.close();
-            return id;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return id;
+        factory.getCurrentSession().saveOrUpdate(gift);
+        return gift.getId();
     }
 
     @Override
     public boolean update(Gift gift) {
-        Transaction transaction = null;
-        try (Session session = factory.openSession()) {
-            transaction = session.beginTransaction();
-            session.merge(gift);
-            transaction.commit();
-            session.close();
-            return true;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return false;
+        factory.getCurrentSession().saveOrUpdate(gift);
+        return gift.getId() == 0 ? false : true;
     }
 
     @Override
     public boolean remove(long id) {
-        Transaction transaction = null;
-        try (Session session = factory.openSession()) {
-            transaction = session.beginTransaction();
-            Gift deletedGift = getById(id);
-            session.remove(deletedGift);
-            transaction.commit();
-            session.close();
-            return true;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return false;
+        factory.getCurrentSession().remove(factory.getCurrentSession().get(Gift.class, id));
+        return true; // переделать
     }
 
     @Override
     public Gift getById(long id) {
-        Gift gift = null;
-        Transaction transaction = null;
-        try (Session session = factory.openSession()) {
-            transaction = session.beginTransaction();
-            gift = (Gift) session.get(Gift.class, id);
-            transaction.commit();
-            session.close();
-            return gift;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return gift;
+        return factory.getCurrentSession().get(Gift.class, id);
     }
 
     @Override
     public List<Gift> getPresentsUserGoingDonate(long userId) {
-        Session session = factory.openSession();
-        Query query = session.createQuery("from Gift where occupiedBy.id = :id");
+        Query query = factory.getCurrentSession().createQuery("from Gift where occupiedBy.id = :id");
         query.setParameter("id", userId);
-        List<Gift> gifts = query.getResultList();
-        session.close();
+        return query.getResultList();
 
-        return gifts;
     }
 
     @Override
-    public List<Gift> findAvailableToDonatePresents(long userTelegramId) {
-        Session session = factory.openSession();
-        Query query = session.createQuery("from Gift where occupiedBy.id = null ");
-        List<Gift> gifts = query.getResultList();
-        session.close();
+    public List<Gift> getAvailableToDonatePresents(long userTelegramId) {
+        Query query = factory.getCurrentSession().createQuery("from Gift where occupiedBy.id = null ");
+        return query.getResultList();
+    }
 
-        return gifts;
+    @Override
+    public List<Gift> getUserWishListPresents(long tgAccountId) {
+        try {
+            Query query = factory.getCurrentSession().createQuery("select botuser.wishList.giftList from BotUser botuser\n" +
+                "where botuser.tgAccountId = :tgAccountId")
+                .setParameter("tgAccountId", tgAccountId);
+
+            List<Gift> gifts = query.getResultList();
+            return gifts;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 }

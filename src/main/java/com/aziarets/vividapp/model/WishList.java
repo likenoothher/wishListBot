@@ -34,61 +34,6 @@ public class WishList {
         return false;
     }
 
-    public boolean updateGift(Gift gift) {
-        Gift updatedGift = giftList.stream().filter(iteratedGift -> iteratedGift.getId() == gift.getId())
-            .findAny()
-            .orElse(null);
-        if (updatedGift != null) {
-            return (giftList.remove(updatedGift) && giftList.add(gift));
-        }
-        return false;
-    }
-
-    public boolean deleteGift(int id) {
-        Gift giftForDelete = giftList.stream().filter(gift -> id == gift.getId())
-            .findAny()
-            .orElse(null);
-        if (giftForDelete != null) {
-            return giftList.remove(giftForDelete);
-        }
-        return false;
-    }
-
-    public boolean donate(int giftId, BotUser donor) {
-        Gift giftForDonate = giftList.stream().filter(gift -> giftId == gift.getId())
-            .findAny()
-            .orElse(null);
-        if (giftForDonate != null) {
-            return giftForDonate.donate(donor);
-        }
-        return false;
-    }
-
-    public boolean refuseFromDonate(int giftId, BotUser donor) {
-        Gift giftForDelete = giftList.stream().filter(gift -> giftId == gift.getId())
-            .findAny()
-            .orElse(null);
-        if (giftForDelete != null) {
-            return giftForDelete.refuseFromDonate(donor);
-        }
-        return false;
-    }
-
-    public boolean setFreeGiftOccupationFromDeletedSubscriber(BotUser subscriber) {
-        if (subscriber != null) {
-            giftList.stream().filter(iteratedGift -> subscriber.equals(iteratedGift.getOccupiedBy()))
-                .forEach(giftOccupiedBySubscriber -> giftOccupiedBySubscriber.refuseFromDonate(subscriber));
-            return true;
-        }
-        return false;
-    }
-
-    public Gift findGiftById(int id) {
-        return giftList.stream().filter(gift -> id == gift.getId())
-            .findAny()
-            .orElse(null);
-    }
-
     public long getId() {
         return id;
     }
@@ -110,22 +55,21 @@ public class WishList {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WishList wishList = (WishList) o;
-        return id == wishList.id &&
-            Objects.equals(giftList, wishList.giftList);
+        return id == wishList.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, giftList);
+        return Objects.hash(id);
     }
 
-//    @Override
-//    public String toString() {
-//        return "WishList{" +
-//            "id=" + id +
-//            ", giftList=" + giftList +
-//            '}';
-//    }
+    @Override
+    public String toString() {
+        return "WishList{" +
+            "id=" + id +
+            ", giftList=" + giftList +
+            '}';
+    }
 
     public static final class WishListBuilder {
         private int id;

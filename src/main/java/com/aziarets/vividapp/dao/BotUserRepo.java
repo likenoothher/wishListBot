@@ -15,5 +15,6 @@ public interface BotUserRepo {
     public boolean isUserExist(long telegramId);
     public BotUser findGiftHolderByGiftId(long giftId);
     public List<BotUser> getUserSubscriptions(BotUser user);
+    public List<BotUser> getUserSubscribers(BotUser user);
 
 }

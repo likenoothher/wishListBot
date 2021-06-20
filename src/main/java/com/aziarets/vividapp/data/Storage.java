@@ -6,10 +6,11 @@ import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import javax.transaction.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ public class Storage {
 
     public boolean addGiftToUser(Gift gift, BotUser botUser) {
         WishList wishList = wishListRepo.getById(botUser.getWishList().getId());
+        System.out.println(wishList != null);
         if (wishList != null) {
             giftRepo.save(gift);
             wishList.addGift(gift); //null check
@@ -59,14 +61,21 @@ public class Storage {
     }
 
     public Optional<BotUser> findUserByUserName(String userName) {
-        return Optional.of(userRepo.getByUserName(userName));
+        System.out.println(userRepo.getByUserName(userName));
+        BotUser user = userRepo.getByUserName(userName);
+        if (user != null) {
+            return  Optional.of(user);
+        }
+        return Optional.empty();
     }
 
-    public Optional<BotUser> findUserByTelegramId(long id) {
-        return Optional.of(userRepo.getByTelegramId(id));
+    public Optional<BotUser> findUserByTelegramId(long telegramId) {
+        BotUser user = userRepo.getByTelegramId(telegramId);
+        return Optional.of(user);
     }
 
     public Optional<Gift> findGiftById(long id) {
+
         return Optional.of(giftRepo.getById(id));
     }
 
@@ -76,23 +85,29 @@ public class Storage {
 
     public boolean addSubscriberToSubscriptions(BotUser subscriber, BotUser subscribedTo) {
         if (subscriber != null && subscribedTo != null) {
-            subscribedTo.addSubscriber(subscriber);
-            return userRepo.update(subscribedTo);
+            BotUser us = findUserByTelegramId(subscriber.getTgAccountId()).get();
+            BotUser usTo = findUserByTelegramId(subscribedTo.getTgAccountId()).get();
+            usTo.getSubscribers().add(us);
+            return userRepo.update(usTo);
         }
         return false;
     }
 
     public boolean removeSubscriberFromSubscriptions(BotUser subscriber, BotUser subscribedTo) {
         if (subscriber != null && subscribedTo != null) {
-            List<Gift> subscribedToGifts = subscribedTo.getWishList().getGiftList();
+            List<Gift> subscribedToGifts = getUserWishListGifts(subscribedTo.getTgAccountId());
             for(Gift gift: subscribedToGifts) {
-                if(gift.getOccupiedBy().equals(subscriber)) {
+                if(subscriber.equals(gift.getOccupiedBy())) {
                     gift.setOccupiedBy(null);
                     giftRepo.update(gift);
                 }
             }
-            subscribedTo.removeSubscriber(subscriber);
-            return userRepo.update(subscribedTo);
+            BotUser us = findUserByTelegramId(subscriber.getTgAccountId()).get();
+            BotUser usTo = findUserByTelegramId(subscribedTo.getTgAccountId()).get();
+            List<BotUser> subscribers = getUserSubscribers(usTo);
+            subscribers.remove(us);
+            usTo.setSubscribers(subscribers);
+            return userRepo.update(usTo);
         }
         return false;
     }
@@ -106,6 +121,23 @@ public class Storage {
             return userRepo.getUserSubscriptions(user);
         }
         return Collections.emptyList();
+    }
+
+    public List<BotUser> getUserSubscribers(BotUser user) {
+        if (user != null) {
+            return userRepo.getUserSubscribers(user);
+        }
+        return Collections.emptyList();
+    }
+
+    public List<Gift> getUserWishListGifts(long userId) {
+        List<Gift> gifts = giftRepo.getUserWishListPresents(userId);
+        return gifts;
+    }
+
+    public List<Gift> getAvailableToDonateGifts(long userId) {
+        List<Gift> gifts = giftRepo.getAvailableToDonatePresents(userId);
+        return gifts;
     }
 
     private boolean addUser(BotUser user) {
@@ -141,54 +173,8 @@ public class Storage {
         return false;
     }
 
-    public List<Gift> findAvailableToDonatePresents(BotUser donateTo) {
-        return giftRepo.findAvailableToDonatePresents(donateTo.getTgAccountId());
-    }
-
     private boolean isUserSigned(BotUser user) {
         return userRepo.isUserExist(user.getTgAccountId());
     }
 
-    private BotUser createUserFromUpdateInfo(Update update) {
-        User gotFrom = extractUserInfoFromUpdate(update);
-        return BotUser.UserBuilder.newUser()
-            .withTgAccountId(gotFrom.getId())
-            .withTgChatId(extractChatIdFromUpdate(update))
-            .withFirstName(gotFrom.getFirstName())
-            .withLastName(gotFrom.getLastName())
-            .withUserName(gotFrom.getUserName())
-            .build();
-    }
-
-    private User extractUserInfoFromUpdate(Update update) { // описаны не все типы ответа! доделать
-        UpdateType updateType = getUpdateType(update);
-        if (updateType.equals(UpdateType.CALLBACK)) {
-            return update.getCallbackQuery().getFrom();
-        }
-        if (updateType.equals(UpdateType.MESSAGE)) {
-            return update.getMessage().getFrom();
-        }
-        if (updateType.equals(UpdateType.EDITED_MESSAGE)) {
-            return update.getEditedMessage().getFrom();
-        }
-        return update.getInlineQuery().getFrom();
-    }
-
-    private long extractChatIdFromUpdate(Update update) { // описаны не все типы ответа! доделать
-        UpdateType updateType = getUpdateType(update);
-        if (updateType.equals(UpdateType.CALLBACK)) {
-            return update.getCallbackQuery().getMessage().getChatId();
-        }
-        if (updateType.equals(UpdateType.MESSAGE)) {
-            return update.getMessage().getChatId();
-        }
-        return update.getEditedMessage().getChatId();
-    }
-
-    private UpdateType getUpdateType(Update update) {
-        if (update.hasMessage()) return UpdateType.MESSAGE;
-        if (update.hasCallbackQuery()) return UpdateType.CALLBACK;
-        if (update.hasEditedMessage()) return UpdateType.EDITED_MESSAGE;
-        return UpdateType.INLINE_QUERY;
-    }
 }

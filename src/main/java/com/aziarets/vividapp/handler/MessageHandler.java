@@ -7,9 +7,11 @@ import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import static com.aziarets.vividapp.menu.Icon.*;
 
 @Component
+@Transactional
 public class MessageHandler {
     private Storage storage;
     private AppMenu menu;
@@ -129,12 +132,10 @@ public class MessageHandler {
         boolean isAdded = storage.addGiftToUser(gift, updateSender);
         updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
         storage.updateUser(updateSender);
-
         if (isAdded) {
-            List<Gift> gifts = updateSender.getWishList().getGiftList();
-
+            List<Gift> gifts = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getWishList().getGiftList();
             messagesToSend.add(menu.showMyWishListMenu(gifts, chatId, messageId, inlineMessageId));
-            List<BotUser> subscribers = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getSubscribers();
+            List<BotUser> subscribers = storage.getUserSubscribers(updateSender);
             for (BotUser subscriber : subscribers) {
                 if (subscriber.isReadyReceiveUpdates()) {
                     messagesToSend.add(new SendMessage(String.valueOf(subscriber.getTgChatId()),
@@ -231,6 +232,6 @@ public class MessageHandler {
     }
 
     private boolean isRequestedUserAlreadyFriend(BotUser requestSender, BotUser requestReceiver) {
-        return requestReceiver.getSubscribers().contains(requestSender);
+        return storage.getUserSubscribers(requestReceiver).contains(requestSender);
     }
 }

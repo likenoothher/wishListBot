@@ -33,23 +33,6 @@ public class Gift {
     }
 
     public Gift() {
-
-    }
-
-    public boolean donate(BotUser donor) {
-        if (donor != null && occupiedBy == null) {
-            occupiedBy = donor;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean refuseFromDonate(BotUser donor) {
-        if (donor != null && occupiedBy.equals(donor)) {
-            occupiedBy = null;
-            return true;
-        }
-        return false;
     }
 
     public long getId() {
@@ -93,6 +76,7 @@ public class Gift {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Gift gift = (Gift) o;
+
         return id == gift.id &&
             Objects.equals(name, gift.name) &&
             Objects.equals(url, gift.url) &&
@@ -104,24 +88,23 @@ public class Gift {
     public int hashCode() {
         return Objects.hash(id, name, url, occupiedBy, description);
     }
-//
-//    @Override
-//    public String toString() {
-//        return "Gift{" +
-//            "id=" + id +
-//            ", name='" + name + '\'' +
-//            ", url=" + url +
-//            ", occupiedBy=" + occupiedBy +
-//            ", description='" + description + '\'' +
-//            '}';
-//    }
+
+    @Override
+    public String toString() {
+        return "Gift{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", url='" + url + '\'' +
+            ", occupiedBy=" + occupiedBy +
+            ", description='" + description + '\'' +
+            '}';
+    }
 
     public static final class GiftBuilder {
         private int id;
         private String name;
         private String url;
         private BotUser occupiedBy;
-        private int price;
         private String description;
 
         private GiftBuilder() {
