@@ -29,7 +29,7 @@ public class BotUser {
     @Column(name = "tgChatId")
     private long tgChatId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "wishlist_id")
     private WishList wishList;
 
@@ -39,8 +39,11 @@ public class BotUser {
         inverseJoinColumns = @JoinColumn(name = "subscriber_id"))
     private List<BotUser> subscribers;
 
-    @ManyToMany(mappedBy = "subscribers")
-    private List<BotUser> subscriptions;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "user_subscribers",
+        joinColumns = @JoinColumn(name = "subscriber_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<BotUser> subscriptions;
 
     @Column(name = "update_ready")
     private boolean isReadyReceiveUpdates;
@@ -89,63 +92,6 @@ public class BotUser {
         this.updateGiftId = updateGiftId;
         this.carryingMessageId = carryingMessageId;
         this.carryingInlineMessageId = carryingInlineMessageId;
-    }
-
-    public boolean addGift(Gift gift) {
-        if (gift != null) {
-            return wishList.addGift(gift);
-        }
-        return false;
-    }
-
-    public boolean updateGift(Gift gift) {
-        if (gift != null) {
-            return wishList.updateGift(gift);
-        }
-        return false;
-    }
-
-    public boolean deleteGift(int id) {
-        return wishList.deleteGift(id);
-    }
-
-    public boolean donate(int giftId, BotUser donor) {
-        if (donor != null) {
-            return wishList.donate(giftId, donor);
-        }
-        return false;
-    }
-
-    public boolean refuseFromDonate(int giftId, BotUser donor) {
-        if (donor != null) {
-            return wishList.refuseFromDonate(giftId, donor);
-        }
-        return false;
-    }
-
-    public Gift findGiftById(int id) {
-        return wishList.findGiftById(id);
-    }
-
-    public boolean addSubscriber(BotUser subscriber) {
-        if (!subscribers.contains(subscriber)) {
-            return subscribers.add(subscriber);
-        }
-        return false;
-    }
-
-    public boolean removeSubscriber(BotUser subscriber) {
-        if (subscribers.contains(subscriber)) {
-            return (subscribers.remove(subscriber) && setFreeGiftOccupationFromDeletedSubscriber(subscriber));
-        }
-        return false;
-    }
-
-    private boolean setFreeGiftOccupationFromDeletedSubscriber(BotUser subscriber) {
-        if (subscriber != null) {
-            return this.wishList.setFreeGiftOccupationFromDeletedSubscriber(subscriber);
-        }
-        return false;
     }
 
     public List<Gift> findAvailableToDonatePresents() {
@@ -270,6 +216,19 @@ public class BotUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BotUser user = (BotUser) o;
+//        System.out.println(id == user.id);
+//        System.out.println(tgChatId == user.tgChatId);
+//        System.out.println(isReadyReceiveUpdates == user.isReadyReceiveUpdates);
+//        System.out.println(isAllCanSeeMyWishList == user.isAllCanSeeMyWishList);
+//        System.out.println(updateGiftId == user.updateGiftId);
+//        System.out.println(carryingMessageId == user.carryingMessageId);
+//        System.out.println(Objects.equals(userName, user.userName));
+//        System.out.println(Objects.equals(firstName, user.firstName));
+//        System.out.println(Objects.equals(lastName, user.lastName));
+//        System.out.println(botUserStatus == user.botUserStatus);
+//        System.out.println(Objects.equals(wishList, user.wishList));
+//        System.out.println(Objects.equals(carryingInlineMessageId, user.carryingInlineMessageId));
+
         return id == user.id &&
             tgAccountId == user.tgAccountId &&
             tgChatId == user.tgChatId &&
@@ -280,13 +239,14 @@ public class BotUser {
             Objects.equals(userName, user.userName) &&
             Objects.equals(firstName, user.firstName) &&
             Objects.equals(lastName, user.lastName) &&
+            Objects.equals(wishList, user.wishList) &&
             botUserStatus == user.botUserStatus &&
             Objects.equals(carryingInlineMessageId, user.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, tgAccountId, tgChatId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, tgAccountId, tgChatId, wishList, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -299,6 +259,8 @@ public class BotUser {
             ", tgAccountId=" + tgAccountId +
             ", tgChatId=" + tgChatId +
             ", wishList=" + wishList +
+//            ", subscribers=" + subscribers +
+//            ", subscriptions=" + subscriptions +
             ", isReadyReceiveUpdates=" + isReadyReceiveUpdates +
             ", isAllCanSeeMyWishList=" + isAllCanSeeMyWishList +
             ", botUserStatus=" + botUserStatus +
@@ -308,24 +270,6 @@ public class BotUser {
             '}';
     }
 
-    public String tString() {
-        return "BotUser{" +
-            "id=" + id +
-            ", userName='" + userName + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", tgAccountId=" + tgAccountId +
-            ", tgChatId=" + tgChatId +
-            ", wishList=" + wishList +
-            ", subscribers=" + subscribers +
-            ", isReadyReceiveUpdates=" + isReadyReceiveUpdates +
-            ", isAllCanSeeMyWishList=" + isAllCanSeeMyWishList +
-            ", botUserStatus=" + botUserStatus +
-            ", updateGiftId=" + updateGiftId +
-            ", carryingMessageId=" + carryingMessageId +
-            ", carryingInlineMessageId='" + carryingInlineMessageId + '\'' +
-            '}';
-    }
 
     public static final class UserBuilder {
         private long id;
