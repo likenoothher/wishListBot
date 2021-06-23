@@ -3,7 +3,7 @@ package com.aziarets.vividapp.handler;
 import com.aziarets.vividapp.data.NotFoundUserNameException;
 import com.aziarets.vividapp.data.Storage;
 import com.aziarets.vividapp.data.UserIsBotException;
-import com.aziarets.vividapp.menu.AppMenu;
+import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.menu.Icon;
 import com.aziarets.vividapp.model.BotUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,12 @@ import java.util.List;
 @Component
 public class UpdateHandler {
     private Storage storage;
-    private AppMenu menu;
+    private BotMenuTemplate menu;
     private CallbackHandler callbackHandler;
     private MessageHandler messageHandler;
 
     @Autowired
-    public UpdateHandler(Storage storage, AppMenu menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
+    public UpdateHandler(Storage storage, BotMenuTemplate menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
         this.storage = storage;
         this.menu = menu;
         this.callbackHandler = callbackHandler;
@@ -57,7 +57,7 @@ public class UpdateHandler {
             return messagesToSend;
         }
 
-        SendMessage message = menu.showMainMenu(chatId);
+        SendMessage message = menu.getMainMenuTemplate(chatId);
         message.setText(Icon.DISAPPOINTED_ICON + " Не знаю такой команды, попробуй ещё раз из главного меню");
 
         return List.of(message);

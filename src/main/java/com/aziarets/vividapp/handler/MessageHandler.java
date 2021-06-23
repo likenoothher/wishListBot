@@ -1,7 +1,7 @@
 package com.aziarets.vividapp.handler;
 
 import com.aziarets.vividapp.data.Storage;
-import com.aziarets.vividapp.menu.AppMenu;
+import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
@@ -23,10 +23,10 @@ import static com.aziarets.vividapp.menu.Icon.*;
 @Transactional
 public class MessageHandler {
     private Storage storage;
-    private AppMenu menu;
+    private BotMenuTemplate menu;
 
     @Autowired
-    public MessageHandler(Storage storage, AppMenu menu) {
+    public MessageHandler(Storage storage, BotMenuTemplate menu) {
         this.storage = storage;
         this.menu = menu;
     }
@@ -35,7 +35,7 @@ public class MessageHandler {
         List<BotApiMethod> messagesToSend = new ArrayList<>();
         String chatId = extractChatId(update);
 
-        SendMessage unknownCommandMessage = menu.showMainMenu(chatId);
+        SendMessage unknownCommandMessage = menu.getMainMenuTemplate(chatId);
         unknownCommandMessage.setText("Не знаю такой команды " + DISAPPOINTED_ICON + "\n" +
             "Попробуй ещё раз из главного меню" + HMM_ICON);
 
@@ -86,8 +86,8 @@ public class MessageHandler {
 
         if (!searchedUser.equals(userSearchedTo)) {
             if (!isRequestedUserAlreadyFriend(userSearchedTo.get(), searchedUser.get())) {
-                messagesToSend.add(menu.showFriendShipRequestTo(searchedUser.get(), userSearchedTo.get())); // message to request receiver
-                messagesToSend.add(menu.showSendRequestMenu(chatId)); // message to request sender
+                messagesToSend.add(menu.getFriendShipRequestToTemplate(searchedUser.get(), userSearchedTo.get())); // message to request receiver
+                messagesToSend.add(menu.getSendFriendshipRequestTemplate(chatId)); // message to request sender
             } else {
                 messagesToSend.add(new SendMessage(chatId, "Ты уже подписан на данного пользователя"
                     + UPSIDE_DOWN_FACE_ICON));
@@ -134,11 +134,11 @@ public class MessageHandler {
         storage.updateUser(updateSender);
         if (isAdded) {
             List<Gift> gifts = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getWishList().getGiftList();
-            messagesToSend.add(menu.showMyWishListMenu(gifts, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
             List<BotUser> subscribers = storage.getUserSubscribers(updateSender);
             for (BotUser subscriber : subscribers) {
                 if (subscriber.isReadyReceiveUpdates()) {
-                    messagesToSend.add(new SendMessage(String.valueOf(subscriber.getTgChatId()),
+                    messagesToSend.add(new SendMessage(String.valueOf(subscriber.getTgAccountId()),
                         EXCLAMATION_ICON + "Пользователь @" + updateSender.getUserName() +
                             " добавил новый подарок в свой WishList"));
                 }
@@ -164,12 +164,12 @@ public class MessageHandler {
             giftHolder.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
             storage.updateUser(giftHolder);
             if (isDescriptionAdded) {
-                messagesToSend.add(menu.showGiftRepresentationMenu(updatedGift, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
-                messagesToSend.add(menu.showErrorStatusMenu("Описание подарка не изменено. Произошла ошибка", chatId));
+                messagesToSend.add(menu.getErrorStatusTemplate("Описание подарка не изменено. Произошла ошибка", chatId));
             }
         } else {
-            messagesToSend.add(menu.showErrorStatusMenu("Описание подарка не изменено. Не смогли найти подарок", chatId));
+            messagesToSend.add(menu.getErrorStatusTemplate("Описание подарка не изменено. Не смогли найти подарок", chatId));
         }
         return messagesToSend;
     }
@@ -191,12 +191,12 @@ public class MessageHandler {
             giftHolder.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
             storage.updateUser(giftHolder);
             if (isDescriptionAdded) {
-                messagesToSend.add(menu.showGiftRepresentationMenu(updatedGift, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
-                messagesToSend.add(menu.showErrorStatusMenu("Ссылка подарка не изменена. Произошла ошибка", chatId));
+                messagesToSend.add(menu.getErrorStatusTemplate("Ссылка подарка не изменена. Произошла ошибка", chatId));
             }
         } else {
-            messagesToSend.add(menu.showErrorStatusMenu("Ссылка подарка не изменена. Не смогли найти подарок", chatId));
+            messagesToSend.add(menu.getErrorStatusTemplate("Ссылка подарка не изменена. Не смогли найти подарок", chatId));
         }
         return messagesToSend;
     }
@@ -208,12 +208,12 @@ public class MessageHandler {
         String messagePrefix = messageText.substring(0, 1);
 
         if (messageText.equals("/start")) {
-            messagesToSend.add(menu.showGreetingMenu(chatId, updateSender));
+            messagesToSend.add(menu.getGreetingTemplate(chatId, updateSender));
             //return messages to send?
         }
 
         if (messageText.equals("Главное меню")) {
-            messagesToSend.add(menu.showMainMenu(chatId));
+            messagesToSend.add(menu.getMainMenuTemplate(chatId));
             //return messages to send?
         }
 

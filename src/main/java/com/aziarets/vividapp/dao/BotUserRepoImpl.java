@@ -81,7 +81,6 @@ public class BotUserRepoImpl implements BotUserRepo {
             "where gifts.id = :giftId");
         query.setParameter("giftId", giftId);
         List<BotUser> users = query.getResultList();
-        System.out.println(users.toString());
         if (!users.isEmpty()) {
             return users.get(0);
         }
@@ -95,7 +94,6 @@ public class BotUserRepoImpl implements BotUserRepo {
             "where subscribers.id = :id");
         query.setParameter("id", user.getId());
         List<BotUser> users = query.getResultList();
-        System.out.println(users.toString() + "++++++++++++++++");
         return (List<BotUser>) users;
     }
 
@@ -106,7 +104,6 @@ public class BotUserRepoImpl implements BotUserRepo {
             "where botuser.id = :id ");
         query.setParameter("id", user.getId());
         List<BotUser> users = query.getResultList();
-        System.out.println(users.toString() + "+++++///////+++++");
         return (List<BotUser>) users;
     }
 }

@@ -42,7 +42,6 @@ public class Storage {
 
     public boolean addGiftToUser(Gift gift, BotUser botUser) {
         WishList wishList = wishListRepo.getById(botUser.getWishList().getId());
-        System.out.println(wishList != null);
         if (wishList != null) {
             giftRepo.save(gift);
             wishList.addGift(gift); //null check
@@ -61,7 +60,6 @@ public class Storage {
     }
 
     public Optional<BotUser> findUserByUserName(String userName) {
-        System.out.println(userRepo.getByUserName(userName));
         BotUser user = userRepo.getByUserName(userName);
         if (user != null) {
             return  Optional.of(user);

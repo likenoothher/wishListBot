@@ -1,7 +1,7 @@
 package com.aziarets.vividapp.handler;
 
 import com.aziarets.vividapp.data.Storage;
-import com.aziarets.vividapp.menu.AppMenu;
+import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.aziarets.vividapp.menu.Icon.*;
@@ -23,10 +22,10 @@ import static com.aziarets.vividapp.menu.Icon.*;
 @Component
 public class CallbackHandler {
     private Storage storage;
-    private AppMenu menu;
+    private BotMenuTemplate menu;
 
     @Autowired
-    public CallbackHandler(Storage storage, AppMenu menu) {
+    public CallbackHandler(Storage storage, BotMenuTemplate menu) {
         this.storage = storage;
         this.menu = menu;
     }
@@ -90,7 +89,7 @@ public class CallbackHandler {
         if (callbackData.equals("/my_wish_list")) {
             List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showMyWishListMenu(gifts, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.equals("/my_wish_list/add_present")) {
@@ -117,7 +116,7 @@ public class CallbackHandler {
             if (updatedGift.isPresent()) {
 //                storage.updateUser(updateSender);
                 messagesToSend.add(callbackAnswer(update));
-                messagesToSend.add(menu.showGiftRepresentationMenu(updatedGift.get(), chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift.get(), chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
@@ -138,7 +137,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши детальное описание подарка и отправь"));
             } else {
-                messagesToSend.add(menu.showErrorStatusMenu("Почему то не смогли найти подарок в нашей базе данных, " +
+                messagesToSend.add(menu.getErrorStatusTemplate("Почему то не смогли найти подарок в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)", chatId));
             }
         }
@@ -168,10 +167,10 @@ public class CallbackHandler {
             if (storage.deleteGiftOfUser(giftIdForDelete, updateSender)) {
                 List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + "Подарок "+ deletedGift.get().getName() + " был удалён"));
-                messagesToSend.add(menu.showMyWishListMenu(gifts, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
 
                 if (deletedGift.get().getOccupiedBy() != null) {
-                    messagesToSend.add(menu.showUserDeletedPresentYouGoingToDonateMenu(deletedGift.get(), updateSender)); // wrong receiver of message
+                    messagesToSend.add(menu.getUserDeletedPresentYouGoingToDonateTemplate(deletedGift.get(), updateSender)); // wrong receiver of message
                 }
             } else {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
@@ -193,7 +192,7 @@ public class CallbackHandler {
 
             List<Gift> iPresentList = storage.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showIPresentMenu(iPresentList, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.contains("/i_present/show_gift_under/id")) {
@@ -201,7 +200,7 @@ public class CallbackHandler {
             Gift requestedGift = storage.findGiftById(requestedGiftId).get();
             BotUser giftHolder = storage.findGiftHolderByGiftId(requestedGiftId).get();
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.createGiftInfoIPresentMenu(requestedGift, giftHolder, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getIPresentGiftInfoTemplate(requestedGift, giftHolder, chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
@@ -209,11 +208,11 @@ public class CallbackHandler {
             if (storage.refuseFromDonate(refusedGiftId, updateSender)) {
                 List<Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
-                messagesToSend.add(menu.showIPresentMenu(iPresentList, chatId, messageId, inlineMessageId)); // добавить всплывающее окно
+                messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId)); // добавить всплывающее окно
             } else {
                 List<Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
-                messagesToSend.add(menu.showIPresentMenu(iPresentList, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             }
         }
         return messagesToSend;
@@ -230,7 +229,7 @@ public class CallbackHandler {
         if (callbackData.equals("/my_subscribers")) {
             List<BotUser> userSubscribers = storage.getUserSubscribers(updateSender);
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showMySubscribersListMenu(userSubscribers, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
         }
 
 
@@ -238,7 +237,7 @@ public class CallbackHandler {
             int subscriberId = extractLastAfterSlashId(callbackData);
             BotUser subscriber = storage.findUserByTelegramId(subscriberId).get();
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showSubscriberRepresentationMenu(subscriber, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getSubscriberRepresentationTemplate(subscriber, chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.contains("/my_subscribers/delete_under/id")) {
@@ -252,11 +251,11 @@ public class CallbackHandler {
             List<BotUser> userSubscribers = storage.getUserSubscribers(updateSender);
             if (isUnsubscribed) {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Пользователь был удалён из списка твоих подписчиков"));
-                messagesToSend.add(menu.showMySubscribersListMenu(userSubscribers, chatId, messageId, inlineMessageId));
-                messagesToSend.add(menu.showNotificationToDeletedSubscriberMenu(deletedUser, byUserDeleted));
+                messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getAlertToDeletedSubscriberTemplate(deletedUser, byUserDeleted));
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Пользователь не был удалён из списка твоих подписчиков"));
-                messagesToSend.add(menu.showMySubscribersListMenu(userSubscribers, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
             }
         }
         return messagesToSend;
@@ -273,7 +272,7 @@ public class CallbackHandler {
         if (callbackData.equals("/my_subscriptions")) {
             List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.contains("/my_subscriptions/show_representation/gift_id")) {
@@ -281,7 +280,7 @@ public class CallbackHandler {
             Gift gift  = storage.findGiftById(giftId).get();
             BotUser giftHolder = storage.findGiftHolderByGiftId(giftId).get();
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showGoingDonateGiftRepresentationMenu(gift,giftHolder,  chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getGoingDonateGiftTemplate(gift,giftHolder,  chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.contains("/my_subscriptions/show/id")) {
@@ -293,11 +292,11 @@ public class CallbackHandler {
             if (wishListHolder.isPresent()) {
                 wishListHolder.get().getWishList().setGiftList(gifts);
                 messagesToSend.add(callbackAnswer(update));
-                messagesToSend.add(menu.showUserWishListMenu(wishListHolder.get(), chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Возникла какая то ошибка, не смогли найти " +
                     "WishList пользователя"));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
         }
 
@@ -308,11 +307,11 @@ public class CallbackHandler {
             if (storage.donate(giftId, updateSender)) {
                 wishListHolder = storage.findGiftHolderByGiftId(giftId);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок добавлен в твою секцию \"Я дарю \"" +I_PRESENT_ICON));
-                messagesToSend.add(menu.showUserWishListMenu(wishListHolder.get(), chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             } else {
                 wishListHolder = storage.findGiftHolderByGiftId(giftId);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не добавлен. Произошла ошибка"));
-                messagesToSend.add(menu.showUserWishListMenu(wishListHolder.get(), chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             }
         }
 
@@ -323,12 +322,12 @@ public class CallbackHandler {
             List<BotUser> userSubscribers = storage.getUserSubscribers(userRequestedTo.get());
 
             if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
-                messagesToSend.add(menu.showAnonymouslyAskAddGiftMenu(userRequestedTo.get()));
+                messagesToSend.add(menu.getAnonymouslyAskAddGiftTemplate(userRequestedTo.get()));
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Запрос не отправлен. Возможно ты был удалён из списка друзей"));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
         }
 
@@ -339,12 +338,12 @@ public class CallbackHandler {
             List<BotUser> userSubscribers = storage.getUserSubscribers(userRequestedTo.get());
 
             if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
-                messagesToSend.add(menu.showExplicitAskAddGiftMenu(userRequestedTo.get()));
+                messagesToSend.add(menu.getExplicitAskAddGiftTemplate(userRequestedTo.get()));
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Запрос не отправлен. Не смогли найти пользователя"));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
         }
 
@@ -360,7 +359,7 @@ public class CallbackHandler {
             if (isUnsubscribed) {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Ты был успешно отписан от пользователя @"
                   + deletedUser.getUserName()));
-                messagesToSend.add(menu.showMySubscriptionsMenu(userSubscriptions, chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Возникла ошибка, не смогли отписать @"
                     + deletedUser.getUserName() + " от тебя"));
@@ -401,12 +400,12 @@ public class CallbackHandler {
 
             messagesToSend.add(callbackAnswer(update));
             if (isSubscribed) {
-                messagesToSend.add(menu.showFriendShipAcceptedMenu(byUserAccepted, String.valueOf(requestedUser.getTgChatId())));
-                messagesToSend.add(menu.showAcceptingFriendshipStatusOkMenu(requestedUser.getUserName(),
-                    String.valueOf(byUserAccepted.getTgChatId()), messageId, inlineMessageId));
+                messagesToSend.add(menu.getFriendShipAcceptedTemplate(byUserAccepted, String.valueOf(requestedUser.getTgAccountId())));
+                messagesToSend.add(menu.getAcceptedFriendshipTemplate(requestedUser.getUserName(),
+                    String.valueOf(byUserAccepted.getTgAccountId()), messageId, inlineMessageId));
             } else {
-                messagesToSend.add(menu.showErrorStatusMenu("Произошла ошибка, пользователь не был добавлен",
-                    String.valueOf(byUserAccepted.getTgChatId())));
+                messagesToSend.add(menu.getErrorStatusTemplate("Произошла ошибка, пользователь не был добавлен",
+                    String.valueOf(byUserAccepted.getTgAccountId())));
             }
         }
 
@@ -418,10 +417,10 @@ public class CallbackHandler {
             BotUser byUserDenied = storage.findUserByTelegramId(byUserDeniedId).orElse(null);
 
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showErrorStatusMenu(byUserDenied.getUserName() + " отклонил предложение дружбы",
-                String.valueOf(requestedUser.getTgChatId())));
-            messagesToSend.add(menu.showAcceptingFriendshipStatusDeniedMenu(requestedUser.getUserName(),
-                String.valueOf(byUserDenied.getTgChatId()), messageId, inlineMessageId));
+            messagesToSend.add(menu.getErrorStatusTemplate(byUserDenied.getUserName() + " отклонил предложение дружбы",
+                String.valueOf(requestedUser.getTgAccountId())));
+            messagesToSend.add(menu.getDeniedFriendshipTemplate(requestedUser.getUserName(),
+                String.valueOf(byUserDenied.getTgAccountId()), messageId, inlineMessageId));
         }
 
         return messagesToSend;
@@ -436,7 +435,7 @@ public class CallbackHandler {
         String chatId = extractChatId(update);
         if (callbackData.equals("/settings")) {
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
         }
 //        if (callbackData.equals("/settings/help")) {          ADD SOS MENU!!!!!!!!!!!!
 //            messagesToSend.add(callbackAnswer(update));
@@ -453,7 +452,7 @@ public class CallbackHandler {
 
         if (callbackData.equals("/settings/set_is_ready_receive_update")) {
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showIsReadyReceiveUpdateMenu(chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getUpdatesSettingsTemplate(chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/true")) {
@@ -464,14 +463,14 @@ public class CallbackHandler {
                 updatedUser.setReadyReceiveUpdates(true);
                 if (storage.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Уведомления об обновлениях друзей включены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
                     messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Произошла ошибка.Настройки не сохранены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 }
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
-                messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
         }
 
@@ -483,20 +482,20 @@ public class CallbackHandler {
                 updatedUser.setReadyReceiveUpdates(false);
                 if (storage.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Уведомления об обновлениях друзей отключены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
                     messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Произошла ошибка.Настройки не сохранены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 }
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
-                messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
         }
 
         if (callbackData.equals("/settings/set_visibility")) {
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showSetVisibilityWishListMenu(chatId, messageId, inlineMessageId));
+            messagesToSend.add(menu.getVisibilitySettingsTemplate(chatId, messageId, inlineMessageId));
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/true")) {
@@ -506,14 +505,14 @@ public class CallbackHandler {
                 updatedUser.setAllCanSeeMyWishList(false);
                 if (storage.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Видимость твоего WishList'а - только подписчики"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
                     messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Произошла ошибка.Настройки не сохранены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 }
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
-                messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
         }
 
@@ -524,14 +523,14 @@ public class CallbackHandler {
                 updatedUser.setAllCanSeeMyWishList(true);
                 if (storage.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Видимость твоего WishList'а - все пользователи"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
                     messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Произошла ошибка.Настройки не сохранены"));
-                    messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                    messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 }
             } else {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
-                messagesToSend.add(menu.showSettingsMenu(chatId, messageId, inlineMessageId));
+                messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
         }
 
