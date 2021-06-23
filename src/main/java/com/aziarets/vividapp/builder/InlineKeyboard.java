@@ -87,13 +87,14 @@ public class InlineKeyboard {
             return this;
         }
 
-        public InlineKeyboardMarkupBuilder withCallBackButtonsFromGiftMap(List<Gift> gifts, String icon, String callBackPrefix) {
-                for (Gift gift : gifts) {
+        public InlineKeyboardMarkupBuilder withCallBackButtonsFromGiftMap(Map<BotUser, Gift> gifts,
+                                                                          String icon, String callBackPrefix) {
+                for (Map.Entry<BotUser,Gift> entry : gifts.entrySet()) {
                     this.row = new ArrayList<>();
                     InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-                    inlineKeyboardButton.setText(icon + " " + gift.getName() + " для пользователя @"
-                        + gift.getOccupiedBy().getUserName());
-                    inlineKeyboardButton.setCallbackData(callBackPrefix + "/" + gift.getId());
+                    inlineKeyboardButton.setText(icon + " " + entry.getValue().getName() + " для пользователя @"
+                        + entry.getKey().getUserName());
+                    inlineKeyboardButton.setCallbackData(callBackPrefix + "/" + entry.getValue().getId());
                     row.add(inlineKeyboardButton);
                     this.keyboard.add(this.row);
                     this.row = null;

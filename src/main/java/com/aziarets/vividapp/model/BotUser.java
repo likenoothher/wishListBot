@@ -215,38 +215,13 @@ public class BotUser {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BotUser user = (BotUser) o;
-//        System.out.println(id == user.id);
-//        System.out.println(tgChatId == user.tgChatId);
-//        System.out.println(isReadyReceiveUpdates == user.isReadyReceiveUpdates);
-//        System.out.println(isAllCanSeeMyWishList == user.isAllCanSeeMyWishList);
-//        System.out.println(updateGiftId == user.updateGiftId);
-//        System.out.println(carryingMessageId == user.carryingMessageId);
-//        System.out.println(Objects.equals(userName, user.userName));
-//        System.out.println(Objects.equals(firstName, user.firstName));
-//        System.out.println(Objects.equals(lastName, user.lastName));
-//        System.out.println(botUserStatus == user.botUserStatus);
-//        System.out.println(Objects.equals(wishList, user.wishList));
-//        System.out.println(Objects.equals(carryingInlineMessageId, user.carryingInlineMessageId));
-
-        return id == user.id &&
-            tgAccountId == user.tgAccountId &&
-            tgChatId == user.tgChatId &&
-            isReadyReceiveUpdates == user.isReadyReceiveUpdates &&
-            isAllCanSeeMyWishList == user.isAllCanSeeMyWishList &&
-            updateGiftId == user.updateGiftId &&
-            carryingMessageId == user.carryingMessageId &&
-            Objects.equals(userName, user.userName) &&
-            Objects.equals(firstName, user.firstName) &&
-            Objects.equals(lastName, user.lastName) &&
-            Objects.equals(wishList, user.wishList) &&
-            botUserStatus == user.botUserStatus &&
-            Objects.equals(carryingInlineMessageId, user.carryingInlineMessageId);
+        BotUser botUser = (BotUser) o;
+        return id == botUser.id && tgAccountId == botUser.tgAccountId && tgChatId == botUser.tgChatId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserStatus == botUser.botUserStatus && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, tgAccountId, tgChatId, wishList, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, tgAccountId, tgChatId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -258,7 +233,7 @@ public class BotUser {
             ", lastName='" + lastName + '\'' +
             ", tgAccountId=" + tgAccountId +
             ", tgChatId=" + tgChatId +
-            ", wishList=" + wishList +
+//            ", wishList=" + wishList +
 //            ", subscribers=" + subscribers +
 //            ", subscriptions=" + subscriptions +
             ", isReadyReceiveUpdates=" + isReadyReceiveUpdates +

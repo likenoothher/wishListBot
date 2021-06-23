@@ -153,9 +153,8 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public EditMessageText getIPresentTemplate(List<Gift> gifts, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getIPresentTemplate(Map<BotUser, Gift> gifts , String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
-
 
         if (!gifts.isEmpty()) {
             message.setText("Это подарки, которые ты планируешь подарить" + WISH_LIST_ICON +
@@ -371,7 +370,8 @@ public class BotMenuTemplate {
             message.setReplyMarkup(replyKeyboard);
         } else {
             message.setText("Кажется, @" + wishListHolder.getUserName() + " ничего не добавил в свой WishList," +
-                " либо все его подарки уже заняты" + MAN_SHRUGGING_ICON + "\nНо ты можешь попросить его добавить подарок");
+                " либо все его подарки уже заняты" + MAN_SHRUGGING_ICON
+                + "\nНо ты можешь попросить его добавить подарок");
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
                 .withRow()
