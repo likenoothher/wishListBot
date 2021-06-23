@@ -21,6 +21,8 @@ public class UpdateHandler {
     private BotMenuTemplate menu;
     private CallbackHandler callbackHandler;
     private MessageHandler messageHandler;
+    private String chatId;
+    private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
     public UpdateHandler(Storage storage, BotMenuTemplate menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
@@ -31,36 +33,37 @@ public class UpdateHandler {
     }
 
     public synchronized List<BotApiMethod> handleUpdate(Update update) {
-        String chatId = extractChatId(update);
+        chatId = getUpdateChatId(update);
+        messagesToSend.clear();
+
         BotUser updateSender = null;
         try {
             updateSender = storage.identifyUser(update);
         } catch (NotFoundUserNameException e) {
             e.printStackTrace();
             return List.of(new SendMessage(chatId, "К сожалению, для пользования нашим ботом" +
-                " тебе необходимо изменить настройки приватности и открыть видимость для имени пользователя @{user_name}"));
+                " тебе необходимо изменить настройки приватности и открыть видимость имени пользователя @{user_name}"));
         } catch (UserIsBotException e) {
             e.printStackTrace();
             return List.of(new SendMessage(chatId, "Ботам здесь не рады"));
         }
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
 
         if (update.hasCallbackQuery() && updateSender != null) {
             messagesToSend.addAll(handleCallBackQuery(update, updateSender));
+            return messagesToSend;
         }
 
         if (update.hasMessage() && updateSender != null) {
             messagesToSend.addAll(handleMessage(update, updateSender));
-        }
-
-        if (!messagesToSend.isEmpty()) {
             return messagesToSend;
         }
 
-        SendMessage message = menu.getMainMenuTemplate(chatId);
-        message.setText(Icon.DISAPPOINTED_ICON + " Не знаю такой команды, попробуй ещё раз из главного меню");
+        SendMessage unknownCommandMessage = menu.getMainMenuTemplate(chatId);
+        unknownCommandMessage.setText(Icon.DISAPPOINTED_ICON
+            + " Не знаю такой команды, попробуй ещё раз из главного меню");
+        messagesToSend.add(unknownCommandMessage);
 
-        return List.of(message);
+        return messagesToSend;
     }
 
     private List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
@@ -69,10 +72,9 @@ public class UpdateHandler {
 
     private List<BotApiMethod> handleCallBackQuery(Update update, BotUser updateSender) {
         return callbackHandler.handleCallBackQuery(update, updateSender);
-
     }
 
-    private String extractChatId(Update update) {
+    private String getUpdateChatId(Update update) {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getMessage().getChatId().toString();
         }

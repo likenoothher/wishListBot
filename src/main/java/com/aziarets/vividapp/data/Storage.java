@@ -149,8 +149,13 @@ public class Storage {
         return userRepo.update(user);
     }
 
-    public List<Gift> getUserPresentsMap(BotUser user) {
-        return giftRepo.getPresentsUserGoingDonate(user.getId());
+    public  Map<BotUser, Gift> getUserPresentsMap(BotUser user) {
+        Map<BotUser, Gift> userPresentsMap = new HashMap<>();
+        List<Gift> giftsUserDonates = giftRepo.getPresentsUserGoingDonate(user.getId());
+        giftsUserDonates.stream()
+            .forEach(gift -> {userPresentsMap.put(findGiftHolderByGiftId(gift.getId()).get(), gift);});
+
+        return userPresentsMap;
     }
 
     public boolean donate(long giftId, BotUser donor) {

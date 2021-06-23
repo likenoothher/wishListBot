@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.aziarets.vividapp.menu.Icon.*;
@@ -23,6 +24,9 @@ import static com.aziarets.vividapp.menu.Icon.*;
 public class CallbackHandler {
     private Storage storage;
     private BotMenuTemplate menu;
+    private String chatId;
+    private String callbackData;
+    private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
     public CallbackHandler(Storage storage, BotMenuTemplate menu) {
@@ -31,13 +35,15 @@ public class CallbackHandler {
     }
 
     public List<BotApiMethod> handleCallBackQuery(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        resetBotUserStatus(updateSender);
+        chatId = getUpdateChatId(update);
+        messagesToSend.clear();
+        callbackData = extractCallbackData(update.getCallbackQuery());
 
-        String callbackData = extractCallbackData(update.getCallbackQuery());
+        resetBotUserStatus(updateSender);
 
         if (callbackData.startsWith("/my_wish_list")) {
             messagesToSend.addAll(handleMyWishListRequests(update, updateSender));
+            return
         }
 
         if (callbackData.startsWith("/i_present")) {
@@ -190,7 +196,7 @@ public class CallbackHandler {
 
         if (callbackData.equals("/i_present")) {
 
-            List<Gift> iPresentList = storage.getUserPresentsMap(updateSender);
+            Map<BotUser, Gift> iPresentList = storage.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
         }
@@ -206,11 +212,11 @@ public class CallbackHandler {
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
             int refusedGiftId = extractLastAfterSlashId(callbackData);
             if (storage.refuseFromDonate(refusedGiftId, updateSender)) {
-                List<Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
+                Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId)); // добавить всплывающее окно
             } else {
-                List<Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
+                Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             }
@@ -302,10 +308,12 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/going_donate/gift_id/")) {
             int giftId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> wishListHolder = storage.findGiftHolderByGiftId(giftId);
+            Optional<BotUser> wishListHolder;
 
             if (storage.donate(giftId, updateSender)) {
                 wishListHolder = storage.findGiftHolderByGiftId(giftId);
+                List<Gift> gifts = storage.getAvailableToDonateGifts(wishListHolder.get().getId());
+                wishListHolder.get().getWishList().setGiftList(gifts);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок добавлен в твою секцию \"Я дарю \"" +I_PRESENT_ICON));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             } else {
@@ -537,7 +545,7 @@ public class CallbackHandler {
         return messagesToSend;
     }
 
-    private String extractChatId(Update update) {
+    private String getUpdateChatId(Update update) {
         if (update.hasCallbackQuery()) {
             return update.getCallbackQuery().getMessage().getChatId().toString();
         }
