@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -39,21 +40,23 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public ThymeleafViewResolver viewResolver() {
+        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+        viewResolver.setTemplateEngine(templateEngine());
+        viewResolver.setOrder(1);
+        viewResolver.setForceContentType(true);
+        viewResolver.setViewNames(new String[]{".html", ".xhtml"});
+        viewResolver.setContentType("text/html; charset=UTF-8");
+        viewResolver.setCharacterEncoding("UTF-8");
+        return viewResolver;
+    }
+
+    @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         return templateEngine;
-    }
-
-    @Bean
-    public ThymeleafViewResolver viewResolver() {
-        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setTemplateEngine(templateEngine());
-        viewResolver.setOrder(1);
-        viewResolver.setViewNames(new String[]{".html", ".xhtml"});
-        viewResolver.setContentType("text/html; charset=UTF-8");
-        return viewResolver;
     }
 
     @Override
@@ -62,4 +65,15 @@ public class WebConfig implements WebMvcConfigurer {
         resolver.setTemplateEngine(templateEngine());
         registry.viewResolver(resolver);
     }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/webjars/**",
+            "/img/**",
+            "/css/**")
+            .addResourceLocations("classpath:/META-INF/resources/webjars/",
+            "classpath:/static/img/",
+            "classpath:/static/css/");
+    }
+
 }

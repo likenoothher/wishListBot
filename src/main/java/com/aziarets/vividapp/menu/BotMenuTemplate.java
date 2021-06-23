@@ -14,9 +14,9 @@ import java.util.Map;
 import static com.aziarets.vividapp.menu.Icon.*;
 
 @Component
-public class AppMenu {
+public class BotMenuTemplate {
 
-    public SendMessage showGreetingMenu(String chatId, BotUser updateSender) {
+    public SendMessage getGreetingTemplate(String chatId, BotUser updateSender) {
         SendMessage message = new SendMessage();
         message.setText("Привет, @" + updateSender.getUserName() + HI_ICON + "\nСудя по всему ты здесь в первый раз. Этот бот позволяет создавать" +
             " свой WishList" + WISH_LIST_ICON + " и делиться им с друзьями " + TWO_GUYS_ICON + " Ты можешь отмечать подарки" + I_PRESENT_ICON + " своих друзей, которые ты планируешь " +
@@ -40,7 +40,7 @@ public class AppMenu {
         return message;
     }
 
-    public SendMessage showMainMenu(String chatId) {
+    public SendMessage getMainMenuTemplate(String chatId) {
         SendMessage message = new SendMessage();
         message.setText(RECYCLE_ICON + " Ты в главном меню\n");
         message.setReplyMarkup(createMainMenuTemplate());
@@ -76,7 +76,8 @@ public class AppMenu {
             .build();
     }
 
-    public EditMessageText showMyWishListMenu(List<Gift> gifts, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getMyWishListTemplate(List<Gift> gifts, String chatId,
+                                                 int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setText(WISH_LIST_ICON + " Здесь ты можешь управлять своим WishList'ом\n");
 
@@ -101,86 +102,12 @@ public class AppMenu {
         return message;
     }
 
-    public EditMessageText createGiftRepresentation(Gift gift, String chatId) {
-        String giftName = gift.getName() == null ? "не указано" : gift.getName();
-        String giftDescription = gift.getDescription() == null ? "не указано" : gift.getDescription();
-        String giftUrl = gift.getUrl() == null ? "не указано" : gift.getUrl();
-        EditMessageText itemMessage = new EditMessageText();
-        itemMessage.setChatId(chatId);
-        itemMessage.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
-            "Описание - " + giftDescription + "\n" +
-            "Ссылка - " + giftUrl + "\n\n" +
-            THUMB_DOWN_POINTER_ICON + "Для редактирования/удаления жми" + THUMB_DOWN_POINTER_ICON);
-
-        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-            .newInlineKeyboardMarkup()
-            .withRow()
-            .buttonWithCallbackData("Редактировать " + MANAGING_ICON,
-                "/my_wish_list/edit_my_present_under/id/" + gift.getId())
-            .buttonWithCallbackData("Удалить " + MINUS_MARK_ICON,
-                "/my_wish_list/delete_my_present_under/id/" + gift.getId())
-            .endRow()
-            .build();
-
-        itemMessage.setReplyMarkup(replyKeyboard);
-        return itemMessage;
-    }
-
-    public EditMessageText createEditGiftRepresentationTemplate(Gift gift, String chatId, int messageId, String inlineMessageId) {
-        EditMessageText editedText = new EditMessageText();
-
-        String giftName = gift.getName() == null ? "не указано" : gift.getName();
-        String giftDescription = gift.getDescription() == null ? "не указано" : gift.getDescription();
-        String giftUrl = gift.getUrl() == null ? "не указано" : gift.getUrl();
-
-        editedText.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
-            "Описание - " + giftDescription + "\n" +
-            "Ссылка - " + giftUrl + "\n\n" +
-            THUMB_DOWN_POINTER_ICON + "Для редактирования/удаления жми" + THUMB_DOWN_POINTER_ICON);
-        editedText.setChatId(chatId);
-        editedText.setMessageId(messageId);
-        editedText.setInlineMessageId(inlineMessageId);
-
-        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-            .newInlineKeyboardMarkup()
-            .withRow()
-            .buttonWithCallbackData("Редактировать " + MANAGING_ICON,
-                "/my_wish_list/edit_my_present_under/id/" + gift.getId())
-            .buttonWithCallbackData("Удалить " + MINUS_MARK_ICON,
-                "/my_wish_list/delete_my_present_under/id/" + gift.getId())
-            .endRow()
-            .build();
-
-        editedText.setReplyMarkup(replyKeyboard);
-
-        return editedText;
-
-    }
-
-    public EditMessageText createEditGiftTextTemplate(Gift gift, String chatId, int messageId, String inlineMessageId) {
-
-        EditMessageText editedText = new EditMessageText();
-        editedText.setChatId(chatId);
-        editedText.setMessageId(messageId);
-        editedText.setInlineMessageId(inlineMessageId);
-        editedText.setText(CHECK_MARK_ICON + " Подарок \"" + gift.getName() + "\" был изменён");
-        return editedText;
-    }
-
-    public EditMessageText createDeleteGiftTextTemplate(Gift gift, String chatId, int messageId, String inlineMessageId) {
-        EditMessageText editedText = new EditMessageText();
-        editedText.setChatId(chatId);
-        editedText.setMessageId(messageId);
-        editedText.setInlineMessageId(inlineMessageId);
-        editedText.setText(CROSS_MARK_ICON + " Подарок \"" + gift.getName() + "\" был удалён");
-
-        return editedText;
-    }
-
-    public EditMessageText showGiftRepresentationMenu(Gift gift, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getGiftRepresentationTemplate(Gift gift, String chatId,
+                                                         int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+
         message.setText(MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
             gift.getName() + "\"" +
             "\nНа данный момент момент:" +
@@ -215,22 +142,20 @@ public class AppMenu {
     }
 
 
-    public SendMessage showUserDeletedPresentYouGoingToDonateMenu(Gift deletedGift, BotUser deletedByUser) {
+    public SendMessage getUserDeletedPresentYouGoingToDonateTemplate(Gift deletedGift, BotUser deletedByUser) {
         SendMessage message = new SendMessage();
         message.setText(EXCLAMATION_ICON + "Пользователь " + deletedByUser.getUserName() +
             " удалил из списка желаний подарок \"" + deletedGift.getName()
             + "\", который ты хотел ему подарить " + MAN_SHRUGGING_ICON + "\n" +
             "Попробуй выбрать другой подарок");
 
-        message.setChatId(String.valueOf(deletedGift.getOccupiedBy().getTgChatId()));
+        message.setChatId(String.valueOf(deletedGift.getOccupiedBy().getTgAccountId()));
         return message;
     }
 
-    public EditMessageText showIPresentMenu(List<Gift> gifts, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getIPresentTemplate(List<Gift> gifts, String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
-        message.setChatId(chatId);
-        message.setMessageId(messageId);
-        message.setInlineMessageId(inlineMessageId);
+
 
         if (!gifts.isEmpty()) {
             message.setText("Это подарки, которые ты планируешь подарить" + WISH_LIST_ICON +
@@ -238,7 +163,7 @@ public class AppMenu {
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
-                .withCallBackButtonsFromGiftMap(gifts, I_PRESENT_ICON, "/i_present/show_gift_under/id") // убрал / после айди
+                .withCallBackButtonsFromGiftMap(gifts, I_PRESENT_ICON, "/i_present/show_gift_under/id")
                 .withRow()
                 .buttonWithCallbackData("« Назад",
                     "/main_menu")
@@ -261,10 +186,14 @@ public class AppMenu {
         }
 
         message.setChatId(chatId);
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+
         return message;
     }
 
-    public EditMessageText createGiftInfoIPresentMenu(Gift gift, BotUser giftHolder, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getIPresentGiftInfoTemplate(Gift gift, BotUser giftHolder, String chatId,
+                                                       int messageId, String inlineMessageId) {
         EditMessageText editedText = new EditMessageText();
 
         String giftName = gift.getName() == null ? "не указано" : gift.getName();
@@ -277,9 +206,7 @@ public class AppMenu {
             "Ссылка - " + giftUrl + "\n" +
             ONE_GUY_ICON +"Для пользователя - @" + giftHolderName + "\n\n" +
             THUMB_DOWN_POINTER_ICON + "Если передумал дарить жми" + THUMB_DOWN_POINTER_ICON);
-        editedText.setChatId(chatId);
-        editedText.setMessageId(messageId);
-        editedText.setInlineMessageId(inlineMessageId);
+
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -293,16 +220,22 @@ public class AppMenu {
             .endRow()
             .build();
 
+        editedText.setChatId(chatId);
+        editedText.setMessageId(messageId);
+        editedText.setInlineMessageId(inlineMessageId);
         editedText.setReplyMarkup(replyKeyboard);
 
         return editedText;
     }
 
-    public EditMessageText showMySubscribersListMenu(List<BotUser> subscribers, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getMySubscribersListTemplate(List<BotUser> subscribers, String chatId,
+                                                     int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
+
         if (!subscribers.isEmpty()) {
             message.setText(ARROW_LOWER_LEFT_ICON + "Это список пользователей, которые на тебя подписаны\n" +
-                "Нажми на имя пользователя "+ONE_GUY_ICON+" для для того, чтобы увидеть более детальную информацию" + WISH_LIST_ICON );
+                "Нажми на имя пользователя "+ONE_GUY_ICON+" для для того, чтобы увидеть более детальную информацию"
+                + WISH_LIST_ICON );
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
@@ -329,24 +262,21 @@ public class AppMenu {
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showSubscriberRepresentationMenu(BotUser subscriber, String chatId, int messageId, String inlineMessageId) {
-        StringBuilder textMessage = new StringBuilder();
+    public EditMessageText getSubscriberRepresentationTemplate(BotUser subscriber, String chatId,
+                                                            int messageId, String inlineMessageId) {
+        EditMessageText message = new EditMessageText();
+
         String firstName = subscriber.getFirstName() == null ? "не указано" : subscriber.getFirstName();
         String lastName = subscriber.getLastName() == null ? "не указано" : subscriber.getLastName();
 
-        textMessage.append(ONE_GUY_ICON + " Информация о пользователе:\n");
-        textMessage
-            .append("Имя пользователя - @" + subscriber.getUserName())
-            .append("\n")
-            .append("Имя - " + firstName)
-            .append("\n")
-            .append("Фамилия - " + lastName);
-
-        EditMessageText message = new EditMessageText();
-        message.setText(textMessage.toString());
+        message.setText(ONE_GUY_ICON + " Информация о пользователе:\n" +
+            "Имя пользователя - @" + subscriber.getUserName() + "\n"
+            +"Имя - " + firstName + "\n" +
+            "Фамилия - " + lastName);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -364,21 +294,24 @@ public class AppMenu {
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public SendMessage showNotificationToDeletedSubscriberMenu(BotUser deletedUser, BotUser deletedByUser) {
+    public SendMessage getAlertToDeletedSubscriberTemplate(BotUser deletedUser, BotUser deletedByUser) {
         SendMessage message = new SendMessage();
         message.setText(BROKEN_HEART_ICON + "Пользователь @" + deletedByUser.getUserName() +
             " удалил тебя из списка друзей");
 
-        message.setChatId(String.valueOf(deletedUser.getTgChatId()));
+        message.setChatId(String.valueOf(deletedUser.getTgAccountId()));
         return message;
     }
 
 
-    public EditMessageText showMySubscriptionsMenu(List<BotUser> subscriptions, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getMySubscriptionsTemplate(List<BotUser> subscriptions, String chatId,
+                                                   int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
+
         if (!subscriptions.isEmpty()) {
             message.setText("Это список пользователей на которых ты подписан.\n" +
                 "Нажми на имя пользователя, для дополнительной информации" + WISH_LIST_ICON);
@@ -408,48 +341,12 @@ public class AppMenu {
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showSubscriptionRepresentationMenu(BotUser subscription, String chatId, int messageId, String inlineMessageId) {
-        StringBuilder textMessage = new StringBuilder();
-        String firstName = subscription.getFirstName() == null ? "не указано" : subscription.getFirstName();
-        String lastName = subscription.getLastName() == null ? "не указано" : subscription.getLastName();
-
-        textMessage.append(ONE_GUY_ICON + " Информация о пользователе:\n");
-        textMessage
-            .append("Имя пользователя - @" + subscription.getUserName())
-            .append("\n")
-            .append("Имя - " + firstName)
-            .append("Фамилия - " + lastName);
-
-        EditMessageText message = new EditMessageText();
-        message.setText(textMessage.toString());
-
-        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-            .newInlineKeyboardMarkup()
-            .withRow()
-            .buttonWithCallbackData(WISH_LIST_ICON + " Посмотреть WishList",
-                "/my_subscriptions/show/id" + subscription.getTgAccountId())
-            .endRow()
-            .withRow()
-            .buttonWithCallbackData(MINUS_MARK_ICON + " Отписаться",
-                "/my_subscriptions/delete_under/id/" + subscription.getTgAccountId())
-            .endRow()
-            .withRow()
-            .buttonWithCallbackData("« Назад",
-                "/my_subscriptions")
-            .endRow()
-            .build();
-
-        message.setReplyMarkup(replyKeyboard);
-        message.setMessageId(messageId);
-        message.setInlineMessageId(inlineMessageId);
-        message.setChatId(chatId);
-        return message;
-    }
-
-    public EditMessageText showUserWishListMenu(BotUser wishListHolder, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getUserWishListTemplate(BotUser wishListHolder, String chatId,
+                                                int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         List<Gift> gifts = wishListHolder.findAvailableToDonatePresents();
         if (!gifts.isEmpty()) {
@@ -458,7 +355,8 @@ public class AppMenu {
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
-                .withCallBackButtonsFromGiftList(gifts, I_PRESENT_ICON, "/my_subscriptions/show_representation/gift_id")
+                .withCallBackButtonsFromGiftList(gifts, I_PRESENT_ICON,
+                    "/my_subscriptions/show_representation/gift_id")
                 .withRow()
                 .buttonWithCallbackData(MINUS_MARK_ICON +
                         " Отписаться от @" + wishListHolder.getUserName(),
@@ -498,17 +396,19 @@ public class AppMenu {
                 .build();
             message.setReplyMarkup(replyKeyboard);
         }
-
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showGoingDonateGiftRepresentationMenu(Gift gift,BotUser giftHolder, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getGoingDonateGiftTemplate(Gift gift,BotUser giftHolder,
+                                                                 String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+
         message.setText(I_PRESENT_ICON + "Название - " + gift.getName() +
             "\n- описание: " + description +
             "\n- ссылка: " + url);
@@ -532,24 +432,25 @@ public class AppMenu {
         return message;
     }
 
-    public SendMessage showAnonymouslyAskAddGiftMenu(BotUser askedUser) {
+    public SendMessage getAnonymouslyAskAddGiftTemplate(BotUser askedUser) {
         SendMessage message = new SendMessage();
         message.setText(EXCLAMATION_ICON + " Кто-то просит добавить подарок в твой WishList");
+        message.setChatId(String.valueOf(askedUser.getTgAccountId()));
 
-        message.setChatId(String.valueOf(askedUser.getTgChatId()));
         return message;
     }
 
-    public SendMessage showExplicitAskAddGiftMenu(BotUser askedUser) {
+    public SendMessage getExplicitAskAddGiftTemplate(BotUser askedUser) {
         SendMessage message = new SendMessage();
         message.setText(EXCLAMATION_ICON + " @" + askedUser.getUserName() + " просит добавить подарок в твой WishList");
+        message.setChatId(String.valueOf(askedUser.getTgAccountId()));
 
-        message.setChatId(String.valueOf(askedUser.getTgChatId()));
         return message;
     }
 
-    public SendMessage showSendRequestMenu(String chatId) {
+    public SendMessage getSendFriendshipRequestTemplate(String chatId) {
         SendMessage message = new SendMessage();
+
         message.setText(CHECK_MARK_ICON
             + "Запрос отправлен. После принятия заявки WishList будет доступен для просмотра");
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
@@ -561,13 +462,14 @@ public class AppMenu {
             .build();
 
         message.setReplyMarkup(replyKeyboard);
-
         message.setChatId(chatId);
+
         return message;
     }
 
-    public SendMessage showFriendShipRequestTo(BotUser toUserName, BotUser fromUserName) {
+    public SendMessage getFriendShipRequestToTemplate(BotUser toUserName, BotUser fromUserName) {
         SendMessage message = new SendMessage();
+
         message.setText(PAPERCLIPS_ICON + "️ЗАПРОС НА ДРУЖБУ! " + PAPERCLIPS_ICON + " \n" +
             HI_ICON + "Привет, " + toUserName.getUserName()
             + "! Это @" + fromUserName.getUserName() + ", добавь меня в друзья!");
@@ -586,15 +488,15 @@ public class AppMenu {
             .endRow()
             .build();
 
-
         message.setReplyMarkup(replyKeyboard);
-        message.setChatId(String.valueOf(toUserName.getTgChatId()));
+        message.setChatId(String.valueOf(toUserName.getTgAccountId()));
 
         return message;
     }
 
-    public SendMessage showFriendShipAcceptedMenu(BotUser byUserAccepted, String chatId) {
+    public SendMessage getFriendShipAcceptedTemplate(BotUser byUserAccepted, String chatId) {
         SendMessage message = new SendMessage();
+
         message.setText(CHECK_MARK_ICON + " @" + byUserAccepted.getUserName() + " принял предложение дружбы" +
             ". Его WishList доступен для просмотра");
 
@@ -607,12 +509,12 @@ public class AppMenu {
             .build();
 
         message.setReplyMarkup(replyKeyboard);
-
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showSettingsMenu(String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getSettingsTemplate(String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setText(SETTINGS_ICON + "Ты в меню настроек");
 
@@ -640,11 +542,13 @@ public class AppMenu {
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showIsReadyReceiveUpdateMenu(String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getUpdatesSettingsTemplate(String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
+
         message.setText(NOTIFICATION_ICON + " Хочешь получать уведомления, когда кто-то из твоих друзей " +
             "добавит новый подарок в свой WishList?");
 
@@ -668,10 +572,11 @@ public class AppMenu {
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public EditMessageText showSetVisibilityWishListMenu(String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getVisibilitySettingsTemplate(String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setText(SEE_ICON + " Кто может видеть твой WishList?");
 
@@ -690,30 +595,30 @@ public class AppMenu {
                 "/settings")
             .endRow()
             .build();
+
         message.setReplyMarkup(replyKeyboard);
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
+
         return message;
     }
 
-    public SendMessage showOkStatusMenu(String text, String chatId) {
-        if (text != null) {
-            return new SendMessage(chatId, CHECK_MARK_ICON + " " + text);
-        }
-        return new SendMessage(chatId, CHECK_MARK_ICON + " Успешно!");
-    }
-
-    public EditMessageText showAcceptingFriendshipStatusOkMenu(String userName, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getAcceptedFriendshipTemplate(String userName, String chatId,
+                                                               int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
+
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
-        message.setText(CHECK_MARK_ICON + " Запрос на дружбу от @" + userName + " принят. Теперь он имеет доступ к твоему WishList'y");
+        message.setText(CHECK_MARK_ICON + " Запрос на дружбу от @" + userName
+            + " принят. Теперь он имеет доступ к твоему WishList'y");
+
         return message;
     }
 
-    public EditMessageText showAcceptingFriendshipStatusDeniedMenu(String userName, String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getDeniedFriendshipTemplate(String userName, String chatId,
+                                                                   int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
@@ -722,29 +627,11 @@ public class AppMenu {
         return message;
     }
 
-    public SendMessage showErrorStatusMenu(String text, String chatId) {
+    public SendMessage getErrorStatusTemplate(String text, String chatId) {
         if (text != null) {
             return new SendMessage(chatId, CROSS_MARK_ICON + " " + text);
         }
         return new SendMessage(chatId, CROSS_MARK_ICON + " Возникла ошибка, операция не выполнена");
     }
-
-    public SendMessage showCustomSingleInlineButton(String text, String buttonText, String callbackData, String chatId) {
-        SendMessage message = new SendMessage();
-        message.setText(text);
-
-        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
-            .newInlineKeyboardMarkup()
-            .withRow()
-            .buttonWithCallbackData(buttonText, callbackData)
-            .endRow()
-            .build();
-
-        message.setReplyMarkup(replyKeyboard);
-
-        message.setChatId(chatId);
-        return message;
-    }
-
 
 }

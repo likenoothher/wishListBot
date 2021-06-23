@@ -1,6 +1,7 @@
 package com.aziarets.vividapp.controllers;
 
 import com.aziarets.vividapp.dao.BotUserRepo;
+import com.aziarets.vividapp.data.Storage;
 import com.aziarets.vividapp.model.BotUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,11 +16,11 @@ import java.util.List;
 public class MainController {
 
     @Autowired
-    private BotUserRepo botUserRepo;
+    private Storage storage;
 
-    @RequestMapping("/1")
+    @RequestMapping("/")
     public String findBotUserById(Model model){
-       BotUser botUser = botUserRepo.getById(1);
+       BotUser botUser = storage.findUserByUserName("john_yoy").get();
        model.addAttribute("user", botUser);
        return "main";
     }

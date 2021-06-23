@@ -1,0 +1,70 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+
+    <title>Vivid - Main </title>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} " />
+<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
+</head>
+<body>
+<header>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #a799c7">
+        <div class="container">
+
+            <a href="" class="navbar-brand">Vivid WishList</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/my_wishlist">My WishList</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/i_present">I present</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/my_subscribers">Subscribers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/my_subscriptions">Subscriptions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/find_friend">Find a Friend</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/settings">Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <div id="carousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img th:src="@{/img/presentingGift1.jpg}" class="d-block w-100" alt="presenting1" >
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/favicon.png}" class="d-block w-100" alt="presenting12">
+            </div>
+            <div class="carousel-item">
+                <img th:src="@{/img/presentingGift3.jpg}" class="d-block w-100" alt="presenting3">
+            </div>
+        </div>
+    </div>
+
+
+</main>
+
+
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+</html>
