@@ -1,6 +1,6 @@
 package com.aziarets.vividapp.handler;
 
-import com.aziarets.vividapp.data.Storage;
+import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
@@ -22,7 +22,7 @@ import static com.aziarets.vividapp.menu.Icon.*;
 
 @Component
 public class CallbackHandler {
-    private Storage storage;
+    private BotService botService;
     private BotMenuTemplate menu;
     private String chatId;
     private String callbackData;
@@ -31,8 +31,8 @@ public class CallbackHandler {
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
-    public CallbackHandler(Storage storage, BotMenuTemplate menu) {
-        this.storage = storage;
+    public CallbackHandler(BotService botService, BotMenuTemplate menu) {
+        this.botService = botService;
         this.menu = menu;
     }
 
@@ -91,21 +91,21 @@ public class CallbackHandler {
 
     private void handleMyWishListRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_wish_list")) {
-            List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
+            List<Gift> gifts = botService.getUserWishListGifts(updateSender.getTgAccountId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
             return;
         }
 
         if (callbackData.equals("/my_wish_list/add_present")) {
-            Optional<BotUser> user = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
             if (user.isPresent()) {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_NAME);
                 updatedUser.setCarryingMessageId(messageId);
                 updatedUser.setCarryingInlineMessageId(inlineMessageId);
-                storage.updateUser(updatedUser);
+                botService.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши имя подарка и отправь"));
             } else {
@@ -118,7 +118,7 @@ public class CallbackHandler {
         if (callbackData.contains("/my_wish_list/edit_my_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
 
-            Optional<Gift> updatedGift = storage.findGiftById(updatedGiftId);
+            Optional<Gift> updatedGift = botService.findGiftById(updatedGiftId);
             if (updatedGift.isPresent()) {
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift.get(), chatId, messageId, inlineMessageId));
@@ -131,7 +131,7 @@ public class CallbackHandler {
 
         if (callbackData.contains("my_wish_list/edit_description_of_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> user = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
             if (user.isPresent()) {
                 BotUser updatedUser = user.get();
@@ -139,7 +139,7 @@ public class CallbackHandler {
                 updatedUser.setUpdateGiftId(updatedGiftId);
                 updatedUser.setCarryingMessageId(messageId);
                 updatedUser.setCarryingInlineMessageId(inlineMessageId);
-                storage.updateUser(updatedUser);
+                botService.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши детальное описание подарка и отправь"));
             } else {
@@ -151,14 +151,14 @@ public class CallbackHandler {
 
         if (callbackData.contains("my_wish_list/edit_url_of_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> user = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
             if (user.isPresent()) {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_URl);
                 updatedUser.setUpdateGiftId(updatedGiftId);
                 updatedUser.setCarryingMessageId(messageId);
                 updatedUser.setCarryingInlineMessageId(inlineMessageId);
-                storage.updateUser(updatedUser);
+                botService.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Вставь ссылку на подарок и отправь"));
             } else {
@@ -170,10 +170,10 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_wish_list/delete_my_present_under/id/")) {
             int giftIdForDelete = extractLastAfterSlashId(callbackData);
-            Optional<Gift> deletedGift = storage.findGiftById(giftIdForDelete);
+            Optional<Gift> deletedGift = botService.findGiftById(giftIdForDelete);
 
-            if (storage.deleteGift(giftIdForDelete)) {
-                List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
+            if (botService.deleteGift(giftIdForDelete)) {
+                List<Gift> gifts = botService.getUserWishListGifts(updateSender.getTgAccountId());
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + "Подарок "+ deletedGift.get().getName() + " был удалён"));
                 messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
 
@@ -191,7 +191,7 @@ public class CallbackHandler {
     private void handleIPresentRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/i_present")) {
 
-            Map<BotUser, Gift> iPresentList = storage.getUserPresentsMap(updateSender);
+            Map<BotUser, Gift> iPresentList = botService.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             return;
@@ -199,8 +199,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/i_present/show_gift_under/id")) {
             int requestedGiftId = extractLastAfterSlashId(callbackData);
-            Gift requestedGift = storage.findGiftById(requestedGiftId).get();
-            BotUser giftHolder = storage.findGiftHolderByGiftId(requestedGiftId).get();
+            Gift requestedGift = botService.findGiftById(requestedGiftId).get();
+            BotUser giftHolder = botService.findGiftHolderByGiftId(requestedGiftId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentGiftInfoTemplate(requestedGift, giftHolder, chatId, messageId, inlineMessageId));
             return;
@@ -208,12 +208,12 @@ public class CallbackHandler {
 
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
             int refusedGiftId = extractLastAfterSlashId(callbackData);
-            if (storage.refuseFromDonate(refusedGiftId, updateSender)) {
-                Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
+            if (botService.refuseFromDonate(refusedGiftId, updateSender)) {
+                Map<BotUser, Gift> iPresentList  = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             } else {
-                Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
+                Map<BotUser, Gift> iPresentList  = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             }
@@ -223,7 +223,7 @@ public class CallbackHandler {
 
     private void handleMySubscribersRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscribers")) {
-            List<BotUser> userSubscribers = storage.getUserSubscribers(updateSender);
+            List<BotUser> userSubscribers = botService.getUserSubscribers(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
             return;
@@ -231,7 +231,7 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscribers/show/id")) {
             int subscriberId = extractLastAfterSlashId(callbackData);
-            BotUser subscriber = storage.findUserByTelegramId(subscriberId).get();
+            BotUser subscriber = botService.findUserByTelegramId(subscriberId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getSubscriberRepresentationTemplate(subscriber, chatId, messageId, inlineMessageId));
             return;
@@ -241,11 +241,11 @@ public class CallbackHandler {
             long deletedUserId = extractLastAfterSlashId(callbackData);
             long byUserDeletedId = updateSender.getTgAccountId();
 
-            BotUser deletedUser = storage.findUserByTelegramId(deletedUserId).orElse(null);
-            BotUser byUserDeleted = storage.findUserByTelegramId(byUserDeletedId).orElse(null);
+            BotUser deletedUser = botService.findUserByTelegramId(deletedUserId).orElse(null);
+            BotUser byUserDeleted = botService.findUserByTelegramId(byUserDeletedId).orElse(null);
 
-            boolean isUnsubscribed = storage.removeSubscriberFromSubscriptions(deletedUser, byUserDeleted);
-            List<BotUser> userSubscribers = storage.getUserSubscribers(updateSender);
+            boolean isUnsubscribed = botService.removeSubscriberFromSubscriptions(deletedUser, byUserDeleted);
+            List<BotUser> userSubscribers = botService.getUserSubscribers(updateSender);
             if (isUnsubscribed) {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Пользователь был удалён из списка твоих подписчиков"));
                 messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
@@ -260,7 +260,7 @@ public class CallbackHandler {
 
     private void handleMySubscriptionsRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscriptions")) {
-            List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
+            List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             return;
@@ -268,8 +268,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/show_representation/gift_id")) {
             int giftId = extractLastAfterSlashId(callbackData);
-            Gift gift  = storage.findGiftById(giftId).get();
-            BotUser giftHolder = storage.findGiftHolderByGiftId(giftId).get();
+            Gift gift  = botService.findGiftById(giftId).get();
+            BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getGoingDonateGiftTemplate(gift,giftHolder,  chatId, messageId, inlineMessageId));
             return;
@@ -277,9 +277,9 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/show/id")) {
             int wishListHolderId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> wishListHolder = storage.findUserByTelegramId(wishListHolderId);
-            List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
-            List<Gift> gifts = storage.getAvailableToDonateGifts(wishListHolderId);
+            Optional<BotUser> wishListHolder = botService.findUserByTelegramId(wishListHolderId);
+            List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
+            List<Gift> gifts = botService.getAvailableToDonateGifts(wishListHolderId);
 
             if (wishListHolder.isPresent()) {
                 wishListHolder.get().getWishList().setGiftList(gifts);
@@ -297,14 +297,14 @@ public class CallbackHandler {
             int giftId = extractLastAfterSlashId(callbackData);
             Optional<BotUser> wishListHolder;
 
-            if (storage.donate(giftId, updateSender)) {
-                wishListHolder = storage.findGiftHolderByGiftId(giftId);
-                List<Gift> gifts = storage.getAvailableToDonateGifts(wishListHolder.get().getId());
+            if (botService.donate(giftId, updateSender)) {
+                wishListHolder = botService.findGiftHolderByGiftId(giftId);
+                List<Gift> gifts = botService.getAvailableToDonateGifts(wishListHolder.get().getId());
                 wishListHolder.get().getWishList().setGiftList(gifts);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок добавлен в твою секцию \"Я дарю \"" +I_PRESENT_ICON));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             } else {
-                wishListHolder = storage.findGiftHolderByGiftId(giftId);
+                wishListHolder = botService.findGiftHolderByGiftId(giftId);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не добавлен. Произошла ошибка"));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             }
@@ -313,9 +313,9 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_anonymously/id/")) {
             int userRequestedToId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> userRequestedTo = storage.findUserByTelegramId(userRequestedToId);
-            List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
-            List<BotUser> userSubscribers = storage.getUserSubscribers(userRequestedTo.get());
+            Optional<BotUser> userRequestedTo = botService.findUserByTelegramId(userRequestedToId);
+            List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
+            List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
 
             if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
                 messagesToSend.add(menu.getAnonymouslyAskAddGiftTemplate(userRequestedTo.get()));
@@ -330,9 +330,9 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_explicitly/id/")) {
             int userRequestedToId = extractLastAfterSlashId(callbackData);
-            Optional<BotUser> userRequestedTo = storage.findUserByTelegramId(userRequestedToId);
-            List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
-            List<BotUser> userSubscribers = storage.getUserSubscribers(userRequestedTo.get());
+            Optional<BotUser> userRequestedTo = botService.findUserByTelegramId(userRequestedToId);
+            List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
+            List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
 
             if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
                 messagesToSend.add(menu.getExplicitAskAddGiftTemplate(userRequestedTo.get()));
@@ -349,11 +349,11 @@ public class CallbackHandler {
             long deletedUserId = extractLastAfterSlashId(callbackData);
             long byUserDeletedId = updateSender.getTgAccountId();
 
-            BotUser deletedUser = storage.findUserByTelegramId(deletedUserId).orElse(null);
-            BotUser byUserDeleted = storage.findUserByTelegramId(byUserDeletedId).orElse(null);
+            BotUser deletedUser = botService.findUserByTelegramId(deletedUserId).orElse(null);
+            BotUser byUserDeleted = botService.findUserByTelegramId(byUserDeletedId).orElse(null);
 
-            boolean isUnsubscribed = storage.removeSubscriptionFromSubscriber(deletedUser, byUserDeleted);
-            List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
+            boolean isUnsubscribed = botService.removeSubscriptionFromSubscriber(deletedUser, byUserDeleted);
+            List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             if (isUnsubscribed) {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Ты был успешно отписан от пользователя @"
                   + deletedUser.getUserName()));
@@ -369,12 +369,12 @@ public class CallbackHandler {
 
     private void handleFindFriendRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/find_friend")) {
-            Optional<BotUser> user = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
             if (user.isPresent()) {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.SEARCHING_FRIEND);
-                storage.updateUser(updatedUser);
+                botService.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши имя пользователя в Telegram"));
             }
@@ -385,10 +385,10 @@ public class CallbackHandler {
             long requestedUserId = extractSecondLastAfterSlashId(callbackData);
             long byUserAcceptedId = extractLastAfterSlashId(callbackData);
 
-            BotUser requestedUser = storage.findUserByTelegramId(requestedUserId).orElse(null);
-            BotUser byUserAccepted = storage.findUserByTelegramId(byUserAcceptedId).orElse(null);
+            BotUser requestedUser = botService.findUserByTelegramId(requestedUserId).orElse(null);
+            BotUser byUserAccepted = botService.findUserByTelegramId(byUserAcceptedId).orElse(null);
 
-            boolean isSubscribed = storage.addSubscriberToSubscriptions(requestedUser, byUserAccepted);
+            boolean isSubscribed = botService.addSubscriberToSubscriptions(requestedUser, byUserAccepted);
 
             messagesToSend.add(callbackAnswer(update));
             if (isSubscribed) {
@@ -406,8 +406,8 @@ public class CallbackHandler {
             long requestedUserId = extractSecondLastAfterSlashId(callbackData);
             long byUserDeniedId = extractLastAfterSlashId(callbackData);
 
-            BotUser requestedUser = storage.findUserByTelegramId(requestedUserId).orElse(null);
-            BotUser byUserDenied = storage.findUserByTelegramId(byUserDeniedId).orElse(null);
+            BotUser requestedUser = botService.findUserByTelegramId(requestedUserId).orElse(null);
+            BotUser byUserDenied = botService.findUserByTelegramId(byUserDeniedId).orElse(null);
 
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getErrorStatusTemplate(byUserDenied.getUserName() + " отклонил предложение дружбы",
@@ -428,7 +428,7 @@ public class CallbackHandler {
 
         if (callbackData.equals("/settings/contact_developer")) {
             updateSender.setBotUserStatus(BotUserStatus.CONTACTING_DEVELOPER);
-            storage.updateUser(updateSender);
+            botService.updateUser(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, "Напиши своё обращение к разработчику и отправь"));
             return;
@@ -441,12 +441,12 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/true")) {
-            Optional<BotUser> currentUser = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> currentUser = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
             if (currentUser.isPresent()) {
                 BotUser updatedUser = currentUser.get();
                 updatedUser.setReadyReceiveUpdates(true);
-                if (storage.updateUser(updatedUser)) {
+                if (botService.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Уведомления об обновлениях друзей включены"));
                     messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
@@ -461,12 +461,12 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/false")) {
-            Optional<BotUser> currentUser = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> currentUser = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
             if (currentUser.isPresent()) {
                 BotUser updatedUser = currentUser.get();
                 updatedUser.setReadyReceiveUpdates(false);
-                if (storage.updateUser(updatedUser)) {
+                if (botService.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Уведомления об обновлениях друзей отключены"));
                     messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
@@ -487,11 +487,11 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/true")) {
-            Optional<BotUser> currentUser = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> currentUser = botService.findUserByTelegramId(updateSender.getTgAccountId());
             if (currentUser.isPresent()) {
                 BotUser updatedUser = currentUser.get();
                 updatedUser.setAllCanSeeMyWishList(false);
-                if (storage.updateUser(updatedUser)) {
+                if (botService.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Видимость твоего WishList'а - только подписчики"));
                     messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
@@ -506,11 +506,11 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/false")) {
-            Optional<BotUser> currentUser = storage.findUserByTelegramId(updateSender.getTgAccountId());
+            Optional<BotUser> currentUser = botService.findUserByTelegramId(updateSender.getTgAccountId());
             if (currentUser.isPresent()) {
                 BotUser updatedUser = currentUser.get();
                 updatedUser.setAllCanSeeMyWishList(true);
-                if (storage.updateUser(updatedUser)) {
+                if (botService.updateUser(updatedUser)) {
                     messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Видимость твоего WishList'а - все пользователи"));
                     messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
                 } else {
@@ -570,7 +570,7 @@ public class CallbackHandler {
     private void resetBotUserStatus(BotUser user) {
         if(user.getBotUserStatus() != BotUserStatus.WITHOUT_STATUS) {
             user.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
-            storage.updateUser(user);
+            botService.updateUser(user);
         }
     }
 }

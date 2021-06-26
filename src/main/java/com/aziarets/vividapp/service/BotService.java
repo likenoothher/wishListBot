@@ -1,6 +1,9 @@
-package com.aziarets.vividapp.data;
+package com.aziarets.vividapp.service;
 
 import com.aziarets.vividapp.dao.*;
+import com.aziarets.vividapp.util.BotUserExtractor;
+import com.aziarets.vividapp.exception.NotFoundUserNameException;
+import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
@@ -14,14 +17,14 @@ import java.util.*;
 
 @Service
 @Transactional
-public class Storage {
+public class BotService {
     private BotUserExtractor botUserExtractor;
     private BotUserDao userRepo;
     private WishListDao wishListDao;
     private GiftDao giftRepo;
 
     @Autowired
-    public Storage(BotUserExtractor botUserExtractor, BotUserDaoImpl userRepo, WishListDaoImpl wishListRepo, GiftDao giftDao) {
+    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userRepo, WishListDaoImpl wishListRepo, GiftDao giftDao) {
         this.botUserExtractor = botUserExtractor;
         this.userRepo = userRepo;
         this.wishListDao = wishListRepo;

@@ -1,8 +1,8 @@
 package com.aziarets.vividapp.handler;
 
-import com.aziarets.vividapp.data.NotFoundUserNameException;
-import com.aziarets.vividapp.data.Storage;
-import com.aziarets.vividapp.data.UserIsBotException;
+import com.aziarets.vividapp.exception.NotFoundUserNameException;
+import com.aziarets.vividapp.service.BotService;
+import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.menu.Icon;
 import com.aziarets.vividapp.model.BotUser;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 public class UpdateHandler {
-    private Storage storage;
+    private BotService botService;
     private BotMenuTemplate menu;
     private CallbackHandler callbackHandler;
     private MessageHandler messageHandler;
@@ -25,8 +25,8 @@ public class UpdateHandler {
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
-    public UpdateHandler(Storage storage, BotMenuTemplate menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
-        this.storage = storage;
+    public UpdateHandler(BotService botService, BotMenuTemplate menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
+        this.botService = botService;
         this.menu = menu;
         this.callbackHandler = callbackHandler;
         this.messageHandler = messageHandler;
@@ -38,7 +38,7 @@ public class UpdateHandler {
 
         BotUser updateSender = null;
         try {
-            updateSender = storage.identifyUser(update);
+            updateSender = botService.identifyUser(update);
         } catch (NotFoundUserNameException e) {
             e.printStackTrace();
             return List.of(new SendMessage(chatId, "К сожалению, для пользования нашим ботом" +
