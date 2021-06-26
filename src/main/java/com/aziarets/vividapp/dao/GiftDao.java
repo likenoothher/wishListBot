@@ -6,7 +6,7 @@ import com.aziarets.vividapp.model.Gift;
 import java.util.List;
 import java.util.Map;
 
-public interface GiftRepo {
+public interface GiftDao {
     public long save(Gift gift);
     public boolean update(Gift gift);
     public boolean remove(long id);

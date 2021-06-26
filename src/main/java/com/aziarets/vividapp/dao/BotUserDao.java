@@ -6,7 +6,7 @@ import com.aziarets.vividapp.model.Gift;
 import java.util.List;
 import java.util.Optional;
 
-public interface BotUserRepo {
+public interface BotUserDao {
     public boolean save(BotUser botUser);
     public boolean update(BotUser botUser);
     public BotUser getById(long id);

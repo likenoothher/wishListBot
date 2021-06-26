@@ -36,7 +36,7 @@ public class MessageHandler {
 
     public List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
         chatId = getUpdateChatId(update);
-        messageText = update.getMessage().getText();
+        messageText = update.getMessage().getText() == null ? "null" : update.getMessage().getText();
         messagesToSend.clear();
 
         if (updateSender.getBotUserStatus().equals(BotUserStatus.WITHOUT_STATUS)) {
@@ -75,7 +75,7 @@ public class MessageHandler {
         }
 
         SendMessage unknownCommandMessage = menu.getMainMenuTemplate(chatId);
-        unknownCommandMessage.setText("Не знаю такой команды " + DISAPPOINTED_ICON + "\n" +
+        unknownCommandMessage.setText("Неизвестная команда " + DISAPPOINTED_ICON + "\n" +
             "Попробуй ещё раз из главного меню" + HMM_ICON);
 
         messagesToSend.add(unknownCommandMessage);
@@ -137,7 +137,7 @@ public class MessageHandler {
             Gift updatedGift = gift.get();
             updatedGift.setDescription(messageText);
 
-            if (storage.updateGiftOfUser(updatedGift, updateSender)) {
+            if (storage.updateGift(updatedGift)) {
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.getErrorStatusTemplate("Описание подарка не изменено. Произошла ошибка",
@@ -160,7 +160,7 @@ public class MessageHandler {
             Gift updatedGift = gift.get();
             updatedGift.setUrl(messageText);
 
-            if (storage.updateGiftOfUser(updatedGift, updateSender)) {
+            if (storage.updateGift(updatedGift)) {
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.getErrorStatusTemplate("Ссылка подарка не изменена. Произошла ошибка",

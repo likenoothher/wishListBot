@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Vivid</title>
+
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <title>Vivid - Main </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+<section>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Updating gift: <span th:text="${gift.getName()}"></span></h3>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-8">
+                    <form method="post" th:action="@{/updateGift}">
+                        <div class="form-group row">
+
+                            <div class="col-md-12 mt-3">
+                                <label for="giftDescription">Gift Description</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="giftDescription" autocomplete="off"
+                                           th:placeholder="${gift.getDescription()}"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <label for="giftURL">Gift URL</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="giftURL" autocomplete="off"
+                                           th:placeholder="${gift.getUrl()}" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" th:value="${gift.getId()}" name="giftId"/>
+                        <input type="hidden" th:value="*{giftHolderId}" name="giftHolderId">
+
+                        <a href="/" class="btn btn-primary">Back</a>
+                        <button class="btn btn-success" type="submit">Update</button>
+                    </form>
+                </div>
+
+                <div class="col-md-2">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

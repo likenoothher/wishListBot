@@ -26,6 +26,8 @@ public class CallbackHandler {
     private BotMenuTemplate menu;
     private String chatId;
     private String callbackData;
+    private String inlineMessageId;
+    private int messageId;
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
@@ -38,64 +40,61 @@ public class CallbackHandler {
         chatId = getUpdateChatId(update);
         messagesToSend.clear();
         callbackData = extractCallbackData(update.getCallbackQuery());
+        inlineMessageId = update.getCallbackQuery().getInlineMessageId();
+        messageId = update.getCallbackQuery().getMessage().getMessageId();
 
         resetBotUserStatus(updateSender);
 
         if (callbackData.startsWith("/my_wish_list")) {
-            messagesToSend.addAll(handleMyWishListRequests(update, updateSender));
-            return
+            handleMyWishListRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.startsWith("/i_present")) {
-            messagesToSend.addAll(handleIPresentRequests(update, updateSender));
+            handleIPresentRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.startsWith("/my_subscribers")) {
-            messagesToSend.addAll(handleMySubscribersRequests(update, updateSender));
+            handleMySubscribersRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.startsWith("/my_subscriptions")) {
-            messagesToSend.addAll(handleMySubscriptionsRequests(update, updateSender));
+            handleMySubscriptionsRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.startsWith("/find_friend")) {
-            messagesToSend.addAll(handleFindFriendRequests(update, updateSender));
+            handleFindFriendRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.startsWith("/settings")) {
-            messagesToSend.addAll(handleSettingsRequests(update, updateSender));
+            handleSettingsRequests(update, updateSender);
+            return messagesToSend;
         }
 
         if (callbackData.equals("/main_menu")) {
-            int messageId = update.getCallbackQuery().getMessage().getMessageId();
-            String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
             messagesToSend.add(callbackAnswer(update));
-            messagesToSend.add(menu.showEditedMainMenu(extractChatId(update), messageId, inlineMessageId));
-        }
-
-        if (!messagesToSend.isEmpty()) {
+            messagesToSend.add(menu.showEditedMainMenu(chatId, messageId, inlineMessageId));
             return messagesToSend;
         }
-        String chatId = extractChatId(update);
+
         SendMessage unknownCommandMessage = new SendMessage(chatId, "Не знаю такой команды"
             + DISAPPOINTED_ICON);
         unknownCommandMessage.setChatId(chatId);
+        messagesToSend.add(unknownCommandMessage);
 
-        return List.of(unknownCommandMessage);
+        return messagesToSend;
     }
 
-    private List<BotApiMethod> handleMyWishListRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
-
+    private void handleMyWishListRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_wish_list")) {
             List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.equals("/my_wish_list/add_present")) {
@@ -104,8 +103,8 @@ public class CallbackHandler {
             if (user.isPresent()) {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_NAME);
-                updatedUser.setCarryingMessageId(update.getCallbackQuery().getMessage().getMessageId());
-                updatedUser.setCarryingInlineMessageId(update.getCallbackQuery().getInlineMessageId());
+                updatedUser.setCarryingMessageId(messageId);
+                updatedUser.setCarryingInlineMessageId(inlineMessageId);
                 storage.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши имя подарка и отправь"));
@@ -113,6 +112,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
             }
+            return;
         }
 
         if (callbackData.contains("/my_wish_list/edit_my_present_under/id/")) {
@@ -120,13 +120,13 @@ public class CallbackHandler {
 
             Optional<Gift> updatedGift = storage.findGiftById(updatedGiftId);
             if (updatedGift.isPresent()) {
-//                storage.updateUser(updateSender);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift.get(), chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
             }
+            return;
         }
 
         if (callbackData.contains("my_wish_list/edit_description_of_present_under/id/")) {
@@ -137,8 +137,8 @@ public class CallbackHandler {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_DESCRIPTION);
                 updatedUser.setUpdateGiftId(updatedGiftId);
-                updatedUser.setCarryingMessageId(update.getCallbackQuery().getMessage().getMessageId());
-                updatedUser.setCarryingInlineMessageId(update.getCallbackQuery().getInlineMessageId());
+                updatedUser.setCarryingMessageId(messageId);
+                updatedUser.setCarryingInlineMessageId(inlineMessageId);
                 storage.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши детальное описание подарка и отправь"));
@@ -146,6 +146,7 @@ public class CallbackHandler {
                 messagesToSend.add(menu.getErrorStatusTemplate("Почему то не смогли найти подарок в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)", chatId));
             }
+            return;
         }
 
         if (callbackData.contains("my_wish_list/edit_url_of_present_under/id/")) {
@@ -155,8 +156,8 @@ public class CallbackHandler {
                 BotUser updatedUser = user.get();
                 updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_URl);
                 updatedUser.setUpdateGiftId(updatedGiftId);
-                updatedUser.setCarryingMessageId(update.getCallbackQuery().getMessage().getMessageId());
-                updatedUser.setCarryingInlineMessageId(update.getCallbackQuery().getInlineMessageId());
+                updatedUser.setCarryingMessageId(messageId);
+                updatedUser.setCarryingInlineMessageId(inlineMessageId);
                 storage.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Вставь ссылку на подарок и отправь"));
@@ -164,13 +165,14 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
             }
+            return;
         }
 
         if (callbackData.contains("/my_wish_list/delete_my_present_under/id/")) {
             int giftIdForDelete = extractLastAfterSlashId(callbackData);
             Optional<Gift> deletedGift = storage.findGiftById(giftIdForDelete);
 
-            if (storage.deleteGiftOfUser(giftIdForDelete, updateSender)) {
+            if (storage.deleteGift(giftIdForDelete)) {
                 List<Gift> gifts = storage.getUserWishListGifts(updateSender.getTgAccountId());
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + "Подарок "+ deletedGift.get().getName() + " был удалён"));
                 messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
@@ -183,22 +185,16 @@ public class CallbackHandler {
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
             }
         }
-        return messagesToSend;
+        return;
     }
 
-    private List<BotApiMethod> handleIPresentRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
-
+    private void handleIPresentRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/i_present")) {
 
             Map<BotUser, Gift> iPresentList = storage.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.contains("/i_present/show_gift_under/id")) {
@@ -207,6 +203,7 @@ public class CallbackHandler {
             BotUser giftHolder = storage.findGiftHolderByGiftId(requestedGiftId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentGiftInfoTemplate(requestedGift, giftHolder, chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
@@ -214,36 +211,30 @@ public class CallbackHandler {
             if (storage.refuseFromDonate(refusedGiftId, updateSender)) {
                 Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
-                messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId)); // добавить всплывающее окно
+                messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             } else {
                 Map<BotUser, Gift> iPresentList  = storage.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             }
         }
-        return messagesToSend;
+        return;
     }
 
-    private List<BotApiMethod> handleMySubscribersRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
-
+    private void handleMySubscribersRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscribers")) {
             List<BotUser> userSubscribers = storage.getUserSubscribers(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
+            return;
         }
-
 
         if (callbackData.contains("/my_subscribers/show/id")) {
             int subscriberId = extractLastAfterSlashId(callbackData);
             BotUser subscriber = storage.findUserByTelegramId(subscriberId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getSubscriberRepresentationTemplate(subscriber, chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.contains("/my_subscribers/delete_under/id")) {
@@ -264,21 +255,15 @@ public class CallbackHandler {
                 messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
             }
         }
-        return messagesToSend;
+        return;
     }
 
-    private List<BotApiMethod> handleMySubscriptionsRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
-
+    private void handleMySubscriptionsRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscriptions")) {
             List<BotUser> userSubscriptions = storage.getUserSubscriptions(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/show_representation/gift_id")) {
@@ -287,6 +272,7 @@ public class CallbackHandler {
             BotUser giftHolder = storage.findGiftHolderByGiftId(giftId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getGoingDonateGiftTemplate(gift,giftHolder,  chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/show/id")) {
@@ -304,6 +290,7 @@ public class CallbackHandler {
                     "WishList пользователя"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/going_donate/gift_id/")) {
@@ -321,6 +308,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не добавлен. Произошла ошибка"));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_anonymously/id/")) {
@@ -337,6 +325,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Запрос не отправлен. Возможно ты был удалён из списка друзей"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_explicitly/id/")) {
@@ -353,6 +342,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Запрос не отправлен. Не смогли найти пользователя"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.contains("/my_subscriptions/delete_under/id")) {
@@ -374,17 +364,10 @@ public class CallbackHandler {
             }
         }
 
-        return messagesToSend;
+        return;
     }
 
-    private List<BotApiMethod> handleFindFriendRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
-
+    private void handleFindFriendRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/find_friend")) {
             Optional<BotUser> user = storage.findUserByTelegramId(updateSender.getTgAccountId());
 
@@ -395,6 +378,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши имя пользователя в Telegram"));
             }
+            return;
         }
 
         if (callbackData.contains("/find_friend/accept_friendship/")) {
@@ -415,6 +399,7 @@ public class CallbackHandler {
                 messagesToSend.add(menu.getErrorStatusTemplate("Произошла ошибка, пользователь не был добавлен",
                     String.valueOf(byUserAccepted.getTgAccountId())));
             }
+            return;
         }
 
         if (callbackData.contains("/find_friend/deny_friendship/")) {
@@ -431,36 +416,28 @@ public class CallbackHandler {
                 String.valueOf(byUserDenied.getTgAccountId()), messageId, inlineMessageId));
         }
 
-        return messagesToSend;
+        return;
     }
 
-    private List<BotApiMethod> handleSettingsRequests(Update update, BotUser updateSender) {
-        List<BotApiMethod> messagesToSend = new ArrayList<>();
-        int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String inlineMessageId = update.getCallbackQuery().getInlineMessageId();
-
-        String callbackData = extractCallbackData(update.getCallbackQuery());
-        String chatId = extractChatId(update);
+    private void handleSettingsRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/settings")) {
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
+            return;
         }
-//        if (callbackData.equals("/settings/help")) {          ADD SOS MENU!!!!!!!!!!!!
-//            messagesToSend.add(callbackAnswer(update));
-//            messagesToSend.add(new SendMessage(chatId, "Серьёзно планировала здесь что то увидеть?\uD83D\uDE06"));
-//        }
 
         if (callbackData.equals("/settings/contact_developer")) {
             updateSender.setBotUserStatus(BotUserStatus.CONTACTING_DEVELOPER);
             storage.updateUser(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, "Напиши своё обращение к разработчику и отправь"));
+            return;
         }
-
 
         if (callbackData.equals("/settings/set_is_ready_receive_update")) {
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getUpdatesSettingsTemplate(chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/true")) {
@@ -480,6 +457,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/false")) {
@@ -499,11 +477,13 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.equals("/settings/set_visibility")) {
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getVisibilitySettingsTemplate(chatId, messageId, inlineMessageId));
+            return;
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/true")) {
@@ -522,6 +502,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Настройки не сохранены. Не найден пользователь"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             }
+            return;
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/false")) {
@@ -542,7 +523,7 @@ public class CallbackHandler {
             }
         }
 
-        return messagesToSend;
+        return;
     }
 
     private String getUpdateChatId(Update update) {
