@@ -26,9 +26,6 @@ public class BotUser {
     @Column(name = "tgAccountId")
     private long tgAccountId;
 
-    @Column(name = "tgChatId")
-    private long tgChatId;
-
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "wishlist_id")
     private WishList wishList;
@@ -67,23 +64,21 @@ public class BotUser {
     public BotUser() {
     }
 
-    public BotUser(String userName, String firstName, String lastName, long tgAccountId, long tgChatId, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus) {
+    public BotUser(String userName, String firstName, String lastName, long tgAccountId, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.tgAccountId = tgAccountId;
-        this.tgChatId = tgChatId;
         this.isReadyReceiveUpdates = isReadyReceiveUpdates;
         this.isAllCanSeeMyWishList = isAllCanSeeMyWishList;
         this.botUserStatus = botUserStatus;
     }
 
-    public BotUser(String userName, String firstName, String lastName, long tgAccountId, long tgChatId, WishList wishList, List<BotUser> subscribers, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId, int carryingMessageId, String carryingInlineMessageId) {
+    public BotUser(String userName, String firstName, String lastName, long tgAccountId, WishList wishList, List<BotUser> subscribers, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId, int carryingMessageId, String carryingInlineMessageId) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.tgAccountId = tgAccountId;
-        this.tgChatId = tgChatId;
         this.wishList = wishList;
         this.subscribers = subscribers;
         this.isReadyReceiveUpdates = isReadyReceiveUpdates;
@@ -137,14 +132,6 @@ public class BotUser {
 
     public void setTgAccountId(long tgAccountId) {
         this.tgAccountId = tgAccountId;
-    }
-
-    public long getTgChatId() {
-        return tgChatId;
-    }
-
-    public void setTgChatId(long tgChatId) {
-        this.tgChatId = tgChatId;
     }
 
     public WishList getWishList() {
@@ -216,12 +203,12 @@ public class BotUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BotUser botUser = (BotUser) o;
-        return id == botUser.id && tgAccountId == botUser.tgAccountId && tgChatId == botUser.tgChatId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserStatus == botUser.botUserStatus && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
+        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserStatus == botUser.botUserStatus && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, tgAccountId, tgChatId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -232,7 +219,6 @@ public class BotUser {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", tgAccountId=" + tgAccountId +
-            ", tgChatId=" + tgChatId +
 //            ", wishList=" + wishList +
 //            ", subscribers=" + subscribers +
 //            ", subscriptions=" + subscriptions +
@@ -247,12 +233,10 @@ public class BotUser {
 
 
     public static final class UserBuilder {
-        private long id;
         private String userName;
         private String firstName;
         private String lastName;
         private long tgAccountId;
-        private long tgChatId;
         private boolean isReadyReceiveUpdates;
         private boolean isAllCanSeeMyWishList;
         private BotUserStatus botUserStatus;
@@ -284,11 +268,6 @@ public class BotUser {
             return this;
         }
 
-        public UserBuilder withTgChatId(long tgChatId) {
-            this.tgChatId = tgChatId;
-            return this;
-        }
-
         public UserBuilder isReadyReceiveUpdates(boolean isReady) {
             this.isReadyReceiveUpdates = isReady;
             return this;
@@ -306,7 +285,7 @@ public class BotUser {
 
 
         public BotUser build() {
-            return new BotUser(userName, firstName, lastName, tgAccountId, tgChatId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus);
+            return new BotUser(userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus);
         }
 
 
