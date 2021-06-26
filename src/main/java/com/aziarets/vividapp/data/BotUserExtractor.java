@@ -23,7 +23,7 @@ public class BotUserExtractor {
         }
         return BotUser.UserBuilder.newUser()
             .withTgAccountId(gotFrom.getId())
-            .withTgChatId(extractChatIdFromUpdate(update))
+            .withTgAccountId(extractChatIdFromUpdate(update))
             .withFirstName(gotFrom.getFirstName())
             .withLastName(gotFrom.getLastName())
             .withUserName(gotFrom.getUserName())
