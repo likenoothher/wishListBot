@@ -1,10 +1,7 @@
 package com.aziarets.vividapp.dao;
 
-import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.WishList;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -12,11 +9,11 @@ import javax.persistence.Query;
 
 
 @Repository
-public class WishListRepoImpl implements WishListRepo{
+public class WishListDaoImpl implements WishListDao {
     private SessionFactory factory;
 
     @Autowired
-    public WishListRepoImpl(SessionFactory factory) {
+    public WishListDaoImpl(SessionFactory factory) {
         this.factory = factory;
     }
 

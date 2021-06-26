@@ -30,7 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(this.applicationContext);
-        templateResolver.setPrefix("/WEB-INF/templates/");
+        templateResolver.setPrefix("/resources/templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setCacheable(true);
@@ -72,8 +72,8 @@ public class WebConfig implements WebMvcConfigurer {
             "/img/**",
             "/css/**")
             .addResourceLocations("classpath:/META-INF/resources/webjars/",
-            "classpath:/static/img/",
-            "classpath:/static/css/");
+            "classpath:/resources/templates/img/",
+            "classpath:/resources/templates/css/");
     }
 
 }

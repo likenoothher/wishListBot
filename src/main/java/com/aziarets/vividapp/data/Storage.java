@@ -8,26 +8,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class Storage {
     private BotUserExtractor botUserExtractor;
-    private BotUserRepo userRepo;
-    private WishListRepo wishListRepo;
-    private GiftRepo giftRepo;
+    private BotUserDao userRepo;
+    private WishListDao wishListDao;
+    private GiftDao giftRepo;
 
     @Autowired
-    public Storage(BotUserExtractor botUserExtractor, BotUserRepoImpl userRepo, WishListRepoImpl wishListRepo, GiftRepo giftRepo) {
+    public Storage(BotUserExtractor botUserExtractor, BotUserDaoImpl userRepo, WishListDaoImpl wishListRepo, GiftDao giftDao) {
         this.botUserExtractor = botUserExtractor;
         this.userRepo = userRepo;
-        this.wishListRepo = wishListRepo;
-        this.giftRepo = giftRepo;
+        this.wishListDao = wishListRepo;
+        this.giftRepo = giftDao;
     }
 
     public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
@@ -41,21 +39,21 @@ public class Storage {
     }
 
     public boolean addGiftToUser(Gift gift, BotUser botUser) {
-        WishList wishList = wishListRepo.getById(botUser.getWishList().getId());
+        WishList wishList = wishListDao.getById(botUser.getWishList().getId());
         if (wishList != null) {
             giftRepo.save(gift);
             wishList.addGift(gift); //null check
-            wishListRepo.update(wishList);
+            wishListDao.update(wishList);
             return true;
         }
         return false;
     }
 
-    public boolean updateGiftOfUser(Gift gift, BotUser botUser) {
+    public boolean updateGift(Gift gift) {
         return giftRepo.update(gift);
     }
 
-    public boolean deleteGiftOfUser(int giftId, BotUser botUser) {
+    public boolean deleteGift(long giftId) {
         return giftRepo.remove(giftId);
     }
 
@@ -128,19 +126,19 @@ public class Storage {
         return Collections.emptyList();
     }
 
-    public List<Gift> getUserWishListGifts(long userId) {
-        List<Gift> gifts = giftRepo.getUserWishListPresents(userId);
+    public List<Gift> getUserWishListGifts(long userTelegramId) {
+        List<Gift> gifts = giftRepo.getUserWishListPresents(userTelegramId);
         return gifts;
     }
 
-    public List<Gift> getAvailableToDonateGifts(long userId) {
-        List<Gift> gifts = giftRepo.getAvailableToDonatePresents(userId);
+    public List<Gift> getAvailableToDonateGifts(long userTelegramId) {
+        List<Gift> gifts = giftRepo.getAvailableToDonatePresents(userTelegramId);
         return gifts;
     }
 
     private boolean addUser(BotUser user) {
         WishList wishList = new WishList();
-        wishListRepo.save(wishList);
+        wishListDao.save(wishList);
         user.setWishList(wishList);
         return userRepo.save(user);
     }

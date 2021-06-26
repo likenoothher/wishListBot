@@ -1,0 +1,80 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Vivid-Main </title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <h3>Your WishList, <span th:text="${user.getUserName()}"></span>!</h3>
+            </div>
+            <div class="col-md-2 text-center">
+                <form method="get" th:action="@{/addGift}">
+                    <button type="submit" class="btn btn-success" name="giftHolderId"
+                            th:value="${user.getTgAccountId()}">Add Gift</button>
+                </form>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-3" th:each="gift: ${gifts}">
+                    <div class="row">
+                        <div class="col-lg-1 text-center">
+                        </div>
+                        <div class="col-lg-10 text-center">
+                            <div class="card">
+                                <img src="img/no_photo2.jpg" class="card-img-top" alt="no-photo">
+                                <div class="card-body">
+                                    <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
+                                    <p class="card-text">Description: <span th:text="${gift.getDescription()}"></span>
+                                    </p>
+                                    <a th:href="${gift.getUrl()}" class="card-link">Gift's URL</a>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-lg-6 text-center">
+                                            <form method="get" th:action="@{/updateGift}">
+                                                <button type="submit" class="btn btn-primary" name="giftId"
+                                                        th:value="*{gift.getId()}">Edit</button>
+                                            </form>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <form method="post" th:action="@{/deleteGift}">
+                                                <button type="submit" class="btn btn-danger" name="giftId"
+                                                        th:value="*{gift.getId()}">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

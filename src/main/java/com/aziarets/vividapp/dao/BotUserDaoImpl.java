@@ -1,11 +1,7 @@
 package com.aziarets.vividapp.dao;
 
 import com.aziarets.vividapp.model.BotUser;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,12 +9,12 @@ import javax.persistence.Query;
 import java.util.List;
 
 @Repository
-public class BotUserRepoImpl implements BotUserRepo {
+public class BotUserDaoImpl implements BotUserDao {
 
     private SessionFactory factory;
 
     @Autowired
-    public BotUserRepoImpl(SessionFactory factory) {
+    public BotUserDaoImpl(SessionFactory factory) {
         this.factory = factory;
     }
 

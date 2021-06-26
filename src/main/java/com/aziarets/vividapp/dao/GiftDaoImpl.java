@@ -1,25 +1,21 @@
 package com.aziarets.vividapp.dao;
 
-import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Repository
-public class GiftRepoImpl implements GiftRepo{
+public class GiftDaoImpl implements GiftDao {
 
     private SessionFactory factory;
 
     @Autowired
-    public GiftRepoImpl(SessionFactory factory) {
+    public GiftDaoImpl(SessionFactory factory) {
         this.factory = factory;
     }
 
@@ -61,11 +57,11 @@ public class GiftRepoImpl implements GiftRepo{
     }
 
     @Override
-    public List<Gift> getUserWishListPresents(long tgAccountId) {
+    public List<Gift> getUserWishListPresents(long userTelegramId) {
         try {
             Query query = factory.getCurrentSession().createQuery("select botuser.wishList.giftList from BotUser botuser\n" +
-                "where botuser.tgAccountId = :tgAccountId")
-                .setParameter("tgAccountId", tgAccountId);
+                "where botuser.tgAccountId = :userTelegramId")
+                .setParameter("userTelegramId", userTelegramId);
 
             List<Gift> gifts = query.getResultList();
             return gifts;
