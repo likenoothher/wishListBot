@@ -1,5 +1,8 @@
-package com.aziarets.vividapp.data;
+package com.aziarets.vividapp.util;
 
+import com.aziarets.vividapp.exception.NotFoundUserNameException;
+import com.aziarets.vividapp.exception.UserIsBotException;
+import com.aziarets.vividapp.handler.UpdateType;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import org.springframework.stereotype.Component;
@@ -23,7 +26,6 @@ public class BotUserExtractor {
         }
         return BotUser.UserBuilder.newUser()
             .withTgAccountId(gotFrom.getId())
-            .withTgAccountId(extractChatIdFromUpdate(update))
             .withFirstName(gotFrom.getFirstName())
             .withLastName(gotFrom.getLastName())
             .withUserName(gotFrom.getUserName())

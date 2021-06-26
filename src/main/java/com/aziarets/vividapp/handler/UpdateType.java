@@ -1,4 +1,4 @@
-package com.aziarets.vividapp.data;
+package com.aziarets.vividapp.handler;
 
 public enum UpdateType {
     MESSAGE,

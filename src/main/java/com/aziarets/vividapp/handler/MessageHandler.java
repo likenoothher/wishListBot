@@ -1,6 +1,6 @@
 package com.aziarets.vividapp.handler;
 
-import com.aziarets.vividapp.data.Storage;
+import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
@@ -22,15 +22,15 @@ import static com.aziarets.vividapp.menu.Icon.*;
 @Component
 @Transactional
 public class MessageHandler {
-    private Storage storage;
+    private BotService botService;
     private BotMenuTemplate menu;
     private String chatId;
     private String messageText;
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
-    public MessageHandler(Storage storage, BotMenuTemplate menu) {
-        this.storage = storage;
+    public MessageHandler(BotService botService, BotMenuTemplate menu) {
+        this.botService = botService;
         this.menu = menu;
     }
 
@@ -84,8 +84,8 @@ public class MessageHandler {
     }
 
     private void handleSearchingFriendRequest(BotUser updateSender) {
-        Optional<BotUser> searchedUser = storage.findUserByUserName(messageText);
-        Optional<BotUser> userSearchedTo = storage.findUserByTelegramId(updateSender.getTgAccountId());
+        Optional<BotUser> searchedUser = botService.findUserByUserName(messageText);
+        Optional<BotUser> userSearchedTo = botService.findUserByTelegramId(updateSender.getTgAccountId());
 
         if(!searchedUser.isPresent()) {
             messagesToSend.add(new SendMessage(chatId, "Мы не смогли найти данного пользователя"
@@ -120,8 +120,8 @@ public class MessageHandler {
 
         Gift gift = Gift.GiftBuilder.newGift().withName(messageText).build();
 
-        if (storage.addGiftToUser(gift, updateSender)) {
-            List<Gift> gifts = storage.findUserByTelegramId(updateSender.getTgAccountId()).get().getWishList().getGiftList();
+        if (botService.addGiftToUser(gift, updateSender)) {
+            List<Gift> gifts = botService.findUserByTelegramId(updateSender.getTgAccountId()).get().getWishList().getGiftList();
             messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
             addGiftAddedMessages(updateSender);
         }
@@ -131,13 +131,13 @@ public class MessageHandler {
         String inlineMessageId = updateSender.getCarryingInlineMessageId();
         int messageId = updateSender.getCarryingMessageId();
 
-        Optional<Gift> gift = storage.findGiftById(updateSender.getUpdateGiftId());
+        Optional<Gift> gift = botService.findGiftById(updateSender.getUpdateGiftId());
 
         if (gift.isPresent()) {
             Gift updatedGift = gift.get();
             updatedGift.setDescription(messageText);
 
-            if (storage.updateGift(updatedGift)) {
+            if (botService.updateGift(updatedGift)) {
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.getErrorStatusTemplate("Описание подарка не изменено. Произошла ошибка",
@@ -154,13 +154,13 @@ public class MessageHandler {
         String inlineMessageId = updateSender.getCarryingInlineMessageId();
         int messageId = updateSender.getCarryingMessageId();
 
-        Optional<Gift> gift = storage.findGiftById(updateSender.getUpdateGiftId());
+        Optional<Gift> gift = botService.findGiftById(updateSender.getUpdateGiftId());
 
         if (gift.isPresent()) {
             Gift updatedGift = gift.get();
             updatedGift.setUrl(messageText);
 
-            if (storage.updateGift(updatedGift)) {
+            if (botService.updateGift(updatedGift)) {
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
                 messagesToSend.add(menu.getErrorStatusTemplate("Ссылка подарка не изменена. Произошла ошибка",
@@ -202,16 +202,16 @@ public class MessageHandler {
     }
 
     private boolean isRequestedUserAlreadyFriend(BotUser requestSender, BotUser requestReceiver) {
-        return storage.getUserSubscribers(requestReceiver).contains(requestSender);
+        return botService.getUserSubscribers(requestReceiver).contains(requestSender);
     }
 
     private void resetUserStatus(BotUser user) {
         user.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
-        storage.updateUser(user);
+        botService.updateUser(user);
     }
 
     private void addGiftAddedMessages(BotUser userAddGift) {
-        List<BotUser> subscribers = storage.getUserSubscribers(userAddGift);
+        List<BotUser> subscribers = botService.getUserSubscribers(userAddGift);
 
         for (BotUser subscriber : subscribers) {
             if (subscriber.isReadyReceiveUpdates()) {

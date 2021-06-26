@@ -1,4 +1,4 @@
-package com.aziarets.vividapp.data;
+package com.aziarets.vividapp.exception;
 
 public class UserIsBotException extends Exception {
     public UserIsBotException(String message) {
