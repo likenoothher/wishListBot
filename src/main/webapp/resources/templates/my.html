@@ -42,8 +42,36 @@
                         </li>
                     </ul>
                 </div>
+                <a class="btn btn-success" href="/login" role="button">Log in</a>
+
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#aboutRegistrationModal">
+                    About registration
+                </button>
+
             </div>
         </nav>
+
+         <!-- Modal -->
+         <div class="modal fade" id="aboutRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+         <div class="modal-dialog">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel">About registration</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal"
+                         aria-label="Close"></button>
+                 </div>
+                 <div class="modal-body">
+                     Registration available only from Telegram client
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                 </div>
+             </div>
+         </div>
+     </div>
+
     </header>
 
     <section>
@@ -56,8 +84,11 @@
                         <h3>Your WishList, <span th:text="${user.getUserName()}"></span>!</h3>
                     </div>
                     <div class="col-md-2 text-center">
-                        <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-success">Add</button>
+                        <form method="POST" action="/updateGift">
+                            <button type="button" class="btn btn-success">Add</button>
+                        </form>
+
+
                     </div>
                     <div class="row">
                         <div class="col-sm-3" th:each="gift: ${gifts}">

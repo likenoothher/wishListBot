@@ -2,12 +2,15 @@ package com.aziarets.vividapp.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -32,6 +35,7 @@ public class HibernateConfig {
     @Bean
     public LocalSessionFactoryBean sessionFactory() throws PropertyVetoException {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+//        sessionFactory.setDataSource(dataSource("users" , "classpath:db/migration/V1__Initial_create.sql"));
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.aziarets.vividapp");
         sessionFactory.setHibernateProperties(hibernateProperties());
@@ -50,6 +54,18 @@ public class HibernateConfig {
 
         return dataSource;
     }
+
+//    @Bean
+//    public DataSource dataSource(
+//        @Value("${datasource.dbname}") String dbname,
+//        @Value("${datasource.script}") String script) {
+//
+//        return new EmbeddedDatabaseBuilder()
+//            .setType(EmbeddedDatabaseType.H2)
+//            .setName(dbname)
+//            .addScript(script)
+//            .build();
+//    }
 
     @Bean
     public PlatformTransactionManager transactionManager() throws PropertyVetoException {

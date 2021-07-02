@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -191,7 +192,7 @@ public class CallbackHandler {
     private void handleIPresentRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/i_present")) {
 
-            Map<BotUser, Gift> iPresentList = botService.getUserPresentsMap(updateSender);
+            Map<Gift, BotUser> iPresentList = botService.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             return;
@@ -209,11 +210,11 @@ public class CallbackHandler {
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
             int refusedGiftId = extractLastAfterSlashId(callbackData);
             if (botService.refuseFromDonate(refusedGiftId, updateSender)) {
-                Map<BotUser, Gift> iPresentList  = botService.getUserPresentsMap(updateSender);
+                Map<Gift, BotUser> iPresentList  = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             } else {
-                Map<BotUser, Gift> iPresentList  = botService.getUserPresentsMap(updateSender);
+                Map<Gift, BotUser> iPresentList  = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             }

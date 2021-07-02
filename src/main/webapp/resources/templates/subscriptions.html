@@ -1,0 +1,70 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+  <link rel="stylesheet"
+        th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title>Subscribers</title>
+
+</head>
+
+<body>
+<header>
+  <div th:insert="header">
+  </div>
+</header>
+
+<section>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Your subscriptions, <span th:text="${user.getUserName()}"></span></h3>
+      </div>
+      <div class="row">
+        <div class="col-sm-3" th:each="subscription: ${subscriptions}">
+          <div class="row">
+            <div class="col-lg-1 text-center">
+            </div>
+            <div class="col-lg-10 text-center">
+              <div class="card">
+                <img src="img/no_photo2.jpg" class="card-img-top" alt="no-photo">
+                <div class="card-body">
+                  <h5 class="card-title">User name: <span th:text="${subscription.getUserName()}"></span></h5>
+                  <p class="card-text">First Name: <span th:text="${subscription.getFirstName()}"></span>
+                  </p>
+                  <p class="card-text">Last Name: <span th:text="${subscription.getLastName()}"></span>
+                  </p>
+                  </p>
+                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getTgAccountId()})}" class="card-link">
+                    <span th:text="${subscription.getUserName()}"></span>'s wishlist</a>
+                  </p>
+                  <div class="row">
+                    <div class="col-lg text-center">
+                      <form method="post" th:action="@{/subscriptions/unsubscribe}">
+                        <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
+                        <button type="submit" class="btn btn-danger" name="unsubscribedFrom"
+                                th:value="*{subscription.getTgAccountId()}">Unsubscribe</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-1 text-center">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

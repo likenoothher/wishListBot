@@ -6,13 +6,13 @@ import com.aziarets.vividapp.model.Gift;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
+@RequestMapping(value = "/wishlist")
 public class WishListController {
     private BotService botService;
 
@@ -21,17 +21,17 @@ public class WishListController {
         this.botService = botService;
     }
 
-    @GetMapping("/")
-    public String findBotUserById(Model model){
-       BotUser botUser = botService.findUserByUserName("john_yoy").get();
+    @GetMapping("")
+    public String showWishList(Principal principal, Model model){
+       BotUser botUser = botService.findUserByUserName(principal.getName()).get();
        List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
        model.addAttribute("user", botUser);
        model.addAttribute("gifts", userGifts);
        return "wishlist";
     }
 
-    @PostMapping("/")
-    public String showMain(@RequestParam(value = "id") long id, Model model){
+    @PostMapping("")
+    public String showWishList(@RequestParam(value = "id") long id, Model model){
         BotUser botUser = botService.findUserByTelegramId(id).get();
         List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
         model.addAttribute("user", botUser);
@@ -39,17 +39,15 @@ public class WishListController {
         return "wishlist";
     }
 
-    @GetMapping("/addGift")
+    @GetMapping("/add_gift")
     public String addGift(@RequestParam(value = "giftHolderId") long id,  Model model) {
         model.addAttribute("giftHolderId", id);
         Gift gift = new Gift();
-        gift.setName("2342");
-        gift.setUrl("asdf");
         model.addAttribute("gift", gift);
         return "addGift";
     }
 
-    @PostMapping("/addGift")
+    @PostMapping("/add_gift")
     public String addGift(@RequestParam(value = "giftHolderId") long id, @RequestParam("giftName") String giftName,
                              @RequestParam("giftDescription") String giftDescription,
                              @RequestParam("giftURL") String giftURL) {
@@ -60,10 +58,10 @@ public class WishListController {
         BotUser botUser = botService.findUserByTelegramId(id).get();
         botService.addGiftToUser(gift,botUser);
 
-        return "redirect:/";
+        return "redirect:/wishlist";
     }
 
-    @GetMapping("/updateGift")
+    @GetMapping("/update_gift")
     public String updateGift(@RequestParam(value = "giftId") long id,  Model model) {
         model.addAttribute("giftHolderId", id);
         Gift gift = botService.findGiftById(id).get();
@@ -71,7 +69,7 @@ public class WishListController {
         return "updateGift";
     }
 
-    @PostMapping("/updateGift")
+    @PostMapping("/update_gift")
     public String updateGift(@RequestParam(value = "giftId") long id,
                              @RequestParam("giftDescription") String giftDescription,
                              @RequestParam("giftURL") String giftURL) {
@@ -80,14 +78,14 @@ public class WishListController {
         gift.setUrl(giftURL);
         botService.updateGift(gift);
 
-        return "redirect:/";
+        return "redirect:/wishlist";
     }
 
-    @PostMapping("/deleteGift")
+    @PostMapping("/delete_gift")
     public String deleteGift(@RequestParam(value = "giftId") long id) {
         Gift gift = botService.findGiftById(id).get();
         botService.deleteGift(gift.getId());
 
-        return "redirect:/";
+        return "redirect:/wishlist";
     }
 }

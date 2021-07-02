@@ -19,22 +19,22 @@ import java.util.*;
 @Transactional
 public class BotService {
     private BotUserExtractor botUserExtractor;
-    private BotUserDao userRepo;
+    private BotUserDao userDao;
     private WishListDao wishListDao;
-    private GiftDao giftRepo;
+    private GiftDao giftDao;
 
     @Autowired
-    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userRepo, WishListDaoImpl wishListRepo, GiftDao giftDao) {
+    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userDao, WishListDaoImpl wishListRepo, GiftDao giftDao) {
         this.botUserExtractor = botUserExtractor;
-        this.userRepo = userRepo;
+        this.userDao = userDao;
         this.wishListDao = wishListRepo;
-        this.giftRepo = giftDao;
+        this.giftDao = giftDao;
     }
 
     public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
         BotUser currentUpdateUser = botUserExtractor.identifyUser(update);
         if (isUserSigned(currentUpdateUser)) {
-            return userRepo.getByTelegramId(currentUpdateUser.getTgAccountId());
+            return userDao.getByTelegramId(currentUpdateUser.getTgAccountId());
         } else {
             addUser(currentUpdateUser);
             return currentUpdateUser;
@@ -44,7 +44,7 @@ public class BotService {
     public boolean addGiftToUser(Gift gift, BotUser botUser) {
         WishList wishList = wishListDao.getById(botUser.getWishList().getId());
         if (wishList != null) {
-            giftRepo.save(gift);
+            giftDao.save(gift);
             wishList.addGift(gift); //null check
             wishListDao.update(wishList);
             return true;
@@ -53,15 +53,15 @@ public class BotService {
     }
 
     public boolean updateGift(Gift gift) {
-        return giftRepo.update(gift);
+        return giftDao.update(gift);
     }
 
     public boolean deleteGift(long giftId) {
-        return giftRepo.remove(giftId);
+        return giftDao.remove(giftId);
     }
 
     public Optional<BotUser> findUserByUserName(String userName) {
-        BotUser user = userRepo.getByUserName(userName);
+        BotUser user = userDao.getByUserName(userName);
         if (user != null) {
             return  Optional.of(user);
         }
@@ -69,17 +69,17 @@ public class BotService {
     }
 
     public Optional<BotUser> findUserByTelegramId(long telegramId) {
-        BotUser user = userRepo.getByTelegramId(telegramId);
+        BotUser user = userDao.getByTelegramId(telegramId);
         return Optional.of(user);
     }
 
     public Optional<Gift> findGiftById(long id) {
 
-        return Optional.of(giftRepo.getById(id));
+        return Optional.of(giftDao.getById(id));
     }
 
     public Optional<BotUser> findGiftHolderByGiftId(long id) {
-        return Optional.of(userRepo.findGiftHolderByGiftId(id));
+        return Optional.of(userDao.findGiftHolderByGiftId(id));
     }
 
     public boolean addSubscriberToSubscriptions(BotUser subscriber, BotUser subscribedTo) {
@@ -87,7 +87,7 @@ public class BotService {
             BotUser us = findUserByTelegramId(subscriber.getTgAccountId()).get();
             BotUser usTo = findUserByTelegramId(subscribedTo.getTgAccountId()).get();
             usTo.getSubscribers().add(us);
-            return userRepo.update(usTo);
+            return userDao.update(usTo);
         }
         return false;
     }
@@ -98,7 +98,7 @@ public class BotService {
             for(Gift gift: subscribedToGifts) {
                 if(subscriber.equals(gift.getOccupiedBy())) {
                     gift.setOccupiedBy(null);
-                    giftRepo.update(gift);
+                    giftDao.update(gift);
                 }
             }
             BotUser us = findUserByTelegramId(subscriber.getTgAccountId()).get();
@@ -106,7 +106,7 @@ public class BotService {
             List<BotUser> subscribers = getUserSubscribers(usTo);
             subscribers.remove(us);
             usTo.setSubscribers(subscribers);
-            return userRepo.update(usTo);
+            return userDao.update(usTo);
         }
         return false;
     }
@@ -117,25 +117,25 @@ public class BotService {
 
     public List<BotUser> getUserSubscriptions(BotUser user) {
         if (user != null) {
-            return userRepo.getUserSubscriptions(user);
+            return userDao.getUserSubscriptions(user);
         }
         return Collections.emptyList();
     }
 
     public List<BotUser> getUserSubscribers(BotUser user) {
         if (user != null) {
-            return userRepo.getUserSubscribers(user);
+            return userDao.getUserSubscribers(user);
         }
         return Collections.emptyList();
     }
 
     public List<Gift> getUserWishListGifts(long userTelegramId) {
-        List<Gift> gifts = giftRepo.getUserWishListPresents(userTelegramId);
+        List<Gift> gifts = giftDao.getUserWishListPresents(userTelegramId);
         return gifts;
     }
 
     public List<Gift> getAvailableToDonateGifts(long userTelegramId) {
-        List<Gift> gifts = giftRepo.getAvailableToDonatePresents(userTelegramId);
+        List<Gift> gifts = giftDao.getAvailableToDonatePresents(userTelegramId);
         return gifts;
     }
 
@@ -143,42 +143,42 @@ public class BotService {
         WishList wishList = new WishList();
         wishListDao.save(wishList);
         user.setWishList(wishList);
-        return userRepo.save(user);
+        return userDao.save(user);
     }
 
     public boolean updateUser(BotUser user) {
-        return userRepo.update(user);
+        return userDao.update(user);
     }
 
-    public  Map<BotUser, Gift> getUserPresentsMap(BotUser user) {
-        Map<BotUser, Gift> userPresentsMap = new HashMap<>();
-        List<Gift> giftsUserDonates = giftRepo.getPresentsUserGoingDonate(user.getId());
+    public Map<Gift, BotUser> getUserPresentsMap(BotUser user) {
+        Map<Gift, BotUser>  userPresentsMap = new HashMap<>();
+        List<Gift> giftsUserDonates = giftDao.getPresentsUserGoingDonate(user.getId());
         giftsUserDonates.stream()
-            .forEach(gift -> {userPresentsMap.put(findGiftHolderByGiftId(gift.getId()).get(), gift);});
+            .forEach(gift -> {userPresentsMap.put(gift, findGiftHolderByGiftId(gift.getId()).get());});
 
         return userPresentsMap;
     }
 
     public boolean donate(long giftId, BotUser donor) {
-        Gift gift = giftRepo.getById(giftId);
+        Gift gift = giftDao.getById(giftId);
         if (gift != null && gift.getOccupiedBy() == null && donor !=null) {
             gift.setOccupiedBy(donor);
-            return giftRepo.update(gift);
+            return giftDao.update(gift);
         }
         return false;
     }
 
-    public boolean refuseFromDonate(int giftId, BotUser donor) { // почему то донор и occupied by не equals - разобраться
-        Gift gift = giftRepo.getById(giftId);
+    public boolean refuseFromDonate(long giftId, BotUser donor) { // почему то донор и occupied by не equals - разобраться
+        Gift gift = giftDao.getById(giftId);
         if (gift != null && donor !=null && gift.getOccupiedBy().getId() == (donor.getId())) {
             gift.setOccupiedBy(null);
-            return giftRepo.update(gift);
+            return giftDao.update(gift);
         }
         return false;
     }
 
     private boolean isUserSigned(BotUser user) {
-        return userRepo.isUserExist(user.getTgAccountId());
+        return userDao.isUserExist(user.getTgAccountId());
     }
 
 }

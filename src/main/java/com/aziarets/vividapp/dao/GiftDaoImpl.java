@@ -52,7 +52,10 @@ public class GiftDaoImpl implements GiftDao {
 
     @Override
     public List<Gift> getAvailableToDonatePresents(long userTelegramId) {
-        Query query = factory.getCurrentSession().createQuery("from Gift where occupiedBy.id = null ");
+        Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser\n" +
+            "            join botuser.wishList.giftList as gifts\n" +
+            "            where gifts.occupiedBy =null and botuser.tgAccountId = :userTelegramId ");
+        query.setParameter("userTelegramId", userTelegramId);
         return query.getResultList();
     }
 

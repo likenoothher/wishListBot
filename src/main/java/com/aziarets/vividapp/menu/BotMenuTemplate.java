@@ -153,7 +153,7 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public EditMessageText getIPresentTemplate(Map<BotUser, Gift> gifts , String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getIPresentTemplate(Map<Gift, BotUser> gifts , String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         if (!gifts.isEmpty()) {
