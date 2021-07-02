@@ -24,7 +24,7 @@
                 <h3>Your WishList, <span th:text="${user.getUserName()}"></span>!</h3>
             </div>
             <div class="col-md-2 text-center">
-                <form method="get" th:action="@{/addGift}">
+                <form method="get" th:action="@{wishlist/add_gift}">
                     <button type="submit" class="btn btn-success" name="giftHolderId"
                             th:value="${user.getTgAccountId()}">Add Gift</button>
                 </form>
@@ -46,13 +46,13 @@
                                     </p>
                                     <div class="row">
                                         <div class="col-lg-6 text-center">
-                                            <form method="get" th:action="@{/updateGift}">
+                                            <form method="get" th:action="@{wishlist/update_gift}">
                                                 <button type="submit" class="btn btn-primary" name="giftId"
                                                         th:value="*{gift.getId()}">Edit</button>
                                             </form>
                                         </div>
                                         <div class="col-lg-6 text-center">
-                                            <form method="post" th:action="@{/deleteGift}">
+                                            <form method="post" th:action="@{wishlist/delete_gift}">
                                                 <button type="submit" class="btn btn-danger" name="giftId"
                                                         th:value="*{gift.getId()}">Delete</button>
                                             </form>

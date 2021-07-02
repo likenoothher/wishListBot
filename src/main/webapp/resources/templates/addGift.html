@@ -7,11 +7,6 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <title>Vivid</title>
 
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
-    <title>Vivid - Main </title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -32,7 +27,7 @@
 
                 </div>
                 <div class="col-md-8">
-                    <form method="post" th:action="@{/addGift}">
+                    <form method="post" th:action="@{/wishlist/add_gift}">
                         <div class="form-group row">
                             <div class="col-md-12 mt-2">
                                 <label for="giftName">Gift name</label>
@@ -59,7 +54,7 @@
 
                         <input type="hidden" th:value="*{giftHolderId}" name="giftHolderId">
 
-                        <a href="/" class="btn btn-primary">Back</a>
+                        <a href="/wishlist" class="btn btn-primary">Back</a>
                         <button class="btn btn-success" type="submit">Add gift</button>
                     </form>
                 </div>

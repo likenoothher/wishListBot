@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/styleForMainPage.css.css}">
     <title>Vivid</title>
-
 </head>
 
 <body>
-<div th:fragment="footer">
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #24134b">
         <div class="container">
             <a href="/" class="navbar-brand">
@@ -20,31 +19,58 @@
                     aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">My WishList</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/i_present">I present</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/my_subscribers">Subscribers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/my_subscriptions">Subscriptions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/find_friend">Find a Friend</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/settings">Settings</a>
-                    </li>
-                </ul>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li sec:authorize="isAuthenticated()" class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/wishlist">My WishList</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()" class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/i_present">I present</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()" class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/subscribers">Subscribers</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()" class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/subscriptions">Subscriptions</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()" class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/settings">Settings</a>
+                        </li>
+                    </ul>
+            </div>
+            <div sec:authorize="isAnonymous()">
+                <a class="btn btn-success" href="/login" role="button">Log in</a>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#aboutRegistrationModal">
+                    About registration
+                </button>
+            </div>
+            <div sec:authorize="hasAnyRole('ADMIN', 'USER')">
+                <a class="btn btn-success" href="/logout" role="button">Log out</a>
             </div>
         </div>
     </nav>
-</div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="aboutRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">About registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Registration available only from Telegram client
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>

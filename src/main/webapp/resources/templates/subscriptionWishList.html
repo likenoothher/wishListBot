@@ -5,7 +5,7 @@
     <link rel="stylesheet"
           th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <title>I present</title>
+    <title>Available gifts</title>
 
 </head>
 
@@ -19,30 +19,28 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h3>Presents you are going present</h3>
+                <h3>Gifts available to donate</h3>
             </div>
             <div class="row">
-                <div class="col-sm-3" th:each="entry: ${gifts}">
+                <div class="col-sm-3" th:each="gift: ${availableGifts}">
                     <div class="row">
                         <div class="col-lg-1 text-center">
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
-                                <img src="img/no_photo2.jpg" class="card-img-top" alt="no-photo">
+                                <img th:src="@{/img/no_photo2.jpg}" class="card-img-top" alt="no-photo">
                                 <div class="card-body">
-                                    <h5 class="card-title"><span th:text="${entry.key.getName()}"></span></h5>
-                                    <p class="card-text">Description: <span th:text="${entry.key.getDescription()}"></span>
+                                    <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
+                                    <p class="card-text">Description: <span th:text="${gift.getDescription()}"></span>
                                     </p>
-                                    <a th:href="${entry.key.getUrl()}" class="card-link">Gift's URL</a>
-                                    </p>
-                                    <p class="card-text">For: <span th:text="${entry.value.getUserName()}"></span>
+                                    <a th:href="${gift.getUrl()}" class="card-link">Gift's URL</a>
                                     </p>
                                     <div class="row">
                                         <div class="col-lg text-center">
-                                            <form method="post" th:action="@{/i_present/refuse}">
+                                            <form method="post" th:action="@{/subscriptions/donate}">
                                                 <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
-                                                <button type="submit" class="btn btn-danger" name="giftId"
-                                                        th:value="*{entry.key.getId()}">Refuse from donate</button>
+                                                <button type="submit" class="btn btn-success" name="giftId"
+                                                        th:value="*{gift.getId()}">I - present!</button>
                                             </form>
                                         </div>
                                     </div>

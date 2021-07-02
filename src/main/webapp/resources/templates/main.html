@@ -1,49 +1,19 @@
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-
-    <title>Vivid - Main </title>
-    <link rel="stylesheet"
-          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} " />
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} " />
+    <link rel="stylesheet" th:href="@{/css/styleForMainPage.css}">
+    <title>Vivid - Main</title>
 </head>
 <body>
+
 <header>
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #a799c7">
-        <div class="container">
-            <a href="/" class="navbar-brand">Vivid WishList</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/my_wishlist">My WishList</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/i_present">I present</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/my_subscribers">Subscribers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/my_subscriptions">Subscriptions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/find_friend">Find a Friend</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/settings">Settings</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        <div th:insert="header"></div>
 </header>
 
-<main>
-
+<section>
     <div id="carousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner img-fluid">
             <div class="carousel-item active">
@@ -58,8 +28,7 @@
         </div>
     </div>
 
-
-</main>
+</section>
 
 
 
