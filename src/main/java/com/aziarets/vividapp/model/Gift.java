@@ -25,6 +25,9 @@ public class Gift {
     @Column(name= "gift_description")
     private String description;
 
+    @Column(name= "photo_id")
+    private String giftPhotoTelegramId;
+
     private Gift(String name, String url, BotUser occupiedBy, String description) {
         this.name = name;
         this.url = url;
@@ -71,22 +74,25 @@ public class Gift {
         this.description = description;
     }
 
+    public String getGiftPhotoTelegramId() {
+        return giftPhotoTelegramId;
+    }
+
+    public void setGiftPhotoTelegramId(String giftPhotoTelegramId) {
+        this.giftPhotoTelegramId = giftPhotoTelegramId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Gift gift = (Gift) o;
-
-        return id == gift.id &&
-            Objects.equals(name, gift.name) &&
-            Objects.equals(url, gift.url) &&
-            Objects.equals(occupiedBy, gift.occupiedBy) &&
-            Objects.equals(description, gift.description);
+        return id == gift.id && Objects.equals(name, gift.name) && Objects.equals(url, gift.url) && Objects.equals(occupiedBy, gift.occupiedBy) && Objects.equals(description, gift.description) && Objects.equals(giftPhotoTelegramId, gift.giftPhotoTelegramId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, url, occupiedBy, description);
+        return Objects.hash(id, name, url, occupiedBy, description, giftPhotoTelegramId);
     }
 
     @Override
@@ -97,6 +103,7 @@ public class Gift {
             ", url='" + url + '\'' +
             ", occupiedBy=" + occupiedBy +
             ", description='" + description + '\'' +
+            ", giftPhotoTelegramId='" + giftPhotoTelegramId + '\'' +
             '}';
     }
 

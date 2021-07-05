@@ -3,6 +3,8 @@ package com.aziarets.vividapp.menu;
 import com.aziarets.vividapp.builder.InlineKeyboard;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.util.GiftTelegramUrlGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -15,6 +17,13 @@ import static com.aziarets.vividapp.menu.Icon.*;
 
 @Component
 public class BotMenuTemplate {
+
+    private GiftTelegramUrlGenerator giftTelegramUrlGenerator;
+
+    @Autowired
+    public BotMenuTemplate(GiftTelegramUrlGenerator giftTelegramUrlGenerator) {
+        this.giftTelegramUrlGenerator = giftTelegramUrlGenerator;
+    }
 
     public SendMessage getGreetingTemplate(String chatId, BotUser updateSender) {
         SendMessage message = new SendMessage();
@@ -73,6 +82,9 @@ public class BotMenuTemplate {
             .buttonWithCallbackData("Найти друга " + FIND_FRIEND_ICON, "/find_friend")
             .buttonWithCallbackData("Настройки " + SETTINGS_ICON, "/settings")
             .endRow()
+            .withRow()
+            .buttonWithCallbackData("Веб-версия " + URL_ICON, "/web")
+            .endRow()
             .build();
     }
 
@@ -106,13 +118,16 @@ public class BotMenuTemplate {
                                                          int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
-        String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+        String giftUrl = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+        String photoId = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
+            : "<a href=\"" +gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
 
-        message.setText(MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
+        message.setText( MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
             gift.getName() + "\"" +
-            "\nНа данный момент момент:" +
+            "\nНа данный момент :" +
             "\n- описание: " + description +
-            "\n- ссылка: " + url);
+            "\n- ссылка: " + giftUrl +
+            "\n" + photoId);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -125,6 +140,10 @@ public class BotMenuTemplate {
                 "/my_wish_list/edit_url_of_present_under/id/" + gift.getId())
             .endRow()
             .withRow()
+            .buttonWithCallbackData(GIFT_IMAGE + " Редактировать изображение подарка",
+                "/my_wish_list/edit_photo_of_present_under/id/" + gift.getId())
+            .endRow()
+            .withRow()
             .buttonWithCallbackData(MINUS_MARK_ICON + " Удалить подарок",
                 "/my_wish_list/delete_my_present_under/id/" + gift.getId())
             .endRow()
@@ -134,6 +153,7 @@ public class BotMenuTemplate {
             .endRow()
             .build();
 
+        message.setParseMode("html");
         message.setReplyMarkup(replyKeyboard);
         message.setChatId(chatId);
         message.setMessageId(messageId);
@@ -193,16 +213,20 @@ public class BotMenuTemplate {
 
     public EditMessageText getIPresentGiftInfoTemplate(Gift gift, BotUser giftHolder, String chatId,
                                                        int messageId, String inlineMessageId) {
-        EditMessageText editedText = new EditMessageText();
+        EditMessageText message = new EditMessageText();
 
         String giftName = gift.getName() == null ? "не указано" : gift.getName();
         String giftDescription = gift.getDescription() == null ? "не указано" : gift.getDescription();
         String giftUrl = gift.getUrl() == null ? "не указано" : gift.getUrl();
         String giftHolderName = giftHolder.getUserName() == null ? "не указано" : giftHolder.getUserName();
+        String photoId = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
+            : "<a href=\"" +gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
 
-        editedText.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
+
+        message.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
             "Описание - " + giftDescription + "\n" +
             "Ссылка - " + giftUrl + "\n" +
+                photoId +  "\n" +
             ONE_GUY_ICON +"Для пользователя - @" + giftHolderName + "\n\n" +
             THUMB_DOWN_POINTER_ICON + "Если передумал дарить жми" + THUMB_DOWN_POINTER_ICON);
 
@@ -219,12 +243,13 @@ public class BotMenuTemplate {
             .endRow()
             .build();
 
-        editedText.setChatId(chatId);
-        editedText.setMessageId(messageId);
-        editedText.setInlineMessageId(inlineMessageId);
-        editedText.setReplyMarkup(replyKeyboard);
+        message.setParseMode("html");
+        message.setChatId(chatId);
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+        message.setReplyMarkup(replyKeyboard);
 
-        return editedText;
+        return message;
     }
 
     public EditMessageText getMySubscribersListTemplate(List<BotUser> subscribers, String chatId,
@@ -529,7 +554,7 @@ public class BotMenuTemplate {
                 "/settings/set_visibility")
             .endRow()
             .withRow()
-            .buttonWithCallbackData("Написать разработчику " + SOS_ICON,
+            .buttonWithCallbackData("Написать разработчику " + SEND_MESSAGE,
                 "/settings/contact_developer")
             .endRow()
             .withRow()
@@ -624,6 +649,35 @@ public class BotMenuTemplate {
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
         message.setText(CROSS_MARK_ICON + " Запрос на дружбу от @" + userName + " был отклонён");
+        return message;
+    }
+
+    public EditMessageText getWebTemplate(String chatId, int messageId, String inlineMessageId) {
+        EditMessageText message = new EditMessageText();
+        message.setText(URL_ICON + "Из этого меню ты можешь перейти в веб-версию бота. Установка/изменение пароля" +
+            " для входа в аккаунт веб-версии осществляется в меню \n\"Установка пароля\"" + LOCK_ICON);
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithUrl("Открыть веб-версию бота " + URL_ICON,
+                "yandex.ru")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Установка пароля" + LOCK_ICON,
+                "/web/set_password")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+        message.setChatId(chatId);
+
         return message;
     }
 

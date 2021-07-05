@@ -47,4 +47,6 @@ public class Icon {
     public final static String KEYBOARD_ICON = "⌨";
     public final static String SOS_ICON = "\uD83C\uDD98";
     public final static String THUMB_DOWN_POINTER_ICON = "\uD83D\uDC47";
+    public final static String SEND_MESSAGE = "\uD83D\uDCE9";
+    public final static String GIFT_IMAGE = "\uD83C\uDFDE";
 }

@@ -23,6 +23,9 @@ public class BotUser {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "password")
+    private String password;
+
     @Column(name = "tgAccountId")
     private long tgAccountId;
 
@@ -52,6 +55,10 @@ public class BotUser {
     @Enumerated(EnumType.STRING)
     private BotUserStatus botUserStatus;
 
+    @Column(name = "user_role")
+    @Enumerated(EnumType.STRING)
+    private BotUserRole botUserRole;
+
     @Column(name = "updated_gift_id")
     private int updateGiftId;
 
@@ -64,14 +71,18 @@ public class BotUser {
     public BotUser() {
     }
 
-    public BotUser(String userName, String firstName, String lastName, long tgAccountId, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus) {
+    public BotUser(String userName, String firstName, String lastName, String password, long tgAccountId,
+                   boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus,
+                   BotUserRole botUserRole) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.password = password;
         this.tgAccountId = tgAccountId;
         this.isReadyReceiveUpdates = isReadyReceiveUpdates;
         this.isAllCanSeeMyWishList = isAllCanSeeMyWishList;
         this.botUserStatus = botUserStatus;
+        this.botUserRole = botUserRole;
     }
 
     public BotUser(String userName, String firstName, String lastName, long tgAccountId, WishList wishList, List<BotUser> subscribers, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId, int carryingMessageId, String carryingInlineMessageId) {
@@ -126,6 +137,14 @@ public class BotUser {
         this.lastName = lastName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public long getTgAccountId() {
         return tgAccountId;
     }
@@ -150,6 +169,14 @@ public class BotUser {
         this.subscribers = subscribers;
     }
 
+    public Set<BotUser> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(Set<BotUser> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
     public boolean isReadyReceiveUpdates() {
         return isReadyReceiveUpdates;
     }
@@ -172,6 +199,14 @@ public class BotUser {
 
     public void setBotUserStatus(BotUserStatus botUserStatus) {
         this.botUserStatus = botUserStatus;
+    }
+
+    public BotUserRole getBotUserRole() {
+        return botUserRole;
+    }
+
+    public void setBotUserRole(BotUserRole botUserRole) {
+        this.botUserRole = botUserRole;
     }
 
     public int getUpdateGiftId() {
@@ -203,12 +238,12 @@ public class BotUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BotUser botUser = (BotUser) o;
-        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserStatus == botUser.botUserStatus && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
+        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserRole == botUser.botUserRole && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserRole, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -218,28 +253,28 @@ public class BotUser {
             ", userName='" + userName + '\'' +
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
+            ", password='" + password + '\'' +
             ", tgAccountId=" + tgAccountId +
-//            ", wishList=" + wishList +
-//            ", subscribers=" + subscribers +
-//            ", subscriptions=" + subscriptions +
             ", isReadyReceiveUpdates=" + isReadyReceiveUpdates +
             ", isAllCanSeeMyWishList=" + isAllCanSeeMyWishList +
             ", botUserStatus=" + botUserStatus +
+            ", botUserRole=" + botUserRole +
             ", updateGiftId=" + updateGiftId +
             ", carryingMessageId=" + carryingMessageId +
             ", carryingInlineMessageId='" + carryingInlineMessageId + '\'' +
             '}';
     }
 
-
     public static final class UserBuilder {
         private String userName;
         private String firstName;
         private String lastName;
+        private String password;
         private long tgAccountId;
         private boolean isReadyReceiveUpdates;
         private boolean isAllCanSeeMyWishList;
         private BotUserStatus botUserStatus;
+        private BotUserRole botUserRole;
 
         private UserBuilder() {
         }
@@ -263,6 +298,11 @@ public class BotUser {
             return this;
         }
 
+        public UserBuilder withPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
         public UserBuilder withTgAccountId(long tgAccountId) {
             this.tgAccountId = tgAccountId;
             return this;
@@ -283,9 +323,15 @@ public class BotUser {
             return this;
         }
 
+        public UserBuilder withUserRole(BotUserRole botUserRole) {
+            this.botUserRole = botUserRole;
+            return this;
+        }
+
 
         public BotUser build() {
-            return new BotUser(userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus);
+            return new BotUser(userName, firstName, lastName, password, tgAccountId, isReadyReceiveUpdates,
+                isAllCanSeeMyWishList, botUserStatus, botUserRole);
         }
 
 
