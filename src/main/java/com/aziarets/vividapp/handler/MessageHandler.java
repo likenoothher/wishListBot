@@ -5,11 +5,15 @@ import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.util.GiftTelegramUrlGenerator;
+import com.aziarets.vividapp.util.PhotoManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 
@@ -27,11 +31,18 @@ public class MessageHandler {
     private String chatId;
     private String messageText;
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
+    private PasswordEncoder passwordEncoder;
+    private PhotoManager photoManager;
+    private GiftTelegramUrlGenerator giftTelegramUrlGenerator;
 
     @Autowired
-    public MessageHandler(BotService botService, BotMenuTemplate menu) {
+    public MessageHandler(BotService botService, BotMenuTemplate menu, PasswordEncoder passwordEncoder,
+                          PhotoManager photoManager, GiftTelegramUrlGenerator giftTelegramUrlGenerator) {
         this.botService = botService;
         this.menu = menu;
+        this.passwordEncoder = passwordEncoder;
+        this.photoManager = photoManager;
+        this.giftTelegramUrlGenerator = giftTelegramUrlGenerator;
     }
 
     public List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
@@ -74,6 +85,18 @@ public class MessageHandler {
             return messagesToSend;
         }
 
+        if (updateSender.getBotUserStatus().equals(BotUserStatus.SETTING_PASSWORD)) {
+            handleSetPasswordRequest(updateSender);
+            return messagesToSend;
+        }
+
+        if (updateSender.getBotUserStatus().equals(BotUserStatus.ADDING_GIFT_PHOTO) &&
+            update.getMessage().hasPhoto()) {
+            handleAddingPhotoRequest(update, updateSender);
+            resetUserStatus(updateSender);
+            return messagesToSend;
+        }
+
         SendMessage unknownCommandMessage = menu.getMainMenuTemplate(chatId);
         unknownCommandMessage.setText("Неизвестная команда " + DISAPPOINTED_ICON + "\n" +
             "Попробуй ещё раз из главного меню" + HMM_ICON);
@@ -112,6 +135,35 @@ public class MessageHandler {
             ": " + messageText));
         messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Твоё сообщение отправлено разработчику"));
 
+    }
+
+    private void handleSetPasswordRequest(BotUser updateSender) {
+        Optional<BotUser> foundUser = botService.findUserByTelegramId(updateSender.getTgAccountId());
+        if(foundUser.isPresent()){
+            BotUser botUser = foundUser.get();
+            botUser.setPassword( passwordEncoder.encode(messageText));
+            botUser.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
+            botService.updateUser(botUser);
+            messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Пароль изменён"));
+        }
+        else {
+            messagesToSend.add(menu.getErrorStatusTemplate("Пароль не изменён, произошла ошибка",
+                chatId));
+        }
+    }
+
+    private void handleAddingPhotoRequest(Update update, BotUser updateSender) { // to do : add check for photo manager actions
+        Optional<Gift> updatedGift = botService.findGiftById(updateSender.getUpdateGiftId());
+        List<PhotoSize> photoSizes = update.getMessage().getPhoto();
+        if(updatedGift.isPresent()){
+            Gift gift = updatedGift.get();
+            gift.setGiftPhotoTelegramId(photoManager.getGiftPhotoLink(gift, photoSizes));
+            messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Фотография изменена"));
+        }
+        else {
+            messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
+                chatId));
+        }
     }
 
     private void handleAddingGiftNameRequest(BotUser updateSender) {

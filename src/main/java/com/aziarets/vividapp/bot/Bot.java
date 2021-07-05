@@ -44,7 +44,6 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         List<BotApiMethod> messages = handler.handleUpdate(update);
-        EditMessageText editMessageText = new EditMessageText();
         for (BotApiMethod message : messages) {
             try {
                 execute(message);

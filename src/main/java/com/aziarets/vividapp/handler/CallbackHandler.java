@@ -76,6 +76,11 @@ public class CallbackHandler {
             return messagesToSend;
         }
 
+        if (callbackData.startsWith("/web")) {
+            handleWebRequests(update, updateSender);
+            return messagesToSend;
+        }
+
         if (callbackData.equals("/main_menu")) {
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.showEditedMainMenu(chatId, messageId, inlineMessageId));
@@ -162,6 +167,25 @@ public class CallbackHandler {
                 botService.updateUser(updatedUser);
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Вставь ссылку на подарок и отправь"));
+            } else {
+                messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
+                    "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
+            }
+            return;
+        }
+
+        if (callbackData.contains("my_wish_list/edit_photo_of_present_under/id/")) {
+            int updatedGiftId = extractLastAfterSlashId(callbackData);
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
+            if (user.isPresent()) {
+                BotUser updatedUser = user.get();
+                updatedUser.setBotUserStatus(BotUserStatus.ADDING_GIFT_PHOTO);
+                updatedUser.setUpdateGiftId(updatedGiftId);
+                updatedUser.setCarryingMessageId(messageId);
+                updatedUser.setCarryingInlineMessageId(inlineMessageId);
+                botService.updateUser(updatedUser);
+                messagesToSend.add(callbackAnswer(update));
+                messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Прикрепи изображение подарка и отправь"));
             } else {
                 messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
                     "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
@@ -525,6 +549,34 @@ public class CallbackHandler {
         }
 
         return;
+    }
+
+    private void handleWebRequests(Update update, BotUser updateSender) {
+        if (callbackData.equals("/web")) {
+            messagesToSend.add(callbackAnswer(update));
+            messagesToSend.add(menu.getWebTemplate(chatId, messageId, inlineMessageId));
+            return;
+        }
+
+        if (callbackData.equals("/web/set_password")) {
+            Optional<BotUser> user = botService.findUserByTelegramId(updateSender.getTgAccountId());
+
+            if (user.isPresent()) {
+                BotUser updatedUser = user.get();
+                updatedUser.setBotUserStatus(BotUserStatus.SETTING_PASSWORD);
+                updatedUser.setCarryingMessageId(messageId);
+                updatedUser.setCarryingInlineMessageId(inlineMessageId);
+                botService.updateUser(updatedUser);
+                messagesToSend.add(callbackAnswer(update));
+                messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Введи пароль и отправь"));
+            } else {
+                messagesToSend.add(callbackAnswer(update, "Почему то не смогли найти пользователя в нашей базе данных, " +
+                    "скорей всего из-за кривых рук человека писавшего этот текст (-_-)"));
+            }
+            return;
+        }
+
+
     }
 
     private String getUpdateChatId(Update update) {

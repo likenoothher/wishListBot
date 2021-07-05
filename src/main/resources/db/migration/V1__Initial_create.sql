@@ -1,5 +1,7 @@
 CREATE TYPE status AS ENUM ('WITHOUT_STATUS', 'ADDING_GIFT_NAME', 'ADDING_GIFT_URl',  'ADDING_GIFT_DESCRIPTION',
-    'SEARCHING_FRIEND');
+    'SEARCHING_FRIEND', 'CONTACTING_DEVELOPER', 'SETTING_PASSWORD');
+
+CREATE TYPE role AS ENUM ('ADMIN', 'USER');
 
 CREATE TABLE IF NOT EXISTS wishlists
 (
@@ -12,15 +14,15 @@ CREATE TABLE IF NOT EXISTS users
     user_name varchar(255),
     first_name varchar(255),
     last_name varchar(255),
+    password varchar (255),
     tgAccountId bigint,
-    tgChatId bigint,
     wishlist_id bigint,
     update_ready boolean,
     show_all_ready boolean,
     user_status varchar(127),
+    user_role varchar (127),
     updated_gift_id int,
     message_id int,
-    gift_description varchar(1024),
     inline_message_id varchar(100),
     FOREIGN KEY (wishlist_id) REFERENCES wishlists(id)
 );
@@ -32,6 +34,7 @@ CREATE TABLE IF NOT EXISTS gifts
     gift_url varchar(512),
     occupied_by_id int,
     gift_description varchar(1024),
+    photo_id varchar (1024),
     wishlist_id bigint,
     FOREIGN KEY (wishlist_id) REFERENCES wishlists(id),
     FOREIGN KEY (occupied_by_id) REFERENCES users(id)

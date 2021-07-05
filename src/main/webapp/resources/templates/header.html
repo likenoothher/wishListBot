@@ -46,7 +46,7 @@
                     About registration
                 </button>
             </div>
-            <div sec:authorize="hasAnyRole('ADMIN', 'USER')">
+            <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
                 <a class="btn btn-success" href="/logout" role="button">Log out</a>
             </div>
         </div>

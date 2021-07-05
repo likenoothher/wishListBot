@@ -1,9 +1,12 @@
 package com.aziarets.vividapp.config;
 
+import com.aziarets.vividapp.model.BotUserRole;
+import com.aziarets.vividapp.service.BotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,25 +24,34 @@ import javax.sql.DataSource;
 @ComponentScan("com.aziarets.vividapp")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private DataSource dataSource;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfig(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser(User.builder()
-            .username("john_yoy")
-            .password(passwordEncoder().encode("1"))
-            .roles("ADMIN")
-            .build())
-            .withUser(User.builder()
-                .username("jama_darma")
-                .password(passwordEncoder().encode("1"))
-                .roles("USER")
-                .build());
+        auth.authenticationProvider(daoAuthenticationProvider());
+//        auth.inMemoryAuthentication().withUser(User.builder()
+//            .username("john_yoy")
+//            .password(passwordEncoder().encode("1"))
+//            .roles(BotUserRole.ADMIN.getRole())
+//            .build())
+//            .withUser(User.builder()
+//                .username("jama_darma")
+//                .password(passwordEncoder().encode("1"))
+//                .roles(BotUserRole.USER.getRole())
+//                .build());
+    }
+
+    @Bean
+    protected DaoAuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return daoAuthenticationProvider;
     }
 
     @Bean
@@ -61,5 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutSuccessUrl("/");
     }
+
+
 
 }

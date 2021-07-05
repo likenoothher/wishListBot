@@ -4,13 +4,25 @@ import com.aziarets.vividapp.exception.NotFoundUserNameException;
 import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.handler.UpdateType;
 import com.aziarets.vividapp.model.BotUser;
+import com.aziarets.vividapp.model.BotUserRole;
 import com.aziarets.vividapp.model.BotUserStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 @Component
 public class BotUserExtractor {
+
+    private PasswordGenerator passwordGenerator;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public BotUserExtractor(PasswordGenerator passwordGenerator, PasswordEncoder passwordEncoder) {
+        this.passwordGenerator = passwordGenerator;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
         return createUserFromUpdateInfo(update);
@@ -29,7 +41,9 @@ public class BotUserExtractor {
             .withFirstName(gotFrom.getFirstName())
             .withLastName(gotFrom.getLastName())
             .withUserName(gotFrom.getUserName())
+            .withPassword(passwordEncoder.encode(passwordGenerator.getRandomPassword()))
             .withUserStatus(BotUserStatus.WITHOUT_STATUS)
+            .withUserRole(BotUserRole.ROLE_USER)
             .isReadyReceiveUpdates(true)
             .isAllCanSeeMyWishList(false)
             .build();

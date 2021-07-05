@@ -27,7 +27,8 @@ public class BotUserDaoImpl implements BotUserDao {
 
     @Override
     public boolean update(BotUser botUser) {
-        factory.getCurrentSession().merge(botUser);
+        System.out.println(factory.getCurrentSession().merge(botUser));
+
         return true;
     }
 
