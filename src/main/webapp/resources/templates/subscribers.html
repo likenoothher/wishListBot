@@ -37,7 +37,7 @@
                                     <div class="row">
                                         <div class="col-lg text-center">
                                             <form method="post" th:action="@{/subscribers/delete}">
-                                                <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
+                                                <input type="hidden" th:value="${user.getId()}" name="userId"/>
                                                 <button type="submit" class="btn btn-danger" name="deletedUserId"
                                                         th:value="*{subscriber.getTgAccountId()}">Delete</button>
                                             </form>

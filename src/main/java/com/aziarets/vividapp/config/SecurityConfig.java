@@ -16,11 +16,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableWebMvc
 @ComponentScan("com.aziarets.vividapp")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -34,20 +36,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
-//        auth.inMemoryAuthentication().withUser(User.builder()
-//            .username("john_yoy")
-//            .password(passwordEncoder().encode("1"))
-//            .roles(BotUserRole.ADMIN.getRole())
-//            .build())
-//            .withUser(User.builder()
-//                .username("jama_darma")
-//                .password(passwordEncoder().encode("1"))
-//                .roles(BotUserRole.USER.getRole())
-//                .build());
     }
 
     @Bean
-    protected DaoAuthenticationProvider daoAuthenticationProvider(){
+    protected DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
@@ -63,17 +55,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf()
             .disable()
             .authorizeRequests()
-                .antMatchers("/wishlist/**", "/i_present/**", "/subscribers/**", "/subscriptions/**").authenticated()
-                .antMatchers("/js/**", "/css/**", "/").permitAll()
+            .antMatchers("/wishlist/**", "/i_present/**", "/subscribers/**", "/subscriptions/**")
+            .authenticated()
+            .antMatchers("/js/**", "/css/**", "/").permitAll()
             .and()
-                .formLogin()
-                .defaultSuccessUrl("/wishlist")
-                .permitAll()
+            .formLogin()
+            .defaultSuccessUrl("/wishlist")
+            .permitAll()
             .and()
-                .logout()
-                .logoutSuccessUrl("/");
+            .logout()
+            .logoutSuccessUrl("/");
     }
-
 
 
 }

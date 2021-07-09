@@ -2,6 +2,8 @@ package com.aziarets.vividapp.dao;
 
 import com.aziarets.vividapp.model.Gift;
 import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Repository
 public class GiftDaoImpl implements GiftDao {
+    private static final Logger logger = LoggerFactory.getLogger(GiftDaoImpl.class);
 
     private SessionFactory factory;
 
@@ -21,57 +24,62 @@ public class GiftDaoImpl implements GiftDao {
 
     @Override
     public long save(Gift gift) {
+        logger.info("Saving gift with gift name " + gift.getName());
         factory.getCurrentSession().saveOrUpdate(gift);
+        logger.info("Saved gift with gift name " + gift.getName() + ", gift id: " + gift.getId());
         return gift.getId();
     }
 
     @Override
     public boolean update(Gift gift) {
+        logger.info("Updating gift with gift id " + gift.getId());
         factory.getCurrentSession().saveOrUpdate(gift);
         return gift.getId() == 0 ? false : true;
     }
 
     @Override
     public boolean remove(long id) {
+        logger.info("Deleting gift with gift id " + id);
         factory.getCurrentSession().remove(factory.getCurrentSession().get(Gift.class, id));
         return true; // переделать
     }
 
     @Override
     public Gift getById(long id) {
+        logger.info("Get gift by id: " + id);
         return factory.getCurrentSession().get(Gift.class, id);
     }
 
     @Override
     public List<Gift> getPresentsUserGoingDonate(long userId) {
+        logger.info("Get presents user going donate by user id: " + userId);
         Query query = factory.getCurrentSession().createQuery("from Gift where occupiedBy.id = :id");
         query.setParameter("id", userId);
+        logger.info("Returning result - presents user going donate by user id: " + userId);
         return query.getResultList();
 
     }
 
     @Override
     public List<Gift> getAvailableToDonatePresents(long userTelegramId) {
+        logger.info("Get presents available to donate of user with telegram id: " + userTelegramId);
         Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser\n" +
             "            join botuser.wishList.giftList as gifts\n" +
             "            where gifts.occupiedBy =null and botuser.tgAccountId = :userTelegramId ");
         query.setParameter("userTelegramId", userTelegramId);
+        logger.info("Returning result -  presents available to donate of user with telegram id: "
+            + userTelegramId);
         return query.getResultList();
     }
 
     @Override
     public List<Gift> getUserWishListPresents(long userTelegramId) {
-        try {
-            Query query = factory.getCurrentSession().createQuery("select botuser.wishList.giftList from BotUser botuser\n" +
-                "where botuser.tgAccountId = :userTelegramId")
-                .setParameter("userTelegramId", userTelegramId);
-
-            List<Gift> gifts = query.getResultList();
-            return gifts;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        logger.info("Get wishlist of user with telegram id: " + userTelegramId);
+        Query query = factory.getCurrentSession().createQuery("select botuser.wishList.giftList " +
+            "from BotUser botuser\n" +
+            "where botuser.tgAccountId = :userTelegramId")
+            .setParameter("userTelegramId", userTelegramId);
+        logger.info("Returning result -  wishlist of user with telegram id: " + userTelegramId);
+        return query.getResultList();
     }
 }

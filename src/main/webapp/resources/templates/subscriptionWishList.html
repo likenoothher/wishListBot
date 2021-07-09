@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h3>Gifts available to donate</h3>
+                <h3><span th:text="${user.getUserName()}"></span>'s gifts available to donate</h3>
             </div>
             <div class="row">
                 <div class="col-sm-3" th:each="gift: ${availableGifts}">
@@ -28,7 +28,8 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
-                                <img th:src="@{/img/no_photo2.jpg}" class="card-img-top" alt="no-photo">
+                                <img th:if="${gift.getGiftPhotoTelegramId() != null}" th:src="${gift.getGiftPhotoTelegramId()}" />
+                                <img th:unless="${gift.getGiftPhotoTelegramId() != null}" th:src="@{/img/no_photo2.jpg}" />
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Description: <span th:text="${gift.getDescription()}"></span>
@@ -38,7 +39,7 @@
                                     <div class="row">
                                         <div class="col-lg text-center">
                                             <form method="post" th:action="@{/subscriptions/donate}">
-                                                <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
+                                                <input type="hidden" th:value="${user.getId()}" name="userId"/>
                                                 <button type="submit" class="btn btn-success" name="giftId"
                                                         th:value="*{gift.getId()}">I - present!</button>
                                             </form>

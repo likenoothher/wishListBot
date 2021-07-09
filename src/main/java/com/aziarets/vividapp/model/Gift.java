@@ -8,24 +8,24 @@ import java.util.Objects;
 public class Gift {
 
     @Id
-    @Column(name= "id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name= "gift_name")
+    @Column(name = "gift_name")
     private String name;
 
-    @Column(name= "gift_url")
+    @Column(name = "gift_url")
     private String url;
 
     @OneToOne
     @JoinColumn(name = "occupied_by_id")
     private BotUser occupiedBy;
 
-    @Column(name= "gift_description")
+    @Column(name = "gift_description")
     private String description;
 
-    @Column(name= "photo_id")
+    @Column(name = "photo_id")
     private String giftPhotoTelegramId;
 
     private Gift(String name, String url, BotUser occupiedBy, String description) {

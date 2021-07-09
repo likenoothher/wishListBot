@@ -27,10 +27,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         BotUser botUser = botUserDao.getByUserName(username);
-        if(botUser != null) {
+        if (botUser != null) {
             return new UserDetails() {
                 @Override
-                public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(botUser.getBotUserRole());
+                public Collection<? extends GrantedAuthority> getAuthorities() {
+                    return List.of(botUser.getBotUserRole());
                 }
 
                 @Override

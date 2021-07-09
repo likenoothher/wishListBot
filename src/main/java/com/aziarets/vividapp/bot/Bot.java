@@ -1,7 +1,12 @@
 package com.aziarets.vividapp.bot;
 
+import com.aziarets.vividapp.controller.SubscribersController;
 import com.aziarets.vividapp.handler.UpdateHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -14,32 +19,39 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import java.util.List;
 
 @Component
+@PropertySource(value= {"classpath:application.properties"})
 public class Bot extends TelegramLongPollingBot {
+    private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
+    private String botUserName;
+    private String botToken;
     private UpdateHandler handler;
 
     @Autowired
-    public Bot(UpdateHandler handler) {
+    public Bot(@Value("${bot.user_name}") String botUserName, @Value("${bot.token}") String botToken,
+               UpdateHandler handler) {
         this.handler = handler;
+        this.botToken = botToken;
+        this.botUserName = botUserName;
         TelegramBotsApi telegramBotsApi = null;
         try {
             telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.warn("Exception during bot's initialization: " + e.getLocalizedMessage());
         }
         try {
             telegramBotsApi.registerBot(this);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            logger.warn("Exception during bot's registration: " + e.getLocalizedMessage());
         }
     }
 
     public String getBotUsername() {
-        return "Vivid";
+        return botUserName;
     }
 
     public String getBotToken() {
-        return "1899375504:AAE-M6_miu3OytFn9pt_otNdniFK82Pb7Kg";
+        return botToken;
     }
 
     public void onUpdateReceived(Update update) {
@@ -48,7 +60,7 @@ public class Bot extends TelegramLongPollingBot {
             try {
                 execute(message);
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                logger.warn("Exception during sending messages: " + e.getLocalizedMessage());
             }
 
         }

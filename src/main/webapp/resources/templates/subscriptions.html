@@ -36,13 +36,13 @@
                   <p class="card-text">Last Name: <span th:text="${subscription.getLastName()}"></span>
                   </p>
                   </p>
-                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getTgAccountId()})}" class="card-link">
+                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="card-link">
                     <span th:text="${subscription.getUserName()}"></span>'s wishlist</a>
                   </p>
                   <div class="row">
                     <div class="col-lg text-center">
                       <form method="post" th:action="@{/subscriptions/unsubscribe}">
-                        <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
+                        <input type="hidden" th:value="${user.getId()}" name="userId"/>
                         <button type="submit" class="btn btn-danger" name="unsubscribedFrom"
                                 th:value="*{subscription.getTgAccountId()}">Unsubscribe</button>
                       </form>

@@ -1,4 +1,4 @@
-package com.aziarets.vividapp.builder;
+package com.aziarets.vividapp.keyboardbuilder;
 
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
@@ -89,16 +89,16 @@ public class InlineKeyboard {
 
         public InlineKeyboardMarkupBuilder withCallBackButtonsFromGiftMap(Map<Gift, BotUser> gifts,
                                                                           String icon, String callBackPrefix) {
-                for (Map.Entry<Gift, BotUser> entry : gifts.entrySet()) {
-                    this.row = new ArrayList<>();
-                    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-                    inlineKeyboardButton.setText(icon + " " + entry.getKey().getName() + " для пользователя @"
-                        + entry.getValue().getUserName());
-                    inlineKeyboardButton.setCallbackData(callBackPrefix + "/" + entry.getKey().getId());
-                    row.add(inlineKeyboardButton);
-                    this.keyboard.add(this.row);
-                    this.row = null;
-                }
+            for (Map.Entry<Gift, BotUser> entry : gifts.entrySet()) {
+                this.row = new ArrayList<>();
+                InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+                inlineKeyboardButton.setText(icon + " " + entry.getKey().getName() + " для пользователя @"
+                    + entry.getValue().getUserName());
+                inlineKeyboardButton.setCallbackData(callBackPrefix + "/" + entry.getKey().getId());
+                row.add(inlineKeyboardButton);
+                this.keyboard.add(this.row);
+                this.row = null;
+            }
 
             return this;
         }
