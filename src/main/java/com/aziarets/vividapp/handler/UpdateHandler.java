@@ -6,6 +6,8 @@ import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.menu.Icon;
 import com.aziarets.vividapp.model.BotUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Component
 public class UpdateHandler {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateHandler.class);
+
     private BotService botService;
     private BotMenuTemplate menu;
     private CallbackHandler callbackHandler;
@@ -27,7 +31,8 @@ public class UpdateHandler {
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
 
     @Autowired
-    public UpdateHandler(BotService botService, BotMenuTemplate menu, CallbackHandler callbackHandler, MessageHandler messageHandler) {
+    public UpdateHandler(BotService botService, BotMenuTemplate menu, CallbackHandler callbackHandler,
+                         MessageHandler messageHandler) {
         this.botService = botService;
         this.menu = menu;
         this.callbackHandler = callbackHandler;
@@ -37,16 +42,19 @@ public class UpdateHandler {
     public synchronized List<BotApiMethod> handleUpdate(Update update) {
         chatId = getUpdateChatId(update);
         messagesToSend.clear();
+        logger.info("Handling update with id: " + update.getUpdateId());
 
         BotUser updateSender = null;
         try {
+            logger.info("Identifying user from update with id: " + update.getUpdateId());
             updateSender = botService.identifyUser(update);
+            logger.info("User identified from update with id: " + update.getUpdateId());
         } catch (NotFoundUserNameException e) {
-            e.printStackTrace();
+            logger.warn("Not found user name during identifying update with id: " + update.getUpdateId());
             return List.of(new SendMessage(chatId, "К сожалению, для пользования нашим ботом" +
                 " тебе необходимо изменить настройки приватности и открыть видимость имени пользователя @{user_name}"));
         } catch (UserIsBotException e) {
-            e.printStackTrace();
+            logger.warn("User from update with id: " + update.getUpdateId() + " is bot. Access rejected");
             return List.of(new SendMessage(chatId, "Ботам здесь не рады"));
         }
 
@@ -60,6 +68,7 @@ public class UpdateHandler {
             return messagesToSend;
         }
 
+        logger.info("Handling unknown request from user with id: " + updateSender.getId());
         SendMessage unknownCommandMessage = menu.getMainMenuTemplate(chatId);
         unknownCommandMessage.setText(Icon.DISAPPOINTED_ICON
             + " Не знаю такой команды, попробуй ещё раз из главного меню");
@@ -69,10 +78,12 @@ public class UpdateHandler {
     }
 
     private List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
+        logger.info("Handling message request from update with id: " + update.getUpdateId());
         return messageHandler.handleMessage(update, updateSender);
     }
 
     private List<BotApiMethod> handleCallBackQuery(Update update, BotUser updateSender) {
+        logger.info("Handling call back query request from update with id: " + update.getUpdateId());
         return callbackHandler.handleCallBackQuery(update, updateSender);
     }
 

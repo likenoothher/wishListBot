@@ -8,10 +8,16 @@ import java.util.Map;
 
 public interface GiftDao {
     public long save(Gift gift);
+
     public boolean update(Gift gift);
+
     public boolean remove(long id);
+
     public Gift getById(long id);
+
     public List<Gift> getPresentsUserGoingDonate(long userTelegramId);
+
     public List<Gift> getAvailableToDonatePresents(long userTelegramId);
+
     public List<Gift> getUserWishListPresents(long userId);
 }

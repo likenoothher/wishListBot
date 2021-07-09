@@ -28,8 +28,9 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
-                                <img src="img/no_photo2.jpg" class="card-img-top" alt="no-photo">
                                 <div class="card-body">
+                                    <img th:if="${entry.key.getGiftPhotoTelegramId() != null}" th:src="${entry.key.getGiftPhotoTelegramId()}" />
+                                    <img th:unless="${entry.key.getGiftPhotoTelegramId() != null}" th:src="@{img/no_photo2.jpg}" />
                                     <h5 class="card-title"><span th:text="${entry.key.getName()}"></span></h5>
                                     <p class="card-text">Description: <span th:text="${entry.key.getDescription()}"></span>
                                     </p>
@@ -40,7 +41,7 @@
                                     <div class="row">
                                         <div class="col-lg text-center">
                                             <form method="post" th:action="@{/i_present/refuse}">
-                                                <input type="hidden" th:value="${user.getTgAccountId()}" name="userId"/>
+                                                <input type="hidden" th:value="${user.getId()}" name="userId"/>
                                                 <button type="submit" class="btn btn-danger" name="giftId"
                                                         th:value="*{entry.key.getId()}">Refuse from donate</button>
                                             </form>

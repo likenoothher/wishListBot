@@ -1,4 +1,4 @@
-package com.aziarets.vividapp.builder;
+package com.aziarets.vividapp.keyboardbuilder;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;

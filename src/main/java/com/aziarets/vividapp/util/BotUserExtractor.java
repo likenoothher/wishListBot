@@ -28,6 +28,11 @@ public class BotUserExtractor {
         return createUserFromUpdateInfo(update);
     }
 
+    public long getUpdateSenderId(Update update) {
+        User gotFrom = extractUserInfoFromUpdate(update);
+        return gotFrom.getId();
+    }
+
     private BotUser createUserFromUpdateInfo(Update update) throws NotFoundUserNameException, UserIsBotException {
         User gotFrom = extractUserInfoFromUpdate(update);
         if (gotFrom.getUserName() == null) {

@@ -1,6 +1,6 @@
 package com.aziarets.vividapp.menu;
 
-import com.aziarets.vividapp.builder.InlineKeyboard;
+import com.aziarets.vividapp.keyboardbuilder.InlineKeyboard;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.util.GiftTelegramUrlGenerator;
@@ -93,7 +93,7 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
         message.setText(WISH_LIST_ICON + " Здесь ты можешь управлять своим WishList'ом\n");
 
-        InlineKeyboardMarkup replyKeyboard =  InlineKeyboard.InlineKeyboardMarkupBuilder
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
             .withRow()
             .buttonWithCallbackData("Добавить подарок" + PLUS_MARK_ICON,
@@ -119,15 +119,15 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String giftUrl = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
-        String photoId = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
-            : "<a href=\"" +gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
+        String photoURL = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
 
-        message.setText( MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
+        message.setText(MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
             gift.getName() + "\"" +
             "\nНа данный момент :" +
             "\n- описание: " + description +
             "\n- ссылка: " + giftUrl +
-            "\n" + photoId);
+            "\n" + photoURL);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -173,7 +173,7 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public EditMessageText getIPresentTemplate(Map<Gift, BotUser> gifts , String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getIPresentTemplate(Map<Gift, BotUser> gifts, String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         if (!gifts.isEmpty()) {
@@ -219,15 +219,15 @@ public class BotMenuTemplate {
         String giftDescription = gift.getDescription() == null ? "не указано" : gift.getDescription();
         String giftUrl = gift.getUrl() == null ? "не указано" : gift.getUrl();
         String giftHolderName = giftHolder.getUserName() == null ? "не указано" : giftHolder.getUserName();
-        String photoId = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
-            : "<a href=\"" +gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
+        String photoURL = gift.getGiftPhotoTelegramId() == null ? "Изображение - отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
 
 
         message.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
             "Описание - " + giftDescription + "\n" +
             "Ссылка - " + giftUrl + "\n" +
-                photoId +  "\n" +
-            ONE_GUY_ICON +"Для пользователя - @" + giftHolderName + "\n\n" +
+            photoURL + "\n" +
+            ONE_GUY_ICON + "Для пользователя - @" + giftHolderName + "\n\n" +
             THUMB_DOWN_POINTER_ICON + "Если передумал дарить жми" + THUMB_DOWN_POINTER_ICON);
 
 
@@ -253,13 +253,13 @@ public class BotMenuTemplate {
     }
 
     public EditMessageText getMySubscribersListTemplate(List<BotUser> subscribers, String chatId,
-                                                     int messageId, String inlineMessageId) {
+                                                        int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         if (!subscribers.isEmpty()) {
             message.setText(ARROW_LOWER_LEFT_ICON + "Это список пользователей, которые на тебя подписаны\n" +
-                "Нажми на имя пользователя "+ONE_GUY_ICON+" для для того, чтобы увидеть более детальную информацию"
-                + WISH_LIST_ICON );
+                "Нажми на имя пользователя " + ONE_GUY_ICON + " для для того, чтобы увидеть более детальную информацию"
+                + WISH_LIST_ICON);
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
@@ -291,7 +291,7 @@ public class BotMenuTemplate {
     }
 
     public EditMessageText getSubscriberRepresentationTemplate(BotUser subscriber, String chatId,
-                                                            int messageId, String inlineMessageId) {
+                                                               int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         String firstName = subscriber.getFirstName() == null ? "не указано" : subscriber.getFirstName();
@@ -299,7 +299,7 @@ public class BotMenuTemplate {
 
         message.setText(ONE_GUY_ICON + " Информация о пользователе:\n" +
             "Имя пользователя - @" + subscriber.getUserName() + "\n"
-            +"Имя - " + firstName + "\n" +
+            + "Имя - " + firstName + "\n" +
             "Фамилия - " + lastName);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
@@ -333,7 +333,7 @@ public class BotMenuTemplate {
 
 
     public EditMessageText getMySubscriptionsTemplate(List<BotUser> subscriptions, String chatId,
-                                                   int messageId, String inlineMessageId) {
+                                                      int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         if (!subscriptions.isEmpty()) {
@@ -370,7 +370,7 @@ public class BotMenuTemplate {
     }
 
     public EditMessageText getUserWishListTemplate(BotUser wishListHolder, String chatId,
-                                                int messageId, String inlineMessageId) {
+                                                   int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         List<Gift> gifts = wishListHolder.findAvailableToDonatePresents();
         if (!gifts.isEmpty()) {
@@ -428,15 +428,18 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public EditMessageText getGoingDonateGiftTemplate(Gift gift,BotUser giftHolder,
-                                                                 String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getGoingDonateGiftTemplate(Gift gift, BotUser giftHolder,
+                                                      String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
+        String photoURL = gift.getGiftPhotoTelegramId() == null ? "Изображение - отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
 
         message.setText(I_PRESENT_ICON + "Название - " + gift.getName() +
             "\n- описание: " + description +
-            "\n- ссылка: " + url);
+            "\n- ссылка: " + url
+            + photoURL);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -450,6 +453,7 @@ public class BotMenuTemplate {
             .endRow()
             .build();
 
+        message.setParseMode("html");
         message.setReplyMarkup(replyKeyboard);
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
@@ -469,6 +473,32 @@ public class BotMenuTemplate {
         SendMessage message = new SendMessage();
         message.setText(EXCLAMATION_ICON + " @" + askedUser.getUserName() + " просит добавить подарок в твой WishList");
         message.setChatId(String.valueOf(askedUser.getTgAccountId()));
+
+        return message;
+    }
+
+    public EditMessageText getFindFriendTemplate(String chatId, int messageId, String inlineMessageId) {
+        EditMessageText message = new EditMessageText();
+
+        String photoURL =
+            "<a href=\"https://res.cloudinary.com/dirdwzm1g/image/upload/v1625585016/Screenshot_4_e81c7b.jpg\">" +
+                "&#8205;</a>";
+
+        message.setText(KEYBOARD_ICON + " Напиши имя пользователя в Telegram и отправь" + photoURL);
+
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/main_menu")
+            .endRow()
+            .build();
+
+        message.setParseMode("html");
+        message.setChatId(chatId);
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+        message.setReplyMarkup(replyKeyboard);
 
         return message;
     }
@@ -630,7 +660,7 @@ public class BotMenuTemplate {
     }
 
     public EditMessageText getAcceptedFriendshipTemplate(String userName, String chatId,
-                                                               int messageId, String inlineMessageId) {
+                                                         int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
 
         message.setMessageId(messageId);
@@ -643,7 +673,7 @@ public class BotMenuTemplate {
     }
 
     public EditMessageText getDeniedFriendshipTemplate(String userName, String chatId,
-                                                                   int messageId, String inlineMessageId) {
+                                                       int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
@@ -655,7 +685,7 @@ public class BotMenuTemplate {
     public EditMessageText getWebTemplate(String chatId, int messageId, String inlineMessageId) {
         EditMessageText message = new EditMessageText();
         message.setText(URL_ICON + "Из этого меню ты можешь перейти в веб-версию бота. Установка/изменение пароля" +
-            " для входа в аккаунт веб-версии осществляется в меню \n\"Установка пароля\"" + LOCK_ICON);
+            " для входа в аккаунт веб-версии осществляется в меню \n\"Установка пароля " + LOCK_ICON + "\"");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()

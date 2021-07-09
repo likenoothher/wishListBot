@@ -23,14 +23,14 @@ public class SettingsController {
     }
 
     @GetMapping("")
-    public String showWishList(Principal principal, Model model){
+    public String showWishList(Principal principal, Model model) {
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         model.addAttribute("user", botUser);
         return "settings";
     }
 
     @PostMapping("")
-    public String showWishList(@RequestParam(value = "id") long id, Model model){
+    public String showWishList(@RequestParam(value = "id") long id, Model model) {
         BotUser botUser = botService.findUserByTelegramId(id).get();
         List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
         model.addAttribute("user", botUser);

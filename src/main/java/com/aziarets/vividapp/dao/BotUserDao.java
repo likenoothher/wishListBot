@@ -8,13 +8,23 @@ import java.util.Optional;
 
 public interface BotUserDao {
     public boolean save(BotUser botUser);
+
     public boolean update(BotUser botUser);
+
     public BotUser getById(long id);
+
     public BotUser getByTelegramId(long telegramId);
+
     public BotUser getByUserName(String userName);
+
     public boolean isUserExist(long telegramId);
+
     public BotUser findGiftHolderByGiftId(long giftId);
-    public List<BotUser> getUserSubscriptions(BotUser user);
-    public List<BotUser> getUserSubscribers(BotUser user);
+
+    public List<BotUser> getUserSubscriptions(long id);
+
+    public List<BotUser> getUserSubscribers(long id);
+
+    public boolean isUserSubscribedTo(long subscribedToId, long subscriberId);
 
 }
