@@ -33,8 +33,8 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
-                                <img th:if="${gift.getGiftPhotoTelegramId() != null}" th:src="${gift.getGiftPhotoTelegramId()}" />
-                                <img th:unless="${gift.getGiftPhotoTelegramId() != null}" th:src="@{img/no_photo2.jpg}" />
+                                <img th:if="${gift.getGiftPhotoCloudinaryId() != null}" th:src="${gift.getGiftPhotoURL()}" />
+                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}" th:src="@{img/no_photo2.jpg}" />
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Description: <span th:text="${gift.getDescription()}"></span>

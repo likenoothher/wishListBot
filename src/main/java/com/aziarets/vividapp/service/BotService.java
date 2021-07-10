@@ -1,20 +1,25 @@
 package com.aziarets.vividapp.service;
 
 import com.aziarets.vividapp.dao.*;
+import com.aziarets.vividapp.exception.AlreadyDonatesException;
+import com.aziarets.vividapp.exception.UserIsDisabled;
 import com.aziarets.vividapp.util.BotUserExtractor;
 import com.aziarets.vividapp.exception.NotFoundUserNameException;
 import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
+import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -26,19 +31,26 @@ public class BotService{
     private BotUserDao userDao;
     private WishListDao wishListDao;
     private GiftDao giftDao;
+    private PhotoManager photoManager;
 
     @Autowired
-    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userDao, WishListDaoImpl wishListRepo, GiftDao giftDao) {
+    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userDao, WishListDaoImpl wishListRepo,
+                      GiftDao giftDao, PhotoManager photoManager) {
         this.botUserExtractor = botUserExtractor;
         this.userDao = userDao;
         this.wishListDao = wishListRepo;
         this.giftDao = giftDao;
+        this.photoManager = photoManager;
     }
 
-    public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
+    public synchronized BotUser identifyUser(Update update)
+        throws NotFoundUserNameException, UserIsBotException, UserIsDisabled {
         logger.info("Identify user from update id:" + update.getUpdateId());
         Long updateSenderId = botUserExtractor.getUpdateSenderId(update);
         if (isUserSigned(updateSenderId)) {
+            if(!isUserEnabled(updateSenderId)) {
+                throw new UserIsDisabled("Пользователь с id" + updateSenderId + " заблокирован");
+            }
             logger.info("Returning familiar user from update id:" + update.getUpdateId() + ", user id: "
                 + updateSenderId);
             return userDao.getByTelegramId(updateSenderId);
@@ -72,7 +84,16 @@ public class BotService{
 
     public boolean deleteGift(long giftId) {
         logger.info("Deleting gift with id: " + giftId);
+        Gift gift = giftDao.getById(giftId);
+        photoManager.deletePhoto(gift);
         return giftDao.remove(giftId);
+    }
+
+    public boolean assignPhotoToGift(Gift gift, List<PhotoSize> photoSizes) {
+        if(gift.getGiftPhotoURL() != null) {
+            photoManager.deletePhoto(gift);
+        }
+        return photoManager.assignGiftPhotoParameters(gift, photoSizes);
     }
 
     public Optional<BotUser> findUserById(long id) {
@@ -82,7 +103,13 @@ public class BotService{
 
     public Optional<BotUser> findUserByUserName(String userName) {
         logger.info("Searching user with user name: " + userName);
-        return Optional.of(userDao.getByUserName(userName));
+        BotUser user = userDao.getByUserName(userName);
+        if (user != null) {
+            logger.info("Returning user with user name: " + userName);
+            return  Optional.of(user);
+        }
+        logger.warn("User with user name " + userName + " not found. Returning Optional.empty()");
+        return Optional.empty();
     }
 
     public Optional<BotUser> findUserByTelegramId(long telegramId) {
@@ -191,9 +218,14 @@ public class BotService{
         return userPresentsMap;
     }
 
-    public boolean donate(long giftId, BotUser donor) {
+    public boolean donate(long giftId, BotUser donor) throws AlreadyDonatesException {
         logger.info("Handle donate request from user with id: "+ donor.getId() + " for gift with id: "
             + giftId);
+        BotUser giftHolder = userDao.findGiftHolderByGiftId(giftId);
+        if(isDonorAlreadyGoingDonateToUser(donor.getId(), giftHolder.getId())) {
+            throw new AlreadyDonatesException("Пользователь c id " + donor.getId() + " пытается подарить 2 подарка" +
+                "для пользователя с id" + giftHolder.getId());
+        }
         Gift gift = giftDao.getById(giftId);
         if (gift != null && gift.getOccupiedBy() == null && donor != null) {
             gift.setOccupiedBy(donor);
@@ -202,6 +234,10 @@ public class BotService{
         logger.info("Couldn't handle donate request from user with id: "+ donor.getId() + " for gift with id: "
             + giftId + " Gift or/and donor is null, or gift was already occupied");
         return false;
+    }
+
+    public boolean isDonorAlreadyGoingDonateToUser(long donorId, long donatedToId) {
+        return !giftDao.getPresentsDonorGoingDonateToUser(donorId, donatedToId).isEmpty();
     }
 
     public boolean refuseFromDonate(long giftId, BotUser donor) {
@@ -220,6 +256,10 @@ public class BotService{
 
     public boolean isUserSubscribedTo(long subscribedToId, long subscriberId) {
         return userDao.isUserSubscribedTo(subscribedToId, subscriberId);
+    }
+
+    public boolean isUserEnabled(long userTelegramId) {
+        return userDao.isUserEnabled(userTelegramId);
     }
 
     private void clearGiftOccupiedFrom(BotUser subscriber, Gift gift) {

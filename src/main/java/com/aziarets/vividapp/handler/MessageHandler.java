@@ -36,15 +36,12 @@ public class MessageHandler {
     private String messageText;
     private List<BotApiMethod> messagesToSend = new ArrayList<>();
     private PasswordEncoder passwordEncoder;
-    private PhotoManager photoManager;
 
     @Autowired
-    public MessageHandler(BotService botService, BotMenuTemplate menu, PasswordEncoder passwordEncoder,
-                          PhotoManager photoManager) {
+    public MessageHandler(BotService botService, BotMenuTemplate menu, PasswordEncoder passwordEncoder) {
         this.botService = botService;
         this.menu = menu;
         this.passwordEncoder = passwordEncoder;
-        this.photoManager = photoManager;
     }
 
     public List<BotApiMethod> handleMessage(Update update, BotUser updateSender) {
@@ -121,6 +118,14 @@ public class MessageHandler {
             return;
         }
 
+        if (searchedUser.isPresent() && searchedUser.get().isEnabled() == false) {
+            logger.info("Handling searching friend request(requested was found, but blocked) from user with id: "
+                + updateSender.getId());
+            messagesToSend.add(new SendMessage(chatId, "Данный пользователь заблокирован"
+                + DISAPPOINTED_ICON));
+            return;
+        }
+
         if (!searchedUser.equals(userSearchedTo)) {
             if (!isRequestedUserAlreadyFriend(userSearchedTo.get(), searchedUser.get())) {
                 messagesToSend.add(menu.getFriendShipRequestToTemplate(searchedUser.get(), userSearchedTo.get()));
@@ -151,22 +156,36 @@ public class MessageHandler {
 
     private void handleSetPasswordRequest(BotUser updateSender) {
         logger.info("Handling set password request from user with id: " + updateSender.getId());
-        updateSender.setPassword(passwordEncoder.encode(messageText));
         updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
+        if (messageText.length() <= 3) {
+            messagesToSend.add(new SendMessage(chatId, CROSS_MARK_ICON + " Пароль не может быть короче 3 символов"));
+        } else {
+            updateSender.setPassword(passwordEncoder.encode(messageText));
+            messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Пароль изменён"));
+        }
         botService.updateUser(updateSender);
-        messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Пароль изменён"));
     }
 
     private void handleAddingPhotoRequest(Update update, BotUser updateSender) { // to do : add check for photo manager actions
         logger.info("Handling adding photo request from user with id: " + updateSender.getId());
-        Optional<Gift> updatedGift = botService.findGiftById(updateSender.getUpdateGiftId());
+        String inlineMessageId = updateSender.getCarryingInlineMessageId();
+        int messageId = updateSender.getCarryingMessageId();
+
+        Optional<Gift> gift = botService.findGiftById(updateSender.getUpdateGiftId());
         List<PhotoSize> photoSizes = update.getMessage().getPhoto();
-        if (updatedGift.isPresent()) {
-            Gift gift = updatedGift.get();
-            gift.setGiftPhotoTelegramId(photoManager.getGiftPhotoLink(gift, photoSizes));
-            messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Фотография изменена"));
+        if (gift.isPresent()) {
+            Gift updatedGift = gift.get();
+            if (botService.assignPhotoToGift(updatedGift, photoSizes)) {
+                messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
+            } else {
+                logger.warn("Exception  during adding photo to gift with id: " + gift.get().getId()
+                    + ". Error in bot service");
+                messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
+                    chatId));
+            }
+            //почему всё работает без update?
         } else {
-            logger.warn("Exception  during adding photo to gift with id: " + updatedGift.get().getId()
+            logger.warn("Exception  during adding photo to gift with id: " + gift.get().getId()
                 + ". Present isn't present");
             messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
                 chatId));

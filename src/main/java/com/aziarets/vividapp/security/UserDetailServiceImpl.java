@@ -61,7 +61,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
                 @Override
                 public boolean isEnabled() {
-                    return true;
+                    return botUser.isEnabled();
                 }
             };
         }

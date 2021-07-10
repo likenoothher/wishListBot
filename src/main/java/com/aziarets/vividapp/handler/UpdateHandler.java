@@ -1,6 +1,7 @@
 package com.aziarets.vividapp.handler;
 
 import com.aziarets.vividapp.exception.NotFoundUserNameException;
+import com.aziarets.vividapp.exception.UserIsDisabled;
 import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
@@ -56,6 +57,9 @@ public class UpdateHandler {
         } catch (UserIsBotException e) {
             logger.warn("User from update with id: " + update.getUpdateId() + " is bot. Access rejected");
             return List.of(new SendMessage(chatId, "Ботам здесь не рады"));
+        } catch (UserIsDisabled e) {
+            logger.warn("User from update with id: " + update.getUpdateId() + " is disabled. Access rejected");
+            return List.of(new SendMessage(chatId, "Твой аккаунт заблокирован"));
         }
 
         if (update.hasCallbackQuery() && updateSender != null) {

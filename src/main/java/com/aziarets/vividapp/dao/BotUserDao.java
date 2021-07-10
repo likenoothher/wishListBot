@@ -27,4 +27,6 @@ public interface BotUserDao {
 
     public boolean isUserSubscribedTo(long subscribedToId, long subscriberId);
 
+    public boolean isUserEnabled(long userTelegramId);
+
 }

@@ -28,9 +28,9 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
+                                <img th:if="${entry.key.getGiftPhotoCloudinaryId() != null}" th:src="${entry.key.getGiftPhotoURL()}" />
+                                <img th:unless="${entry.key.getGiftPhotoCloudinaryId() != null}" th:src="@{img/no_photo2.jpg}" />
                                 <div class="card-body">
-                                    <img th:if="${entry.key.getGiftPhotoTelegramId() != null}" th:src="${entry.key.getGiftPhotoTelegramId()}" />
-                                    <img th:unless="${entry.key.getGiftPhotoTelegramId() != null}" th:src="@{img/no_photo2.jpg}" />
                                     <h5 class="card-title"><span th:text="${entry.key.getName()}"></span></h5>
                                     <p class="card-text">Description: <span th:text="${entry.key.getDescription()}"></span>
                                     </p>

@@ -28,8 +28,8 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
-                                <img th:if="${gift.getGiftPhotoTelegramId() != null}" th:src="${gift.getGiftPhotoTelegramId()}" />
-                                <img th:unless="${gift.getGiftPhotoTelegramId() != null}" th:src="@{/img/no_photo2.jpg}" />
+                                <img th:if="${gift.getGiftPhotoCloudinaryId() != null}" th:src="${gift.getGiftPhotoURL()}" />
+                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/no_photo2.jpg}" />
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Description: <span th:text="${gift.getDescription()}"></span>
@@ -40,8 +40,14 @@
                                         <div class="col-lg text-center">
                                             <form method="post" th:action="@{/subscriptions/donate}">
                                                 <input type="hidden" th:value="${user.getId()}" name="userId"/>
-                                                <button type="submit" class="btn btn-success" name="giftId"
-                                                        th:value="*{gift.getId()}">I - present!</button>
+                                                <div th:switch="${showIPresentButton}">
+                                                    <button type="submit" class="btn btn-success" name="giftId"
+                                                            th:case="true"
+                                                            th:value="*{gift.getId()}">I - present!</button>
+                                                    <button type="submit" class="btn btn-success" disabled name="giftId"
+                                                            th:case="false"
+                                                            th:value="*{gift.getId()}">I - present!</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>

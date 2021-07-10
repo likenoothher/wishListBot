@@ -1,5 +1,6 @@
 package com.aziarets.vividapp.handler;
 
+import com.aziarets.vividapp.exception.AlreadyDonatesException;
 import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
@@ -321,17 +322,24 @@ public class CallbackHandler {
             logger.info("Handling my subscriptions request(going donate) from user with id: " + updateSender.getId()
                 + "going donate gift id: " + giftId);
             BotUser wishListHolder;
-
-            if (botService.donate(giftId, updateSender)) {
+            boolean isDonated = false;
+            try {
+                isDonated = botService.donate(giftId, updateSender);
+            } catch (AlreadyDonatesException e) {
                 wishListHolder = botService.findGiftHolderByGiftId(giftId).get();
-                List<Gift> gifts = botService.getAvailableToDonateGifts(wishListHolder.getTgAccountId());
-                wishListHolder.getWishList().setGiftList(gifts);
+                messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
+                    + " Не добавлено. Один подарок для каждого друга"));
+                messagesToSend.add(menu.getUserWishListTemplate(wishListHolder, chatId, messageId, inlineMessageId));
+                return;
+            }
+            if (isDonated) {
+                wishListHolder = botService.findGiftHolderByGiftId(giftId).get();
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON
                     + " Подарок добавлен в твою секцию \"Я дарю \"" + I_PRESENT_ICON));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder, chatId, messageId, inlineMessageId));
             } else {
                 logger.warn("Exception  during handling my subscriptions request(going donate) from user with id: " +
-                    + updateSender.getId() + ", false result during donate method");
+                    +updateSender.getId() + ", false result during donate method");
                 wishListHolder = botService.findGiftHolderByGiftId(giftId).get();
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не добавлен. Произошла ошибка"));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder, chatId, messageId, inlineMessageId));

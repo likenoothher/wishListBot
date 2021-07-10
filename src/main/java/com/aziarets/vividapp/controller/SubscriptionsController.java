@@ -1,5 +1,6 @@
 package com.aziarets.vividapp.controller;
 
+import com.aziarets.vividapp.exception.AlreadyDonatesException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.service.BotService;
@@ -44,6 +45,12 @@ public class SubscriptionsController {
             List<Gift> availableToDonateGifts = botService.getAvailableToDonateGifts(botUser.getTgAccountId());
             model.addAttribute("user", botUser);
             model.addAttribute("availableGifts", availableToDonateGifts);
+            if(botService.isDonorAlreadyGoingDonateToUser(currentUser.getId(), userId)) {
+                model.addAttribute("showIPresentButton", false);
+            }
+            else {
+                model.addAttribute("showIPresentButton", true);
+            }
             logger.info("Returning wish list of user with id "+userId +" for " + principal.getName());
             return "subscriptionWishList";
         }
@@ -58,10 +65,17 @@ public class SubscriptionsController {
             ", request from user  " + principal.getName());
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
-        boolean isAdded = botService.donate(giftId, botUser);
+        boolean isAdded = false;
+        try {
+            isAdded = botService.donate(giftId, botUser);
+        } catch (AlreadyDonatesException e) {
+            logger.warn("User with id " + botUser.getId() + " tried to add one more present for donating to " +
+                "user with id " + giftHolder.getId() + " despite he already donates gift to him");
+            return "forbidden";
+        }
         logger.info("Donating gift request for gift with id " + giftId +
             ", from user  " + principal.getName() +", result - " + isAdded);
-        return "redirect:/subscriptions/" + giftHolder.getTgAccountId();
+        return "redirect:/subscriptions/" + giftHolder.getId();
     }
 
     @PostMapping("/unsubscribe")

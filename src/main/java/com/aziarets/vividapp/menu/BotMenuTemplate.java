@@ -119,8 +119,8 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String giftUrl = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
-        String photoURL = gift.getGiftPhotoTelegramId() == null ? "- изображение: отсутствует"
-            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
+        String photoURL = gift.getGiftPhotoURL() == null ? "- изображение: отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoURL() + "\">&#8205;</a>";
 
         message.setText(MANAGING_ICON + " В этом меню ты можешь управлять подарком \"" +
             gift.getName() + "\"" +
@@ -219,8 +219,8 @@ public class BotMenuTemplate {
         String giftDescription = gift.getDescription() == null ? "не указано" : gift.getDescription();
         String giftUrl = gift.getUrl() == null ? "не указано" : gift.getUrl();
         String giftHolderName = giftHolder.getUserName() == null ? "не указано" : giftHolder.getUserName();
-        String photoURL = gift.getGiftPhotoTelegramId() == null ? "Изображение - отсутствует"
-            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
+        String photoURL = gift.getGiftPhotoURL() == null ? "Изображение - отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoURL() + "\">&#8205;</a>";
 
 
         message.setText(DIAMOND_ICON + "Имя подарка - " + giftName + "\n" +
@@ -433,12 +433,12 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
-        String photoURL = gift.getGiftPhotoTelegramId() == null ? "Изображение - отсутствует"
-            : "<a href=\"" + gift.getGiftPhotoTelegramId() + "\">&#8205;</a>";
+        String photoURL = gift.getGiftPhotoURL() == null ? "-изображеие: отсутствует"
+            : "<a href=\"" + gift.getGiftPhotoURL() + "\">&#8205;</a>";
 
         message.setText(I_PRESENT_ICON + "Название - " + gift.getName() +
             "\n- описание: " + description +
-            "\n- ссылка: " + url
+            "\n- ссылка: " + url + "\n"
             + photoURL);
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
