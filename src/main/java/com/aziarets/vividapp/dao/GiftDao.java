@@ -20,4 +20,6 @@ public interface GiftDao {
     public List<Gift> getAvailableToDonatePresents(long userTelegramId);
 
     public List<Gift> getUserWishListPresents(long userId);
+
+    public List<Gift> getPresentsDonorGoingDonateToUser(long donorId, long donatesTo);
 }

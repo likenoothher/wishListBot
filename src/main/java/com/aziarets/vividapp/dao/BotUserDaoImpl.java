@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.util.List;
 
@@ -64,10 +65,15 @@ public class BotUserDaoImpl implements BotUserDao {
         logger.info("Get user by user name : " + userName);
         Query query = factory.getCurrentSession().createQuery("from BotUser where userName = :userName")
             .setParameter("userName", userName);
+        try {
+            BotUser user = (BotUser) query.getSingleResult();
+            logger.info("Returning result - user by user name: " + userName);
+            return user;
+        } catch (NoResultException e) {
+            logger.warn("Exception during searching user with user name " + userName + ":" + e.getLocalizedMessage());
+            return null;
+        }
 
-        BotUser user = (BotUser) query.getSingleResult();
-        logger.info("Returning result - user by user name: " + userName);
-        return user;
     }
 
     @Override
@@ -134,4 +140,18 @@ public class BotUserDaoImpl implements BotUserDao {
             + subscriberId +" subscribed to user with id : " + subscribedToId + ". Result - " + isSubscribed);
         return isSubscribed;
     }
+
+    @Override
+    public boolean isUserEnabled(long userTelegramId) {
+        logger.info("Searching is user account with id " + userTelegramId +" enabled");
+        Query query = factory.getCurrentSession().createQuery("select botuser from BotUser as botuser\n" +
+            "where botuser.tgAccountId = :userTelegramId and botuser.isEnabled = true");
+        query.setParameter("userTelegramId", userTelegramId);
+        boolean isEnabled = !query.getResultList().isEmpty();
+        logger.info("Searching is user account with id " + userTelegramId +" enabled. Result - " + isEnabled);
+        return isEnabled;
+    }
+
+
+
 }

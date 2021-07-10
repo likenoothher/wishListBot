@@ -26,7 +26,10 @@ public class Gift {
     private String description;
 
     @Column(name = "photo_id")
-    private String giftPhotoTelegramId;
+    private String giftPhotoCloudinaryId;
+
+    @Column(name = "photo_url")
+    private String giftPhotoURL;
 
     private Gift(String name, String url, BotUser occupiedBy, String description) {
         this.name = name;
@@ -74,12 +77,20 @@ public class Gift {
         this.description = description;
     }
 
-    public String getGiftPhotoTelegramId() {
-        return giftPhotoTelegramId;
+    public String getGiftPhotoCloudinaryId() {
+        return giftPhotoCloudinaryId;
     }
 
-    public void setGiftPhotoTelegramId(String giftPhotoTelegramId) {
-        this.giftPhotoTelegramId = giftPhotoTelegramId;
+    public void setGiftPhotoCloudinaryId(String giftPhotoCloudinaryId) {
+        this.giftPhotoCloudinaryId = giftPhotoCloudinaryId;
+    }
+
+    public String getGiftPhotoURL() {
+        return giftPhotoURL;
+    }
+
+    public void setGiftPhotoURL(String giftPhotoURL) {
+        this.giftPhotoURL = giftPhotoURL;
     }
 
     @Override
@@ -87,12 +98,12 @@ public class Gift {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Gift gift = (Gift) o;
-        return id == gift.id && Objects.equals(name, gift.name) && Objects.equals(url, gift.url) && Objects.equals(occupiedBy, gift.occupiedBy) && Objects.equals(description, gift.description) && Objects.equals(giftPhotoTelegramId, gift.giftPhotoTelegramId);
+        return id == gift.id && Objects.equals(name, gift.name) && Objects.equals(url, gift.url) && Objects.equals(occupiedBy, gift.occupiedBy) && Objects.equals(description, gift.description) && Objects.equals(giftPhotoCloudinaryId, gift.giftPhotoCloudinaryId) && Objects.equals(giftPhotoURL, gift.giftPhotoURL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, url, occupiedBy, description, giftPhotoTelegramId);
+        return Objects.hash(id, name, url, occupiedBy, description, giftPhotoCloudinaryId, giftPhotoURL);
     }
 
     @Override
@@ -103,7 +114,8 @@ public class Gift {
             ", url='" + url + '\'' +
             ", occupiedBy=" + occupiedBy +
             ", description='" + description + '\'' +
-            ", giftPhotoTelegramId='" + giftPhotoTelegramId + '\'' +
+            ", giftPhotoCloudinaryId='" + giftPhotoCloudinaryId + '\'' +
+            ", giftPhotoURL='" + giftPhotoURL + '\'' +
             '}';
     }
 
@@ -122,6 +134,9 @@ public class Gift {
         }
 
         public GiftBuilder withName(String name) {
+            if(name.length() == 0) {
+                this.name = "<Без имени>";
+            }
             this.name = name;
             return this;
         }

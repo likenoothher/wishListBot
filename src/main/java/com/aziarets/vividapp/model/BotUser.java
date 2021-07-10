@@ -59,6 +59,9 @@ public class BotUser {
     @Enumerated(EnumType.STRING)
     private BotUserRole botUserRole;
 
+    @Column(name = "is_enabled")
+    private boolean isEnabled;
+
     @Column(name = "updated_gift_id")
     private int updateGiftId;
 
@@ -73,7 +76,7 @@ public class BotUser {
 
     public BotUser(String userName, String firstName, String lastName, String password, long tgAccountId,
                    boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus,
-                   BotUserRole botUserRole) {
+                   BotUserRole botUserRole, boolean isEnabled) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -83,6 +86,7 @@ public class BotUser {
         this.isAllCanSeeMyWishList = isAllCanSeeMyWishList;
         this.botUserStatus = botUserStatus;
         this.botUserRole = botUserRole;
+        this.isEnabled = isEnabled;
     }
 
     public BotUser(String userName, String firstName, String lastName, long tgAccountId, WishList wishList, List<BotUser> subscribers, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId, int carryingMessageId, String carryingInlineMessageId) {
@@ -209,6 +213,14 @@ public class BotUser {
         this.botUserRole = botUserRole;
     }
 
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public int getUpdateGiftId() {
         return updateGiftId;
     }
@@ -238,12 +250,12 @@ public class BotUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BotUser botUser = (BotUser) o;
-        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && botUserRole == botUser.botUserRole && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
+        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && isEnabled == botUser.isEnabled && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && Objects.equals(password, botUser.password) && botUserStatus == botUser.botUserStatus && botUserRole == botUser.botUserRole && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserRole, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, password, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, botUserRole, isEnabled, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -259,6 +271,7 @@ public class BotUser {
             ", isAllCanSeeMyWishList=" + isAllCanSeeMyWishList +
             ", botUserStatus=" + botUserStatus +
             ", botUserRole=" + botUserRole +
+            ", isEnabled=" + isEnabled +
             ", updateGiftId=" + updateGiftId +
             ", carryingMessageId=" + carryingMessageId +
             ", carryingInlineMessageId='" + carryingInlineMessageId + '\'' +
@@ -273,6 +286,7 @@ public class BotUser {
         private long tgAccountId;
         private boolean isReadyReceiveUpdates;
         private boolean isAllCanSeeMyWishList;
+        private boolean isEnabled;
         private BotUserStatus botUserStatus;
         private BotUserRole botUserRole;
 
@@ -318,6 +332,11 @@ public class BotUser {
             return this;
         }
 
+        public UserBuilder isEnabled(boolean isEnabled) {
+            this.isEnabled = isEnabled;
+            return this;
+        }
+
         public UserBuilder withUserStatus(BotUserStatus botUserStatus) {
             this.botUserStatus = botUserStatus;
             return this;
@@ -331,7 +350,7 @@ public class BotUser {
 
         public BotUser build() {
             return new BotUser(userName, firstName, lastName, password, tgAccountId, isReadyReceiveUpdates,
-                isAllCanSeeMyWishList, botUserStatus, botUserRole);
+                isAllCanSeeMyWishList, botUserStatus, botUserRole, isEnabled);
         }
 
 

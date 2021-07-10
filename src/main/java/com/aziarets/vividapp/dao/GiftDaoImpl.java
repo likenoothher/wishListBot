@@ -82,4 +82,17 @@ public class GiftDaoImpl implements GiftDao {
         logger.info("Returning result -  wishlist of user with telegram id: " + userTelegramId);
         return query.getResultList();
     }
+
+    @Override
+    public List<Gift> getPresentsDonorGoingDonateToUser(long donorId, long donatesTo) {
+        logger.info("Searching is user with id " + donorId +" donates something to user with id " +donatesTo);
+        Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser " +
+            "            left join botuser.wishList.giftList as gifts " +
+            "            where gifts.occupiedBy.id = :donorId and botuser.id = :donatesTo");
+        query.setParameter("donorId", donorId);
+        query.setParameter("donatesTo", donatesTo);
+        List<Gift> gifts = query.getResultList();
+        logger.info("Returning gifts user with id " + donorId +" donates to user with id " +donatesTo);
+        return gifts;
+    }
 }
