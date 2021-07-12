@@ -178,8 +178,8 @@ public class CallbackHandler {
                     + " был удалён"));
                 messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
 
-                if (deletedGift.getOccupiedBy() != null) {
-                    messagesToSend.add(menu.getUserDeletedPresentYouGoingToDonateTemplate(deletedGift, updateSender)); // вынести в нотификацию
+                if (deletedGift.getOccupiedBy() != null && deletedGift.getOccupiedBy().isReadyReceiveUpdates() ) {
+                    messagesToSend.add(menu.getUserDeletedPresentYouGoingToDonateTemplate(deletedGift, updateSender));
                 }
             } else {
                 logger.warn("Exception  during handling delete present request from user with id: " + updateSender.getId()
@@ -262,7 +262,8 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON
                     + " Пользователь был удалён из списка твоих подписчиков"));
                 messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
-                messagesToSend.add(menu.getAlertToDeletedSubscriberTemplate(deletedUser, byUserDeleted));
+                if(deletedUser.isReadyReceiveUpdates()){
+                messagesToSend.add(menu.getAlertToDeletedSubscriberTemplate(deletedUser, byUserDeleted));}
             } else {
                 logger.warn("Exception  during handling my subscribers request(delete subscriber) from user with id: " +
                     + updateSender.getId() + ", false result during remove subscriber method");
@@ -328,7 +329,7 @@ public class CallbackHandler {
             } catch (AlreadyDonatesException e) {
                 wishListHolder = botService.findGiftHolderByGiftId(giftId).get();
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
-                    + " Не добавлено. Один подарок для каждого друга"));
+                    + " Не добавлено. Один подарок для каждого пользователя"));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder, chatId, messageId, inlineMessageId));
                 return;
             }
@@ -355,7 +356,8 @@ public class CallbackHandler {
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
 
-            if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
+            if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)
+            && userRequestedTo.get().isReadyReceiveUpdates()) {
                 messagesToSend.add(menu.getAnonymouslyAskAddGiftTemplate(userRequestedTo.get()));
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
@@ -365,7 +367,8 @@ public class CallbackHandler {
                     + updateSender.getId() + " is not in the subscribers list of user with id: "
                     + userRequestedTo.get().getId());
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
-                    + " Запрос не отправлен. Возможно ты был удалён из списка друзей"));
+                    + " Запрос не отправлен. Возможно ты был удалён из списка друзей или пользователь отключил " +
+                    "доставку уведомлений"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
             return;
@@ -379,7 +382,8 @@ public class CallbackHandler {
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
 
-            if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)) {
+            if (userRequestedTo.isPresent() && userSubscribers.contains(updateSender)
+             && userRequestedTo.get().isReadyReceiveUpdates()) {
                 messagesToSend.add(menu.getExplicitAskAddGiftTemplate(userRequestedTo.get()));
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
@@ -388,8 +392,9 @@ public class CallbackHandler {
                     + updateSender.getId() + ", user requested to add gift isn't present or user with id:"
                 + updateSender.getId() + " is not in the subscribers list of user with id: "
                     + userRequestedTo.get().getId());
-                messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON +
-                    " Запрос не отправлен. Возможно ты был удалён из списка друзей"));
+                messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
+                    + " Запрос не отправлен. Возможно ты был удалён из списка друзей или пользователь отключил " +
+                    "доставку уведомлений"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             }
             return;

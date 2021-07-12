@@ -5,7 +5,8 @@
   <link rel="stylesheet"
         th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
   <link rel="stylesheet" th:href="@{/css/style.css}">
-  <title>Subscribers</title>
+  <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
+  <title>Подписки</title>
 
 </head>
 
@@ -19,7 +20,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
-        <h3>Your subscriptions, <span th:text="${user.getUserName()}"></span></h3>
+        <h3>Список подписок пользователя <span th:text="${user.getUserName()}"></span></h3>
       </div>
       <div class="row">
         <div class="col-sm-3" th:each="subscription: ${subscriptions}">
@@ -28,23 +29,23 @@
             </div>
             <div class="col-lg-10 text-center">
               <div class="card">
-                <img src="img/no_photo2.jpg" class="card-img-top" alt="no-photo">
+                <img src="/img/no_photo2.jpg" class="card-img-top" alt="no-photo">
                 <div class="card-body">
-                  <h5 class="card-title">User name: <span th:text="${subscription.getUserName()}"></span></h5>
-                  <p class="card-text">First Name: <span th:text="${subscription.getFirstName()}"></span>
+                  <h5 class="card-title">Имя пользователя: <span th:text="${subscription.getUserName()}"></span></h5>
+                  <p class="card-text">Имя: <span th:text="${subscription.getFirstName()}"></span>
                   </p>
-                  <p class="card-text">Last Name: <span th:text="${subscription.getLastName()}"></span>
+                  <p class="card-text">Фамилия: <span th:text="${subscription.getLastName()}"></span>
                   </p>
                   </p>
                   <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="card-link">
-                    <span th:text="${subscription.getUserName()}"></span>'s wishlist</a>
+                    <span th:text="${subscription.getUserName()}"></span> wish list</a>
                   </p>
                   <div class="row">
                     <div class="col-lg text-center">
                       <form method="post" th:action="@{/subscriptions/unsubscribe}">
                         <input type="hidden" th:value="${user.getId()}" name="userId"/>
                         <button type="submit" class="btn btn-danger" name="unsubscribedFrom"
-                                th:value="*{subscription.getTgAccountId()}">Unsubscribe</button>
+                                th:value="*{subscription.getTgAccountId()}">Отписаться</button>
                       </form>
                     </div>
                   </div>

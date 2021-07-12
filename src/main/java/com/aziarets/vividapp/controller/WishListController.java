@@ -3,6 +3,7 @@ package com.aziarets.vividapp.controller;
 import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.util.NotificationSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,12 @@ public class WishListController {
     private static final Logger logger = LoggerFactory.getLogger(WishListController.class);
 
     private BotService botService;
+    private NotificationSender notificationSender;
 
     @Autowired
-    public WishListController(BotService botService) {
+    public WishListController(BotService botService, NotificationSender notificationSender) {
         this.botService = botService;
+        this.notificationSender = notificationSender;
     }
 
     @GetMapping({"", "/"})
@@ -64,7 +67,10 @@ public class WishListController {
         gift.setDescription(giftDescription);
         gift.setUrl(giftURL);
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
-        botService.addGiftToUser(gift, botUser);
+        boolean isAdded = botService.addGiftToUser(gift, botUser);
+        if(isAdded) {
+            notificationSender.sendUserAddGiftNotification(botUser);
+        }
         logger.info("Gift with name "+ giftName+" added to user " + principal.getName());
         return "redirect:/wishlist";
     }
@@ -110,7 +116,10 @@ public class WishListController {
         Gift gift = botService.findGiftById(giftId).get();
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
         if (giftHolder.getUserName().equals(principal.getName())) {
-            botService.deleteGift(gift.getId());
+            boolean isRemoved = botService.deleteGift(gift.getId());
+            if (isRemoved && gift.getOccupiedBy() != null) {
+                notificationSender.sendUserDeletedGiftYouDonateNotification(gift, giftHolder);
+            }
             logger.info("Gift with id " + giftId + " deleted to user " + principal.getName());
             return "redirect:/wishlist";
         } else {

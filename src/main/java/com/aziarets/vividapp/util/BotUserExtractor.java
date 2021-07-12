@@ -48,9 +48,10 @@ public class BotUserExtractor {
             .withUserName(gotFrom.getUserName())
             .withPassword(passwordEncoder.encode(passwordGenerator.getRandomPassword()))
             .withUserStatus(BotUserStatus.WITHOUT_STATUS)
-            .withUserRole(BotUserRole.ROLE_USER)
+            .withUserRole(BotUserRole.USER)
             .isReadyReceiveUpdates(true)
             .isAllCanSeeMyWishList(false)
+            .isEnabled(true)
             .build();
     }
 

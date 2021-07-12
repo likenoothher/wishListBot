@@ -9,6 +9,7 @@ import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
+import com.aziarets.vividapp.util.NotificationSender;
 import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class BotService{
     private WishListDao wishListDao;
     private GiftDao giftDao;
     private PhotoManager photoManager;
+
 
     @Autowired
     public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userDao, WishListDaoImpl wishListRepo,
@@ -86,7 +88,9 @@ public class BotService{
         logger.info("Deleting gift with id: " + giftId);
         Gift gift = giftDao.getById(giftId);
         photoManager.deletePhoto(gift);
-        return giftDao.remove(giftId);
+        boolean isRemoved = giftDao.remove(giftId);
+
+        return isRemoved;
     }
 
     public boolean assignPhotoToGift(Gift gift, List<PhotoSize> photoSizes) {

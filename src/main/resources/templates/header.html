@@ -2,13 +2,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
-<head>
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
-    <link rel="stylesheet" th:href="@{/css/styleForMainPage.css}">
-    <title>Vivid</title>
-</head>
-
 <body>
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #24134b">
         <div class="container">
@@ -22,32 +15,40 @@
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/wishlist">My WishList</a>
+                            <a class="nav-link active" aria-current="page" href="/wishlist">Мой WishList</a>
                         </li>
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/i_present">I present</a>
+                            <a class="nav-link active" aria-current="page" href="/i_present">Я дарю</a>
                         </li>
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/subscribers">Subscribers</a>
+                            <a class="nav-link active" aria-current="page" href="/subscribers">Подписчики</a>
                         </li>
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/subscriptions">Subscriptions</a>
+                            <a class="nav-link active" aria-current="page" href="/subscriptions">Подписки</a>
                         </li>
                         <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/settings">Settings</a>
+                            <a class="nav-link active" aria-current="page" href="/settings">Настройки</a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Админка
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" role="menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" th:href="@{/admin/search_user}">Найти пользователя</a></li>
+                            </ul>
                         </li>
                     </ul>
             </div>
             <div sec:authorize="isAnonymous()">
-                <a class="btn btn-success" href="/login" role="button">Log in</a>
+                <a class="btn btn-success" href="/login" role="button">Войти</a>
                 <!-- Button trigger modal -->
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                         data-bs-target="#aboutRegistrationModal">
-                    About registration
+                    О регистрации
                 </button>
             </div>
-            <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')">
-                <a class="btn btn-success" href="/logout" role="button">Log out</a>
+            <div sec:authorize="hasAnyAuthority('ADMIN', 'USER')">
+                <a class="btn btn-success" href="/logout" role="button">Выйти</a>
             </div>
         </div>
     </nav>
@@ -58,22 +59,20 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">About registration</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">О регистрации</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Registration available only from Telegram client
+                    Регистрация доступна только через <a th:href="@{https://t.me/vividwishlistbot}">Telegram бота</a>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
     </div>
 
-<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
-<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
 </body>
 
 </html>
