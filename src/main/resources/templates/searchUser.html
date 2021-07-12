@@ -19,17 +19,17 @@
 
   <section>
     <div class="container">
-      <form method="post" th:action="@{/admin/search_user}">
+      <form method="get" th:action="@{/admin/search_user}">
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">@</span>
           <input type="text" class="form-control" placeholder="Имя пользователя"
-                 name="userName" aria-label="Username" aria-describedby="basic-addon1">
-          <button type="submit" class="btn btn-success" name="userId">Найти</button>
+                 name="user_name" aria-label="Username" aria-describedby="basic-addon1" required="required">
+          <button type="submit" class="btn btn-success">Найти</button>
       </div>
       </form>
 
-      <div th:if="${user == null}">
-        <h3> Пользователь не найден</h3>
+      <div th:if="${not_found != null}">
+        <h3 th:text="${not_found}"></h3>
       </div>
 
       <div th:if="${user != null}">

@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -29,26 +26,23 @@ public class AdminController {
         this.notificationSender = notificationSender;
     }
 
-    @GetMapping(value = "/search_user")
-    public String searchUser() {
+    @GetMapping(value = "/search")
+    public String searchUserMain() {
         logger.info("Returning search user page for admin");
         return "searchUser";
-
     }
 
-    @PostMapping(value = "/search_user")
-    public String searchUser(@RequestParam(value = "userName", required = false) String username, Model model) {
-        if (username != null) {
-            logger.info("Admin search user by user name - " + username);
-            Optional<BotUser> botUser = botService.findUserByUserName(username);
-            if (botUser.isPresent()) {
-                model.addAttribute("user", botUser.get());
-            }
-            return "searchUser";
+    @GetMapping(value = "/search_user")
+    public String searchUser(@RequestParam(value = "user_name", required = true) String username, Model model) {
+        logger.info("Admin searches user with user name - " + username);
+        Optional<BotUser> botUser = botService.findUserByUserName(username);
+        if (botUser.isPresent()) {
+            model.addAttribute("user", botUser.get());
         } else {
-            logger.info("Returning search user page for admin");
-            return "searchUser";
+            model.addAttribute("not_found", "Пользователь \"" + username + "\" не найден");
         }
+        return "searchUser";
+
     }
 
     @PostMapping(value = "/send_message")
