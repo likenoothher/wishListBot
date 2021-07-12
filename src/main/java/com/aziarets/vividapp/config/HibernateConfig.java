@@ -13,6 +13,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -69,9 +70,14 @@ public class HibernateConfig {
 
     @Bean
     public PlatformTransactionManager transactionManager() throws PropertyVetoException {
-        HibernateTransactionManager transactionManager
-            = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory().getObject());
+//        HibernateTransactionManager transactionManager
+//            = new HibernateTransactionManager();
+//        transactionManager.setSessionFactory(sessionFactory().getObject());
+//        return transactionManager;
+
+        JpaTransactionManager transactionManager
+            = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(sessionFactory().getObject());
         return transactionManager;
     }
 

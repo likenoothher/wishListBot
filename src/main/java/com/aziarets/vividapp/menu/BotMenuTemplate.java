@@ -433,7 +433,7 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
         String description = gift.getDescription() == null ? "отсутствует" : gift.getDescription();
         String url = gift.getUrl() == null ? "отсутствует" : gift.getUrl().toString();
-        String photoURL = gift.getGiftPhotoURL() == null ? "-изображеие: отсутствует"
+        String photoURL = gift.getGiftPhotoURL() == null ? "- изображеие: отсутствует"
             : "<a href=\"" + gift.getGiftPhotoURL() + "\">&#8205;</a>";
 
         message.setText(I_PRESENT_ICON + "Название - " + gift.getName() +

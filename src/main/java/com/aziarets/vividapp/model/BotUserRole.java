@@ -4,8 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 public enum BotUserRole implements GrantedAuthority {
 
-    ROLE_ADMIN("ROLE_ADMIN"),
-    ROLE_USER("ROLE_USER");
+    ADMIN("ADMIN"),
+    USER("USER");
 
     private String role;
 

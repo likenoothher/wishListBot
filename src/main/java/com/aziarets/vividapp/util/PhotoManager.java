@@ -40,6 +40,9 @@ public class PhotoManager {
 
     public Map deletePhoto(Gift gift) {
         logger.info("Deleting photo of gift with id: " + gift.getId());
+        if(gift.getGiftPhotoCloudinaryId() == null) {
+            logger.info("Gift with id: " + gift.getId() + "doesn't have a photo. Return");
+            return Collections.emptyMap();}
         try {
             return cloudinary.uploader().destroy(gift.getGiftPhotoCloudinaryId(),cloudinary.config.properties);
         } catch (IOException e) {
@@ -58,13 +61,14 @@ public class PhotoManager {
         } catch (MalformedURLException e) {
             logger.warn("Exception during creating photo URL in telegram: " + e.getMessage());
         }
-        File file = new File("src/main/webapp/resources/download/giftId" + gift.getId());
+        File file = new File("giftId" + gift.getId());
         try {
             file.createNewFile();
             FileUtils.copyURLToFile(photoUrlInTelegram, file);
             uploadPhotoResponse = uploadPhoto(file);
             file.delete();
         } catch (IOException e) {
+            e.printStackTrace();
             logger.warn("Exception during copying photo from telegram: " + e.getMessage());
         }
         if (uploadPhotoResponse != null && uploadPhotoResponse.containsKey("url")

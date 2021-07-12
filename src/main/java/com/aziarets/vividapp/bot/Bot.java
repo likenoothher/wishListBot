@@ -65,4 +65,12 @@ public class Bot extends TelegramLongPollingBot {
 
         }
     }
+
+    public void sendNotification(BotApiMethod notification) {
+        try {
+            execute(notification);
+        } catch (TelegramApiException e) {
+            logger.warn("Exception during sending notification: " + e.getLocalizedMessage());
+        }
+    }
 }

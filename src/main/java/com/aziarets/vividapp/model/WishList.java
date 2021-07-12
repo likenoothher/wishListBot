@@ -15,7 +15,7 @@ public class WishList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "wishlist_id")
     private List<Gift> giftList;
 
