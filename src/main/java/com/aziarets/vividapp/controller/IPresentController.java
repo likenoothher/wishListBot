@@ -30,7 +30,7 @@ public class IPresentController {
     }
 
     @GetMapping({"", "/"})
-    public String showIPresentList(Principal principal, Model model) {
+    public String showIPresentList(Model model, Principal principal) {
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         Map<Gift, BotUser> userGifts = botService.getUserPresentsMap(botUser);
         model.addAttribute("user", botUser);

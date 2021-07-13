@@ -28,7 +28,7 @@ public class SubscriptionsController {
     }
 
     @GetMapping({"", "/"})
-    public String showSubscriptionsList(Principal principal, Model model) {
+    public String showSubscriptionsList(Model model, Principal principal) {
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         List<BotUser> subscriptions = botService.getUserSubscriptions(botUser);
         model.addAttribute("user", botUser);

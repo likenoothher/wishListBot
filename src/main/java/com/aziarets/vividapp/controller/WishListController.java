@@ -29,7 +29,7 @@ public class WishListController {
     }
 
     @GetMapping({"", "/"})
-    public String showWishList(Principal principal, Model model) {
+    public String showWishList(Model model, Principal principal) {
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
         model.addAttribute("user", botUser);
@@ -37,16 +37,6 @@ public class WishListController {
         logger.info("Returning wish list page for " + principal.getName());
         return "wishlist";
     }
-
-//    @PostMapping("")
-//    public String showWishList(@RequestParam(value = "id") long id, Model model, Principal principal) {
-//        BotUser botUser = botService.findUserByTelegramId(id).get();
-//        List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
-//        model.addAttribute("user", botUser);
-//        model.addAttribute("gifts", userGifts);
-//        logger.info("Returning wish list page for " + principal.getName());
-//        return "wishlist";
-//    }
 
     @GetMapping("/add_gift")
     public String addGift(Model model, Principal principal) {
@@ -57,21 +47,14 @@ public class WishListController {
     }
 
     @PostMapping("/add_gift")
-    public String addGift(@RequestParam("giftName") String giftName,
-                          @RequestParam("giftDescription") String giftDescription,
-                          @RequestParam("giftURL") String giftURL,
-                          Principal principal) {
+    public String addGift(@ModelAttribute("gift") Gift gift, Principal principal) {
         logger.info("Handling add gift request from user " + principal.getName());
-        Gift gift = new Gift();
-        gift.setName(giftName);
-        gift.setDescription(giftDescription);
-        gift.setUrl(giftURL);
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         boolean isAdded = botService.addGiftToUser(gift, botUser);
         if(isAdded) {
             notificationSender.sendUserAddGiftNotification(botUser);
         }
-        logger.info("Gift with name "+ giftName+" added to user " + principal.getName());
+        logger.info("Gift with name "+ gift.getName() +" added to user " + principal.getName());
         return "redirect:/wishlist";
     }
 
@@ -83,6 +66,7 @@ public class WishListController {
             model.addAttribute("giftHolderId", giftHolder.getId());
             Gift gift = botService.findGiftById(giftId).get();
             model.addAttribute("gift", gift);
+            System.out.println(gift.toString());
             return "updateGift";
         } else {
             logger.warn("User with name " + principal.getName() + " tried to update not his gift with id " + giftId);

@@ -54,8 +54,14 @@ public class NotificationSender {
         }
     }
 
-    public void sendMessage(BotUser botUser, String message) {
-        sendNotification(new SendMessage(String.valueOf(botUser.getTgAccountId()), message));
+    public void sendMessage(BotUser to, String message) {
+        sendNotification(new SendMessage(String.valueOf(to.getTgAccountId()), message));
+
+    }
+
+    public void sendMessageToDeveloper(BotUser from, String message) {
+        sendNotification(new SendMessage(String.valueOf("988800148"), "Сообщение от @" + from.getUserName()
+            + ": " + message));
 
     }
 }

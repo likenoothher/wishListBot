@@ -22,47 +22,41 @@
             <div class="col-md-12">
                 <h3>Добавление подарка</h3>
             </div>
-
             <div class="row">
                 <div class="col-md-2">
-
                 </div>
                 <div class="col-md-8">
-                    <form method="post" th:action="@{/wishlist/add_gift}">
+                    <form method="post" th:action="@{/wishlist/add_gift}" th:object="${gift}">
                         <div class="form-group row">
                             <div class="col-md-12 mt-2">
                                 <label for="giftName" class="form-label">Имя подарка</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="giftName" required="required"
-                                           autocomplete="off"/>
+                                <div class="input-group" >
+                                    <input type="text" class="form-control" th:field="*{name}" name="giftName"
+                                           id="giftName" required="required" autocomplete="off"/>
                                 </div>
                             </div>
-
                             <div class="col-md-12 mt-3">
                                 <label for="giftDescription">Описание подарка</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="giftDescription" autocomplete="off"/>
+                                    <input type="text" class="form-control" th:field="*{description}"
+                                           name="giftDescription" id="giftDescription" autocomplete="off"/>
                                 </div>
                             </div>
-
                             <div class="col-md-12 mt-3">
                                 <label for="giftURL">Ссылка на подарок</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="giftURL" autocomplete="off"/>
+                                    <input type="text" class="form-control" th:field="*{url}"
+                                           name="giftURL" id="giftURL" autocomplete="off"/>
                                 </div>
                             </div>
                         </div>
-
                         <a href="/wishlist" class="btn btn-primary">Назад</a>
                         <button class="btn btn-success" type="submit">Добавить</button>
                     </form>
                 </div>
-
                 <div class="col-md-2">
-
                 </div>
             </div>
-
         </div>
     </div>
 
