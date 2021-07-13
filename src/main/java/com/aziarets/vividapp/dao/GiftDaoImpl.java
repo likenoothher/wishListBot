@@ -33,7 +33,7 @@ public class GiftDaoImpl implements GiftDao {
     @Override
     public boolean update(Gift gift) {
         logger.info("Updating gift with gift id " + gift.getId());
-        factory.getCurrentSession().saveOrUpdate(gift);
+        factory.getCurrentSession().merge(gift);
         return gift.getId() == 0 ? false : true;
     }
 

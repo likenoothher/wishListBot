@@ -55,6 +55,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
+        System.out.println(update.toString());
         List<BotApiMethod> messages = handler.handleUpdate(update);
         for (BotApiMethod message : messages) {
             try {

@@ -605,7 +605,7 @@ public class BotMenuTemplate {
         EditMessageText message = new EditMessageText();
 
         message.setText(NOTIFICATION_ICON + " Хочешь получать уведомления, когда кто-то из твоих друзей " +
-            "добавит новый подарок в свой WishList?");
+            "добавит/удалит подарок из своего WishList'а или попросит тебя добавить новый подарок в твой WishList?");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
