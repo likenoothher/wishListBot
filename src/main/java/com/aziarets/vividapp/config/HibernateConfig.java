@@ -24,7 +24,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("com.aziarets.vividapp")
 @EnableTransactionManagement
-@PropertySource(value = "classpath:DB.properties")
+@PropertySource(value = "classpath:application.properties")
 public class HibernateConfig {
     Environment environment;
 
@@ -39,7 +39,7 @@ public class HibernateConfig {
 //        sessionFactory.setDataSource(dataSource("users" , "classpath:db/migration/V1__Initial_create.sql"));
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.aziarets.vividapp");
-        sessionFactory.setHibernateProperties(hibernateProperties());
+//        sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;
     }
@@ -47,10 +47,10 @@ public class HibernateConfig {
     @Bean
     public DataSource dataSource() throws PropertyVetoException {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass(environment.getRequiredProperty("jdbc.Driver"));
-        dataSource.setJdbcUrl(environment.getRequiredProperty("jdbc.url"));
-        dataSource.setUser(environment.getRequiredProperty("jdbc.username"));
-        dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
+        dataSource.setDriverClass(environment.getRequiredProperty("spring.datasource.driver-class-name"));
+        dataSource.setJdbcUrl(environment.getRequiredProperty("spring.datasource.url"));
+        dataSource.setUser(environment.getRequiredProperty("spring.datasource.username"));
+        dataSource.setPassword(environment.getRequiredProperty("spring.datasource.password"));
         dataSource.setMaxPoolSize(10);
 
         return dataSource;
