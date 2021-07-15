@@ -691,7 +691,7 @@ public class BotMenuTemplate {
             .newInlineKeyboardMarkup()
             .withRow()
             .buttonWithUrl("Открыть веб-версию бота " + URL_ICON,
-                "yandex.ru")
+                "https://vividbot.herokuapp.com/")
             .endRow()
             .withRow()
             .buttonWithCallbackData("Установка пароля" + LOCK_ICON,
