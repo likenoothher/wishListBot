@@ -61,38 +61,38 @@ public class GiftDaoImpl implements GiftDao {
     }
 
     @Override
-    public List<Gift> getAvailableToDonatePresents(long userTelegramId) {
-        logger.info("Get presents available to donate of user with telegram id: " + userTelegramId);
+    public List<Gift> getAvailableToDonatePresents(long userId) {
+        logger.info("Get presents available to donate of user with  id: " + userId);
         Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser\n" +
             "            join botuser.wishList.giftList as gifts\n" +
-            "            where gifts.occupiedBy =null and botuser.tgAccountId = :userTelegramId ");
-        query.setParameter("userTelegramId", userTelegramId);
-        logger.info("Returning result -  presents available to donate of user with telegram id: "
-            + userTelegramId);
+            "            where gifts.occupiedBy =null and botuser.id = :userId ");
+        query.setParameter("userId", userId);
+        logger.info("Returning result -  presents available to donate of user with id: "
+            + userId);
         return query.getResultList();
     }
 
     @Override
-    public List<Gift> getUserWishListPresents(long userTelegramId) {
-        logger.info("Get wishlist of user with telegram id: " + userTelegramId);
+    public List<Gift> getUserWishListPresents(long userId) {
+        logger.info("Get wishlist of user with id: " + userId);
         Query query = factory.getCurrentSession().createQuery("select botuser.wishList.giftList " +
             "from BotUser botuser\n" +
-            "where botuser.tgAccountId = :userTelegramId")
-            .setParameter("userTelegramId", userTelegramId);
-        logger.info("Returning result -  wishlist of user with telegram id: " + userTelegramId);
+            "where botuser.id = :userId")
+            .setParameter("userId", userId);
+        logger.info("Returning result -  wishlist of user with id: " + userId);
         return query.getResultList();
     }
 
     @Override
     public List<Gift> getPresentsDonorGoingDonateToUser(long donorId, long donatesTo) {
-        logger.info("Searching is user with id " + donorId +" donates something to user with id " +donatesTo);
+        logger.info("Searching is user with id " + donorId + " donates something to user with id " + donatesTo);
         Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser " +
             "            left join botuser.wishList.giftList as gifts " +
             "            where gifts.occupiedBy.id = :donorId and botuser.id = :donatesTo");
         query.setParameter("donorId", donorId);
         query.setParameter("donatesTo", donatesTo);
         List<Gift> gifts = query.getResultList();
-        logger.info("Returning gifts user with id " + donorId +" donates to user with id " +donatesTo);
+        logger.info("Returning gifts user with id " + donorId + " donates to user with id " + donatesTo);
         return gifts;
     }
 }

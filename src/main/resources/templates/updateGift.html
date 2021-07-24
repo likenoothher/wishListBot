@@ -28,7 +28,7 @@
 
                 </div>
                 <div class="col-md-8">
-                    <form method="post" th:action="@{/wishlist/update_gift}" th:object="${gift}">
+                    <form method="post" th:action="@{/wishlist/update_gift}" th:object="${gift}" enctype="multipart/form-data">
                         <div class="form-group row">
 
                             <div class="col-md-12 mt-3">
@@ -45,6 +45,16 @@
                                     <input type="text" class="form-control" name="giftURL" id="giftURL" autocomplete="off"
                                            th:value="*{url}" />
                                 </div>
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <label for="giftImage" class="form-label">Загрузить изображение подарка</label>
+                                <input class="form-control" type="file" name="giftImage" id="giftImage">
+                                <script>
+                                    $( "#giftImage" ).attr({
+                                        title: "new content"
+                                    });
+                                </script>
                             </div>
                         </div>
                         <input type="hidden" th:value="*{id}" name="giftId" id="giftId"/>

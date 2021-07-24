@@ -1,104 +1,143 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} " />
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-  <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
-  <title>Настройки</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} " />
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
+    <title>Настройки</title>
 
 </head>
 
 <body>
-  <header>
+<header>
     <div th:insert="header">
     </div>
-  </header>
+</header>
 
-  <section>
+<section>
     <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-12 col-lg-10 col-xl-8 mx-auto">
-          <h2 class="h3 mb-4 page-title">Настройки</h2>
-          <div class="my-4">
-            <form method="post" th:action="@{/settings/refresh}">
-              <div class="list-group mb-5 shadow">
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col">
-                      <strong class="mb-0">Настройка уведомлений</strong>
-                      <p class="text-muted mb-0">Включение данной опции позволит получать уведомления
-                        о добавлении/удалении подарков друзьями, запросы на добавление подарков от друзей</p>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" id="alert1" name="isReadyReceiveUpdates"
-                               th:checked="${user.isReadyReceiveUpdates()}"/>
-                        <span class="custom-control-label"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col">
-                      <strong class="mb-0">Видимость WishList'a</strong>
-                      <p class="text-muted mb-0">Включение данной опции позволит просматривать твой WishList любому
-                        пользователю, даже не из списка твоих подписчиков</p>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" id="alert2" name="isAllCanSeeWishlist"
-                               th:checked="${user.isAllCanSeeMyWishList()}"/>
-                        <span class="custom-control-label"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <input th:if="${user != null}" type="hidden"  th:value="${user.getId()}" name="userId">
-                <button type="submit" class="btn btn-success">Сохранить</button>
-              </div>
-            </form>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+                <h2 class="h3 mb-4 page-title">Настройки</h2>
+                <div class="my-4">
+                    <form method="post" th:action="@{/settings/refresh}">
+                        <div class="list-group mb-5 shadow">
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <strong class="mb-0">Настройка уведомлений</strong>
+                                        <p class="text-muted mb-0">Включение данной опции позволит получать уведомления
+                                            о добавлении/удалении подарков друзьями, запросы на добавление подарков от
+                                            друзей</p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-switch">
+                                            <input th:type="checkbox" class="form-check-input" id="isReadyReceiveUpdates"
+                                                   name="readyReceiveUpdates"
+                                                   th:checked="${user.isReadyReceiveUpdates()}"/>
+                                            <span class="custom-control-label"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <strong class="mb-0">Видимость WishList'a</strong>
+                                        <p class="text-muted mb-0">Включение данной опции позволит просматривать твой
+                                            WishList любому
+                                            пользователю, даже не из списка твоих подписчиков</p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check form-switch">
+                                            <input th:type="checkbox" class="form-check-input" id="isAllCanSeeWishlist"
+                                                   name="allCanSeeWishlist"
+                                                   th:checked="${user.isAllCanSeeMyWishList()}"/>
+                                            <span class="custom-control-label"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-            <hr class="my-4" />
-            <strong class="mb-0">Написать разработчику</strong>
-            <p>Если ты хочешь оставить отзыв, либо сообщить о каких-либо недоработках в работе бота/сайта,
-              то можешь воспользоваться кнопкой ниже</p>
-            <div class="list-group mb-5 shadow">
-              <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#exampleModal"
-                      data-bs-whatever="@mdo">Написать разработчику</button>
-            </div>
-          </div>
-          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Сообщение для разработчика</a></h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form method="post" th:action="@{/settings/send_message}">
-                    <div class="mb-3">
-                      <label for="message-text" class="col-form-label">Сообщение:</label>
-                      <textarea class="form-control" id="message-text" name="message" type="text"></textarea>
-                      <input th:if="${user != null}" type="hidden"  th:value="${user.getId()}" name="userId">
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <strong class="mb-0">Лимит подарков</strong>
+                                        <p class="text-muted mb-0">Изменение максимального количества подарков,
+                                            доступных для бронирования
+                                            одним пользователем</p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-select" aria-label="select gift's limit"
+                                                id="giftLimit" name="giftLimit">
+                                            <option selected th:text="${user.getGiftLimit()}"></option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input th:if="${user != null}" type="hidden" th:value="${user.getId()}" name="userId">
+                            <button type="submit" class="btn btn-success">Сохранить</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4"/>
+                    <strong class="mb-0">Написать разработчику</strong>
+                    <p>Если ты хочешь оставить отзыв, либо сообщить о каких-либо недоработках в работе бота/сайта,
+                        то можешь воспользоваться кнопкой ниже</p>
+                    <div class="list-group mb-5 shadow">
+                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                data-bs-whatever="@mdo">Написать разработчику
+                        </button>
                     </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Назад</button>
-                      <button type="submit" class="btn btn-success">Отправить</button>
-                    </div>
-                  </form>
                 </div>
-              </div>
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Сообщение для разработчика</a></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" th:action="@{/settings/send_message}">
+                                    <div class="mb-3">
+                                        <label for="message-text" class="col-form-label">Сообщение:</label>
+                                        <textarea class="form-control" id="message-text" name="message"
+                                                  type="text"></textarea>
+                                        <input th:if="${user != null}" type="hidden" th:value="${user.getId()}"
+                                               name="userId">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Назад
+                                        </button>
+                                        <button type="submit" class="btn btn-success">Отправить</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
-  <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
 </body>
 
 </html>

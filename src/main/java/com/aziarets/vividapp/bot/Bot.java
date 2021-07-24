@@ -19,7 +19,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import java.util.List;
 
 @Component
-@PropertySource(value= {"classpath:application.properties"})
+@PropertySource(value = {"classpath:application.properties"})
 public class Bot extends TelegramLongPollingBot {
     private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
@@ -55,6 +55,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
+
         List<BotApiMethod> messages = handler.handleUpdate(update);
         for (BotApiMethod message : messages) {
             try {

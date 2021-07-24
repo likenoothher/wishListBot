@@ -3,7 +3,7 @@ package com.aziarets.vividapp.menu;
 import com.aziarets.vividapp.keyboardbuilder.InlineKeyboard;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
-import com.aziarets.vividapp.util.GiftTelegramUrlGenerator;
+import com.aziarets.vividapp.util.PhotoTelegramUrlGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,11 +18,11 @@ import static com.aziarets.vividapp.menu.Icon.*;
 @Component
 public class BotMenuTemplate {
 
-    private GiftTelegramUrlGenerator giftTelegramUrlGenerator;
+    private PhotoTelegramUrlGenerator photoTelegramUrlGenerator;
 
     @Autowired
-    public BotMenuTemplate(GiftTelegramUrlGenerator giftTelegramUrlGenerator) {
-        this.giftTelegramUrlGenerator = giftTelegramUrlGenerator;
+    public BotMenuTemplate(PhotoTelegramUrlGenerator photoTelegramUrlGenerator) {
+        this.photoTelegramUrlGenerator = photoTelegramUrlGenerator;
     }
 
     public SendMessage getGreetingTemplate(String chatId, BotUser updateSender) {
@@ -338,7 +338,7 @@ public class BotMenuTemplate {
 
         if (!subscriptions.isEmpty()) {
             message.setText("Это список пользователей на которых ты подписан.\n" +
-                "Нажми на имя пользователя, для дополнительной информации" + WISH_LIST_ICON);
+                "Нажми на имя пользователя, чтобы увидеть его WishList" + WISH_LIST_ICON);
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
@@ -511,7 +511,7 @@ public class BotMenuTemplate {
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
             .withRow()
-            .buttonWithCallbackData("« " + RECYCLE_ICON + " В главное меню",
+            .buttonWithCallbackData("« В главное меню " + RECYCLE_ICON,
                 "/main_menu")
             .endRow()
             .build();
@@ -549,11 +549,11 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public SendMessage getFriendShipAcceptedTemplate(BotUser byUserAccepted, String chatId) {
+    public SendMessage getFriendShipAcceptedTemplate(BotUser byUserAccepted, BotUser requestedUser) {
         SendMessage message = new SendMessage();
 
-        message.setText(CHECK_MARK_ICON + " @" + byUserAccepted.getUserName() + " принял предложение дружбы" +
-            ". Его WishList доступен для просмотра");
+        message.setText(CHECK_MARK_ICON + " @" + byUserAccepted.getUserName() + " принял предложение дружбы." +
+            " Его WishList доступен для просмотра");
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()
@@ -561,11 +561,55 @@ public class BotMenuTemplate {
             .buttonWithCallbackData("Посмотреть " + SEE_ICON,
                 "/my_subscriptions/show/id/" + byUserAccepted.getTgAccountId())
             .endRow()
+            .withRow()
+            .buttonWithCallbackData("« В главное меню " + RECYCLE_ICON,
+                "/main_menu")
+            .endRow()
             .build();
 
         message.setReplyMarkup(replyKeyboard);
-        message.setChatId(chatId);
+        message.setChatId(String.valueOf(requestedUser.getTgAccountId()));
 
+        return message;
+    }
+
+    public EditMessageText getAcceptedFriendshipTemplate(BotUser requestedUser, BotUser byUserAccepted,
+                                                         int messageId, String inlineMessageId,
+                                                         boolean isAlreadyFriends) {
+        EditMessageText message = new EditMessageText();
+
+
+        message.setText(CHECK_MARK_ICON + " Запрос на дружбу от @" + requestedUser.getUserName()
+            + " принят. Теперь он имеет доступ к твоему WishList'y");
+
+        if (!isAlreadyFriends) {
+            InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+                .newInlineKeyboardMarkup()
+                .withRow()
+                .buttonWithCallbackData("Подписаться на @" + requestedUser.getUserName() + ONE_GUY_ICON,
+                    "/find_friend/mutual_friendship/" + requestedUser.getTgAccountId())
+                .endRow()
+                .withRow()
+                .buttonWithCallbackData("« В главное меню " + RECYCLE_ICON,
+                    "/main_menu")
+                .endRow()
+                .build();
+
+            message.setReplyMarkup(replyKeyboard);
+        }
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+        message.setChatId(String.valueOf(byUserAccepted.getTgAccountId()));
+        return message;
+    }
+
+    public EditMessageText getDeniedFriendshipTemplate(BotUser requestedUser, BotUser byUserDenied,
+                                                       int messageId, String inlineMessageId) {
+        EditMessageText message = new EditMessageText();
+        message.setMessageId(messageId);
+        message.setInlineMessageId(inlineMessageId);
+        message.setChatId(String.valueOf(byUserDenied.getTgAccountId()));
+        message.setText(CROSS_MARK_ICON + " Запрос на дружбу от @" + requestedUser.getUserName() + " был отклонён");
         return message;
     }
 
@@ -582,6 +626,10 @@ public class BotMenuTemplate {
             .withRow()
             .buttonWithCallbackData("Видимость моего WishList'a" + SEE_ICON,
                 "/settings/set_visibility")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("Лимит подарков " + GIFT_LIMIT,
+                "/settings/set_limit")
             .endRow()
             .withRow()
             .buttonWithCallbackData("Написать разработчику " + SEND_MESSAGE,
@@ -659,33 +707,57 @@ public class BotMenuTemplate {
         return message;
     }
 
-    public EditMessageText getAcceptedFriendshipTemplate(String userName, String chatId,
-                                                         int messageId, String inlineMessageId) {
+    public EditMessageText getGiftLimitTemplate(String chatId, int messageId, String inlineMessageId, BotUser botUser) {
         EditMessageText message = new EditMessageText();
+        message.setText(GIFT_LIMIT + " Выбери максимальное число подарков из твоего WishList'а," +
+            " которое может забронировать каждый пользователь\n" +
+            "На данный момент - " + botUser.getGiftLimit());
 
+        InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
+            .newInlineKeyboardMarkup()
+            .withRow()
+            .buttonWithCallbackData("1",
+                "/settings/set_limit/1")
+            .buttonWithCallbackData("2",
+                "/settings/set_limit/2")
+            .buttonWithCallbackData("3",
+                "/settings/set_limit/3")
+            .buttonWithCallbackData("4",
+                "/settings/set_limit/4")
+            .buttonWithCallbackData("5",
+                "/settings/set_limit/5")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("6",
+                "/settings/set_limit/6")
+            .buttonWithCallbackData("7",
+                "/settings/set_limit/7")
+            .buttonWithCallbackData("8",
+                "/settings/set_limit/8")
+            .buttonWithCallbackData("9",
+                "/settings/set_limit/9")
+            .buttonWithCallbackData("10",
+                "/settings/set_limit/10")
+            .endRow()
+            .withRow()
+            .buttonWithCallbackData("« Назад",
+                "/settings")
+            .endRow()
+            .build();
+
+        message.setReplyMarkup(replyKeyboard);
         message.setMessageId(messageId);
         message.setInlineMessageId(inlineMessageId);
         message.setChatId(chatId);
-        message.setText(CHECK_MARK_ICON + " Запрос на дружбу от @" + userName
-            + " принят. Теперь он имеет доступ к твоему WishList'y");
 
         return message;
     }
 
-    public EditMessageText getDeniedFriendshipTemplate(String userName, String chatId,
-                                                       int messageId, String inlineMessageId) {
-        EditMessageText message = new EditMessageText();
-        message.setMessageId(messageId);
-        message.setInlineMessageId(inlineMessageId);
-        message.setChatId(chatId);
-        message.setText(CROSS_MARK_ICON + " Запрос на дружбу от @" + userName + " был отклонён");
-        return message;
-    }
-
-    public EditMessageText getWebTemplate(String chatId, int messageId, String inlineMessageId) {
+    public EditMessageText getWebTemplate(String chatId, int messageId, String inlineMessageId, BotUser botUser) {
         EditMessageText message = new EditMessageText();
         message.setText(URL_ICON + "Из этого меню ты можешь перейти в веб-версию бота. Установка/изменение пароля" +
-            " для входа в аккаунт веб-версии осществляется в меню \n\"Установка пароля " + LOCK_ICON + "\"");
+            " для входа в аккаунт на сайте осуществляется в меню \n\"Установка пароля " + LOCK_ICON + "\n" +
+            "Твоё имя пользователя для входа на сайт: " + botUser.getUserName());
 
         InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
             .newInlineKeyboardMarkup()

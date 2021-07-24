@@ -16,7 +16,6 @@ import java.util.List;
 public class BotUserDaoImpl implements BotUserDao {
     private static final Logger logger = LoggerFactory.getLogger(BotUserDaoImpl.class);
 
-
     private SessionFactory factory;
 
     @Autowired
@@ -128,7 +127,7 @@ public class BotUserDaoImpl implements BotUserDao {
 
     @Override
     public boolean isUserSubscribedTo(long subscribedToId, long subscriberId) {
-        logger.info("Searching is user with id " + subscriberId +" subscribed to user with id : " + subscribedToId);
+        logger.info("Searching is user with id " + subscriberId + " subscribed to user with id : " + subscribedToId);
         Query query = factory.getCurrentSession().createQuery("select subscribers from BotUser as botuser\n" +
             "join botuser.subscribers as subscribers\n" +
             "where botuser.id = :subscribedToId and subscribers.id = :subscriberId");
@@ -137,21 +136,20 @@ public class BotUserDaoImpl implements BotUserDao {
         List<BotUser> users = query.getResultList();
         boolean isSubscribed = !users.isEmpty();
         logger.info("Returning result of searching is user with id "
-            + subscriberId +" subscribed to user with id : " + subscribedToId + ". Result - " + isSubscribed);
+            + subscriberId + " subscribed to user with id : " + subscribedToId + ". Result - " + isSubscribed);
         return isSubscribed;
     }
 
     @Override
     public boolean isUserEnabled(long userTelegramId) {
-        logger.info("Searching is user account with id " + userTelegramId +" enabled");
+        logger.info("Searching is user account with id " + userTelegramId + " enabled");
         Query query = factory.getCurrentSession().createQuery("select botuser from BotUser as botuser\n" +
-            "where botuser.tgAccountId = :userTelegramId and botuser.isEnabled = true");
+            "where botuser.tgAccountId = :userTelegramId and botuser.enabled = true");
         query.setParameter("userTelegramId", userTelegramId);
         boolean isEnabled = !query.getResultList().isEmpty();
-        logger.info("Searching is user account with id " + userTelegramId +" enabled. Result - " + isEnabled);
+        logger.info("Searching is user account with id " + userTelegramId + " enabled. Result - " + isEnabled);
         return isEnabled;
     }
-
 
 
 }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,14 +18,16 @@ public class PasswordGenerator {
 
     private RestTemplate restTemplate;
     private ObjectMapper objectMapper;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PasswordGenerator(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public PasswordGenerator(RestTemplate restTemplate, ObjectMapper objectMapper, PasswordEncoder passwordEncoder) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public String getRandomPassword() {
+    private String getRandomPassword() {
         logger.info("Handle get password request");
         Password password = null;
         String passwordGeneratorURL = "https://makemeapassword.ligos.net/api/v1/alphanumeric/json?c=1&l=5";
@@ -40,5 +43,9 @@ public class PasswordGenerator {
         }
         logger.warn("Password is null. Return default value");
         return "def";
+    }
+
+    public String getEncodedPassword(){
+        return passwordEncoder.encode(getRandomPassword());
     }
 }

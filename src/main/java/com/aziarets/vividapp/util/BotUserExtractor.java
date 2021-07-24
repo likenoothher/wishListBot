@@ -16,12 +16,12 @@ import org.telegram.telegrambots.meta.api.objects.User;
 public class BotUserExtractor {
 
     private PasswordGenerator passwordGenerator;
-    private PasswordEncoder passwordEncoder;
+    private PhotoManager photoManager;
 
     @Autowired
-    public BotUserExtractor(PasswordGenerator passwordGenerator, PasswordEncoder passwordEncoder) {
+    public BotUserExtractor(PasswordGenerator passwordGenerator, PhotoManager photoManager) {
         this.passwordGenerator = passwordGenerator;
-        this.passwordEncoder = passwordEncoder;
+        this.photoManager = photoManager;
     }
 
     public synchronized BotUser identifyUser(Update update) throws NotFoundUserNameException, UserIsBotException {
@@ -46,12 +46,14 @@ public class BotUserExtractor {
             .withFirstName(gotFrom.getFirstName())
             .withLastName(gotFrom.getLastName())
             .withUserName(gotFrom.getUserName())
-            .withPassword(passwordEncoder.encode(passwordGenerator.getRandomPassword()))
+            .withPassword(passwordGenerator.getEncodedPassword())
+            .withAvatarPhotoURL(photoManager.getAvatarPhotoURL(gotFrom.getId()))
             .withUserStatus(BotUserStatus.WITHOUT_STATUS)
             .withUserRole(BotUserRole.USER)
             .isReadyReceiveUpdates(true)
             .isAllCanSeeMyWishList(false)
             .isEnabled(true)
+            .withGiftLimit(3)
             .build();
     }
 

@@ -20,22 +20,26 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h3>Список подарков, которые ты собираешься подарить</h3>
+                <h3 th:if="${gifts.isEmpty()}">Ты пока ничего не собираешься подарить</h3>
+                <h3 th:unless="${gifts.isEmpty()}">Список подарков, которые ты собираешься подарить</span></h3>
             </div>
             <div class="row">
-                <div class="col-sm-3" th:each="entry: ${gifts}">
+                <div class="col-sm-3" th:unless="${gifts.isEmpty()}" th:each="entry: ${gifts}">
                     <div class="row">
                         <div class="col-lg-1 text-center">
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card">
                                 <img th:if="${entry.key.getGiftPhotoCloudinaryId() != null}" th:src="${entry.key.getGiftPhotoURL()}" />
-                                <img th:unless="${entry.key.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/no_photo2.jpg}" />
+                                <img th:unless="${entry.key.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/gift.jpg}" />
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${entry.key.getName()}"></span></h5>
-                                    <p class="card-text">Описание: <span th:text="${entry.key.getDescription()}"></span>
+                                    <p class="card-text">Описание:
+                                        <span th:if="${entry.key.getDescription() != null}" th:text="${entry.key.getDescription()}"></span>
+                                        <span th:unless="${entry.key.getDescription() != null}"> отсутствует</span>
                                     </p>
-                                    <a th:href="${entry.key.getUrl()}" class="card-link">Ссылка</a>
+                                    <a th:if="${entry.key.getUrl() != null}" th:href="${entry.key.getUrl()}" class="card-link">Ссылка</a>
+                                    <span th:unless="${entry.key.getUrl() != null}">Ссылка: отсутствует</span>
                                     </p>
                                     <p class="card-text">Для пользователя: <span th:text="${entry.value.getUserName()}"></span>
                                     </p>

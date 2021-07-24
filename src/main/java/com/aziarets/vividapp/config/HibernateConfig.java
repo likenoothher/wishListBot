@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -74,7 +75,7 @@ public class HibernateConfig {
 //            = new HibernateTransactionManager();
 //        transactionManager.setSessionFactory(sessionFactory().getObject());
 //        return transactionManager;
-
+//
         JpaTransactionManager transactionManager
             = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(sessionFactory().getObject());

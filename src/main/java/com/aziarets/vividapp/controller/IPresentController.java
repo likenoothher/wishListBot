@@ -46,8 +46,8 @@ public class IPresentController {
         logger.info("Handling refuse from donate gift request from user " + principal.getName());
         BotUser botUser = botService.findUserById(userId).get();
         boolean isRefused = botService.refuseFromDonate(giftId, botUser);
-        logger.info("Gift with id "+ giftId+" deleting from i present list of to user " + principal.getName()
-        + " result - " + isRefused);
+        logger.info("Gift with id " + giftId + " deleting from i present list of to user " + principal.getName()
+            + " result - " + isRefused);
         return "redirect:/i_present";
     }
 }

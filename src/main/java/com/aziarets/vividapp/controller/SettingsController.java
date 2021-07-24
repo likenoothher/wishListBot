@@ -41,27 +41,28 @@ public class SettingsController {
 
     @PostMapping("/send_message")
     public String sendMessageToDeveloper(@RequestParam(value = "userId") long id,
-                                         @RequestParam(value = "message") String message)  {
+                                         @RequestParam(value = "message") String message) {
         logger.info("User with id " + id + " send message to developer");
         Optional<BotUser> user = botService.findUserById(id);
-        if(user.isPresent()) {
-            notificationSender.sendMessageToDeveloper(user.get(),message);
+        if (user.isPresent()) {
+            notificationSender.sendMessageToDeveloper(user.get(), message);
         }
-
         return "redirect:/settings";
     }
 
     @PostMapping("/refresh")
-    public String refreshUserSettings(@RequestParam(value = "userId") long id,
-                                      @RequestParam(value = "isReadyReceiveUpdates", required = false) boolean isReadyReceiveUpdates,
-                                      @RequestParam(value = "isAllCanSeeWishlist", required = false) boolean isAllCanSeeWishlist) {
+    public String refreshUserSettings(@RequestParam(value = "userId", required = true) long id,
+                                      @RequestParam(value = "readyReceiveUpdates", required = false) boolean readyReceiveUpdates,
+                                      @RequestParam(value = "allCanSeeWishlist", required = false) boolean allCanSeeWishlist,
+                                      @RequestParam(value = "giftLimit", required = true) int giftLimit) {
         logger.info("User with id " + id + " updates settings");
 
         Optional<BotUser> user = botService.findUserById(id);
         if (user.isPresent()) {
             BotUser updatedUser = user.get();
-            updatedUser.setReadyReceiveUpdates(isReadyReceiveUpdates);
-            updatedUser.setAllCanSeeMyWishList(isAllCanSeeWishlist);
+            updatedUser.setReadyReceiveUpdates(readyReceiveUpdates);
+            updatedUser.setAllCanSeeMyWishList(allCanSeeWishlist);
+            updatedUser.setGiftLimit(giftLimit);
             botService.updateUser(updatedUser);
         }
 
