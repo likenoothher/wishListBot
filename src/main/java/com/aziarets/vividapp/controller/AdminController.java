@@ -53,7 +53,7 @@ public class AdminController {
         Optional<BotUser> botUser = botService.findUserById(id);
         if (botUser.isPresent()) {
             notificationSender.sendMessage(botUser.get(), message);
-            logger.info("Message to user with id - " + id + " sended");
+            logger.info("Message to user with id  " + id + " was sent");
             model.addAttribute("user", botUser.get());
         }
         return "searchUser";
@@ -61,7 +61,7 @@ public class AdminController {
 
     @PostMapping(value = "/block")
     public String block(@RequestParam(value = "userId") long id,
-                              Model model) {
+                        Model model) {
         logger.info("Admin blocks user with id - " + id);
         BotUser botUser = botService.findUserById(id).get();
         botUser.setEnabled(false);
@@ -73,7 +73,7 @@ public class AdminController {
 
     @PostMapping(value = "/unblock")
     public String unblock(@RequestParam(value = "userId") long id,
-                              Model model) {
+                          Model model) {
         logger.info("Admin blocks user with id - " + id);
         BotUser botUser = botService.findUserById(id).get();
         botUser.setEnabled(true);

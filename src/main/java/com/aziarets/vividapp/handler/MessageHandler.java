@@ -5,8 +5,6 @@ import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
-import com.aziarets.vividapp.util.GiftTelegramUrlGenerator;
-import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +156,7 @@ public class MessageHandler {
         logger.info("Handling set password request from user with id: " + updateSender.getId());
         updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
         if (messageText.length() <= 3) {
-            messagesToSend.add(new SendMessage(chatId, CROSS_MARK_ICON + " Пароль не может быть короче 3 символов"));
+            messagesToSend.add(new SendMessage(chatId, CROSS_MARK_ICON + " Пароль не может быть короче 4 символов"));
         } else {
             updateSender.setPassword(passwordEncoder.encode(messageText));
             messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Пароль изменён"));

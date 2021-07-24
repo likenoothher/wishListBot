@@ -1,6 +1,6 @@
 package com.aziarets.vividapp.controller;
 
-import com.aziarets.vividapp.exception.AlreadyDonatesException;
+import com.aziarets.vividapp.exception.GiftsLimitReachedException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.service.BotService;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.PathParam;
 import java.security.Principal;
 import java.util.List;
 
@@ -38,24 +37,24 @@ public class SubscriptionsController {
     }
 
     @GetMapping("/{userId}")
-    public String showSubscriptionWishList(@PathVariable Long userId, Model model, Principal principal) {
+    public String showSubscriptionWishList(@PathVariable(value = "userId") Long wishListHolderId, Model model, Principal principal) {
         BotUser currentUser = botService.findUserByUserName(principal.getName()).get();
-        if (botService.isUserSubscribedTo(userId, currentUser.getId())) {
-            BotUser botUser = botService.findUserById(userId).get();
-            List<Gift> availableToDonateGifts = botService.getAvailableToDonateGifts(botUser.getTgAccountId());
-            model.addAttribute("user", botUser);
+        if (botService.isUserSubscribedTo(wishListHolderId, currentUser.getId())) {
+            BotUser wishListHolder = botService.findUserById(wishListHolderId).get();
+            List<Gift> availableToDonateGifts = botService.getAvailableToDonateGifts(wishListHolder.getId());
+            model.addAttribute("user", wishListHolder);
             model.addAttribute("availableGifts", availableToDonateGifts);
-            if(botService.isDonorAlreadyGoingDonateToUser(currentUser.getId(), userId)) {
+            if (botService.isDonorReachedGiftLimit(currentUser, wishListHolder)) {
                 model.addAttribute("showIPresentButton", false);
-            }
-            else {
+            } else {
                 model.addAttribute("showIPresentButton", true);
             }
-            logger.info("Returning wish list of user with id "+userId +" for " + principal.getName());
+            logger.info("Returning wish list of user with id " + wishListHolderId + " for " + principal.getName());
             return "subscriptionWishList";
         }
-        logger.info("Illegal request for wish list of user with id " +userId +" from user " + principal.getName()
-        + ". Not in subscription list");
+        logger.info("Illegal request for wish list of user with id " + wishListHolderId + " from user "
+            + principal.getName()
+            + ". Not in subscription list");
         return "forbidden";
     }
 
@@ -68,13 +67,13 @@ public class SubscriptionsController {
         boolean isAdded = false;
         try {
             isAdded = botService.donate(giftId, botUser);
-        } catch (AlreadyDonatesException e) {
+        } catch (GiftsLimitReachedException e) {
             logger.warn("User with id " + botUser.getId() + " tried to add one more present for donating to " +
                 "user with id " + giftHolder.getId() + " despite he already donates gift to him");
             return "forbidden";
         }
         logger.info("Donating gift request for gift with id " + giftId +
-            ", from user  " + principal.getName() +", result - " + isAdded);
+            ", from user  " + principal.getName() + ", result - " + isAdded);
         return "redirect:/subscriptions/" + giftHolder.getId();
     }
 
@@ -82,12 +81,12 @@ public class SubscriptionsController {
     public String unsubscribe(@RequestParam(value = "userId") Long userId,
                               @RequestParam(value = "unsubscribedFrom") Long unsubscribedFrom,
                               Principal principal) {
-        logger.info("Handling unsubscribe from user with id "+unsubscribedFrom+ " request from user "
+        logger.info("Handling unsubscribe from user with id " + unsubscribedFrom + " request from user "
             + principal.getName());
         BotUser byUserDeleted = botService.findUserById(userId).get();
         BotUser deletedUser = botService.findUserByTelegramId(unsubscribedFrom).get();
         boolean isUnsubscribed = botService.removeSubscriptionFromSubscriber(deletedUser, byUserDeleted);
-        logger.info("Unsubscribe from user with id "+unsubscribedFrom+ " request from user "
+        logger.info("Unsubscribe from user with id " + unsubscribedFrom + " request from user "
             + principal.getName() + " result - " + isUnsubscribed);
         return "redirect:/subscriptions/";
     }

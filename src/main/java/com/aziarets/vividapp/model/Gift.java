@@ -144,7 +144,7 @@ public class Gift {
         }
 
         public GiftBuilder withName(String name) {
-            if(name.length() == 0) {
+            if (name.length() == 0) {
                 this.name = "<Без имени>";
             }
             this.name = name;

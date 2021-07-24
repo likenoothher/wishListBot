@@ -1,7 +1,7 @@
 package com.aziarets.vividapp.service;
 
 import com.aziarets.vividapp.dao.*;
-import com.aziarets.vividapp.exception.AlreadyDonatesException;
+import com.aziarets.vividapp.exception.GiftsLimitReachedException;
 import com.aziarets.vividapp.exception.UserIsDisabled;
 import com.aziarets.vividapp.util.BotUserExtractor;
 import com.aziarets.vividapp.exception.NotFoundUserNameException;
@@ -9,23 +9,22 @@ import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
-import com.aziarets.vividapp.util.NotificationSender;
 import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 
-import java.io.IOException;
 import java.util.*;
 
 @Service
 @Transactional
-public class BotService{
+public class BotService {
     private static final Logger logger = LoggerFactory.getLogger(BotService.class);
 
     private BotUserExtractor botUserExtractor;
@@ -45,12 +44,12 @@ public class BotService{
         this.photoManager = photoManager;
     }
 
-    public synchronized BotUser identifyUser(Update update)
+    public BotUser identifyUser(Update update)
         throws NotFoundUserNameException, UserIsBotException, UserIsDisabled {
         logger.info("Identify user from update id:" + update.getUpdateId());
         Long updateSenderId = botUserExtractor.getUpdateSenderId(update);
         if (isUserSigned(updateSenderId)) {
-            if(!isUserEnabled(updateSenderId)) {
+            if (!isUserEnabled(updateSenderId)) {
                 throw new UserIsDisabled("Пользователь с id" + updateSenderId + " заблокирован");
             }
             logger.info("Returning familiar user from update id:" + update.getUpdateId() + ", user id: "
@@ -66,16 +65,16 @@ public class BotService{
     }
 
     public boolean addGiftToUser(Gift gift, BotUser botUser) {
-        logger.info("Add gift with id " + gift.getId()+ " to user with id:" + botUser.getId());
+        logger.info("Add gift with id " + gift.getId() + " to user with id:" + botUser.getId());
         WishList wishList = wishListDao.getById(botUser.getWishList().getId());
         if (wishList != null) {
             giftDao.save(gift);
             wishList.addGift(gift); //null check
             wishListDao.update(wishList);
-            logger.info("Gift with id " + gift.getId()+ " added to user with id:" + botUser.getId());
+            logger.info("Gift with id " + gift.getId() + " added to user with id:" + botUser.getId());
             return true;
         }
-        logger.info("Gift with id " + gift.getId()+ " wasn't added to user with id:" + botUser.getId());
+        logger.info("Gift with id " + gift.getId() + " wasn't added to user with id:" + botUser.getId());
         return false;
     }
 
@@ -94,15 +93,28 @@ public class BotService{
     }
 
     public boolean assignPhotoToGift(Gift gift, List<PhotoSize> photoSizes) {
-        if(gift.getGiftPhotoURL() != null) {
+        if (gift.getGiftPhotoURL() != null) {
             photoManager.deletePhoto(gift);
         }
         return photoManager.assignGiftPhotoParameters(gift, photoSizes);
     }
 
+    public boolean assignPhotoToGift(Gift gift, MultipartFile file) {
+        if (gift.getGiftPhotoURL() != null) {
+            photoManager.deletePhoto(gift);
+        }
+        return photoManager.assignGiftPhotoParameters(gift, file);
+    }
+
     public Optional<BotUser> findUserById(long id) {
         logger.info("Searching user with id: " + id);
-        return Optional.of(userDao.getById(id));
+        BotUser user = userDao.getById(id);
+        if (user != null) {
+            logger.info("Returning user with id: " + id);
+            return Optional.of(user);
+        }
+        logger.warn("User with id " + id + " not found. Returning Optional.empty()");
+        return Optional.empty();
     }
 
     public Optional<BotUser> findUserByUserName(String userName) {
@@ -110,7 +122,7 @@ public class BotService{
         BotUser user = userDao.getByUserName(userName);
         if (user != null) {
             logger.info("Returning user with user name: " + userName);
-            return  Optional.of(user);
+            return Optional.of(user);
         }
         logger.warn("User with user name " + userName + " not found. Returning Optional.empty()");
         return Optional.empty();
@@ -118,35 +130,55 @@ public class BotService{
 
     public Optional<BotUser> findUserByTelegramId(long telegramId) {
         logger.info("Searching user with telegram id: " + telegramId);
-        return Optional.of(userDao.getByTelegramId(telegramId));
+        BotUser user = userDao.getByTelegramId(telegramId);
+        if (user != null) {
+            logger.info("Returning user with telegram id: " + telegramId);
+            return Optional.of(user);
+        }
+        logger.warn("User with telegram id " + telegramId + " not found. Returning Optional.empty()");
+        return Optional.empty();
     }
 
     public Optional<Gift> findGiftById(long id) {
         logger.info("Searching gift with id: " + id);
-        return Optional.of(giftDao.getById(id));
+        Gift gift = giftDao.getById(id);
+        if (gift != null) {
+            logger.info("Returning gift with id: " + id);
+            return Optional.of(gift);
+        }
+        logger.warn("Gift with id " + id + " not found. Returning Optional.empty()");
+        return Optional.empty();
     }
 
     public Optional<BotUser> findGiftHolderByGiftId(long giftId) {
         logger.info("Searching gift holder by gift with id: " + giftId);
-        return Optional.of(userDao.findGiftHolderByGiftId(giftId));
+        BotUser user = userDao.findGiftHolderByGiftId(giftId);
+        if (user != null) {
+            logger.info("Returning gift holder by gift with id: " + giftId);
+            return Optional.of(user);
+        }
+        logger.warn("Gift holder by gift with id " + giftId + " not found. Returning Optional.empty()");
+        return Optional.empty();
     }
 
     public boolean addSubscriberToSubscriptions(BotUser subscriber, BotUser subscribedTo) {
-        logger.info("Add subscriber with id: "+ subscriber.getId() + " to user with id: "
+        logger.info("Add subscriber with id: " + subscriber.getId() + " to user with id: "
             + subscribedTo.getId());
-        if (subscriber != null && subscribedTo != null) {
+        if (subscriber != null && subscribedTo != null
+            && !isUserSubscribedTo(subscribedTo.getId(), subscriber.getId())) {
+
             List<BotUser> subscribers = getUserSubscribers(subscribedTo);
             subscribers.add(subscriber);
             subscribedTo.setSubscribers(subscribers);
             return userDao.update(subscribedTo);
         }
-        logger.warn("Couldn't add subscriber with id: "+ subscriber.getId() + " to user with id:" +
+        logger.warn("Couldn't add subscriber with id: " + subscriber.getId() + " to user with id:" +
             subscribedTo.getId() + " . Subscriber or/and subscribed to is null");
         return false;
     }
 
     public boolean removeSubscriberFromSubscriptions(BotUser subscriber, BotUser subscribedTo) {
-        logger.info("Deleting subscriber with id: "+ subscriber.getId() + " to user with id: "
+        logger.info("Deleting subscriber with id: " + subscriber.getId() + " to user with id: "
             + subscribedTo.getId());
         if (subscriber != null && subscribedTo != null) {
             List<Gift> subscribedToGifts = getUserWishListGifts(subscribedTo.getTgAccountId());
@@ -159,8 +191,8 @@ public class BotService{
             subscribedTo.setSubscribers(subscribers);
             return userDao.update(subscribedTo);
         }
-        logger.warn("Couldn't remove subscriber with id: "+ subscriber.getId() + " to user with id:" +
-            + subscribedTo.getId() + " . Subscriber or/and subscribed to is null");
+        logger.warn("Couldn't remove subscriber with id: " + subscriber.getId() + " to user with id:" +
+            +subscribedTo.getId() + " . Subscriber or/and subscribed to is null");
         return false;
     }
 
@@ -170,35 +202,35 @@ public class BotService{
     }
 
     public List<BotUser> getUserSubscriptions(BotUser user) {
-        logger.info("Get subscriptions of user with id: "+ user.getId());
+        logger.info("Get subscriptions of user with id: " + user.getId());
         if (user != null) {
             return userDao.getUserSubscriptions(user.getId());
         }
-        logger.warn("Couldn't get subscriptions of user with id: "+ user.getId() + ". User is null");
+        logger.warn("Couldn't get subscriptions of user with id: " + user.getId() + ". User is null");
         return Collections.emptyList();
     }
 
     public List<BotUser> getUserSubscribers(BotUser user) {
-        logger.info("Get subscribers of user with id: "+ user.getId());
+        logger.info("Get subscribers of user with id: " + user.getId());
         if (user != null) {
             return userDao.getUserSubscribers(user.getId());
         }
-        logger.warn("Couldn't get subscribers of user with id: "+ user.getId() + ". User is null");
+        logger.warn("Couldn't get subscribers of user with id: " + user.getId() + ". User is null");
         return Collections.emptyList();
     }
 
-    public List<Gift> getUserWishListGifts(long userTelegramId) {
-        logger.info("Get wishlist's gifts of user with telegram id: "+ userTelegramId);
-        return giftDao.getUserWishListPresents(userTelegramId);
+    public List<Gift> getUserWishListGifts(long userId) {
+        logger.info("Get wishlist's gifts of user with id: " + userId);
+        return giftDao.getUserWishListPresents(userId);
     }
 
-    public List<Gift> getAvailableToDonateGifts(long userTelegramId) {
-        logger.info("Get available to donate gifts of user with telegram id: "+ userTelegramId);
-        return giftDao.getAvailableToDonatePresents(userTelegramId);
+    public List<Gift> getAvailableToDonateGifts(long userId) {
+        logger.info("Get available to donate gifts of user with id: " + userId);
+        return giftDao.getAvailableToDonatePresents(userId);
     }
 
     private boolean addUser(BotUser user) {
-        logger.info("Add user with user name: "+ user.getUserName());
+        logger.info("Add user with user name: " + user.getUserName());
         WishList wishList = new WishList();
         wishListDao.save(wishList);
         user.setWishList(wishList);
@@ -206,46 +238,51 @@ public class BotService{
     }
 
     public boolean updateUser(BotUser user) {
-        logger.info("Update user with user name: "+ user.getUserName());
+        logger.info("Update user with user name: " + user.getUserName());
         return userDao.update(user);
     }
 
     public Map<Gift, BotUser> getUserPresentsMap(BotUser user) {
-        logger.info("Get user's present map of user with id: "+ user.getId());
+        logger.info("Get user's present map of user with id: " + user.getId());
         Map<Gift, BotUser> userPresentsMap = new HashMap<>();
         List<Gift> giftsUserDonates = giftDao.getPresentsUserGoingDonate(user.getId());
         giftsUserDonates.stream()
             .forEach(gift -> {
                 userPresentsMap.put(gift, findGiftHolderByGiftId(gift.getId()).get());
             });
-        logger.info("return user's present map with id: "+ user.getId());
+        logger.info("return user's present map with id: " + user.getId());
         return userPresentsMap;
     }
 
-    public boolean donate(long giftId, BotUser donor) throws AlreadyDonatesException {
-        logger.info("Handle donate request from user with id: "+ donor.getId() + " for gift with id: "
+    public boolean donate(long giftId, BotUser donor) throws GiftsLimitReachedException {
+        logger.info("Handle donate request from user with id: " + donor.getId() + " for gift with id: "
             + giftId);
         BotUser giftHolder = userDao.findGiftHolderByGiftId(giftId);
-        if(isDonorAlreadyGoingDonateToUser(donor.getId(), giftHolder.getId())) {
-            throw new AlreadyDonatesException("Пользователь c id " + donor.getId() + " пытается подарить 2 подарка" +
-                "для пользователя с id" + giftHolder.getId());
+        if (isDonorReachedGiftLimit(donor, giftHolder)) {
+            throw new GiftsLimitReachedException("Пользователь c id " + donor.getId() + " пытается превысить лимит" +
+                " подарков, уставновленный пользователем с id " + giftHolder.getId());
         }
         Gift gift = giftDao.getById(giftId);
         if (gift != null && gift.getOccupiedBy() == null && donor != null) {
             gift.setOccupiedBy(donor);
             return giftDao.update(gift);
         }
-        logger.info("Couldn't handle donate request from user with id: "+ donor.getId() + " for gift with id: "
+        logger.info("Couldn't handle donate request from user with id: " + donor.getId() + " for gift with id: "
             + giftId + " Gift or/and donor is null, or gift was already occupied");
         return false;
     }
 
-    public boolean isDonorAlreadyGoingDonateToUser(long donorId, long donatedToId) {
-        return !giftDao.getPresentsDonorGoingDonateToUser(donorId, donatedToId).isEmpty();
+    public boolean isDonorReachedGiftLimit(BotUser donor, BotUser donatedTo) {
+        int giftsLimit = donatedTo.getGiftLimit();
+        List<Gift> gifts = giftDao.getPresentsDonorGoingDonateToUser(donor.getId(), donatedTo.getId());
+        if (gifts.size() < giftsLimit) {
+            return false;
+        }
+        return true;
     }
 
     public boolean refuseFromDonate(long giftId, BotUser donor) {
-        logger.info("Handle refuse from donate request from user with id: "+ donor.getId()
+        logger.info("Handle refuse from donate request from user with id: " + donor.getId()
             + " for gift with id: " + giftId);
         Gift gift = giftDao.getById(giftId);
         if (gift != null && donor != null && gift.getOccupiedBy().equals(donor)) {

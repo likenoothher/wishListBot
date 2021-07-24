@@ -1,5 +1,6 @@
 package com.aziarets.vividapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import javax.persistence.*;
@@ -24,35 +25,47 @@ public class BotUser {
     private String lastName;
 
     @Column(name = "password")
+    @JsonIgnore
     private String password;
 
     @Column(name = "tgAccountId")
+    @JsonIgnore
     private long tgAccountId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @Column(name = "photo_id")
+    private String userAvatarCloudinaryId;
+
+    @Column(name = "photo_url")
+    private String userAvatarPhotoURL;
+
+    @OneToOne
     @JoinColumn(name = "wishlist_id")
+    @JsonIgnore
     private WishList wishList;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "user_subscribers",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "subscriber_id"))
+    @JsonIgnore
     private List<BotUser> subscribers;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "user_subscribers",
         joinColumns = @JoinColumn(name = "subscriber_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnore
     private Set<BotUser> subscriptions;
 
     @Column(name = "update_ready")
-    private boolean isReadyReceiveUpdates;
+    private boolean readyReceiveUpdates;
 
     @Column(name = "show_all_ready")
-    private boolean isAllCanSeeMyWishList;
+    private boolean allCanSeeMyWishList;
 
     @Column(name = "user_status")
     @Enumerated(EnumType.STRING)
+    @JsonIgnore
     private BotUserStatus botUserStatus;
 
     @Column(name = "user_role")
@@ -60,44 +73,55 @@ public class BotUser {
     private BotUserRole botUserRole;
 
     @Column(name = "is_enabled")
-    private boolean isEnabled;
+    private boolean enabled;
+
+    @Column(name = "gift_limit")
+    private int giftLimit;
 
     @Column(name = "updated_gift_id")
+    @JsonIgnore
     private int updateGiftId;
 
     @Column(name = "message_id")
+    @JsonIgnore
     private int carryingMessageId;
 
     @Column(name = "inline_message_id")
+    @JsonIgnore
     private String carryingInlineMessageId;
 
     public BotUser() {
     }
 
-    public BotUser(String userName, String firstName, String lastName, String password, long tgAccountId,
-                   boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus,
-                   BotUserRole botUserRole, boolean isEnabled) {
+    public BotUser(String userName, String firstName, String lastName, String password, long tgAccountId, String userAvatarPhotoURL,
+                   boolean readyReceiveUpdates, boolean allCanSeeMyWishList, BotUserStatus botUserStatus,
+                   BotUserRole botUserRole, boolean enabled, int giftLimit) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.tgAccountId = tgAccountId;
-        this.isReadyReceiveUpdates = isReadyReceiveUpdates;
-        this.isAllCanSeeMyWishList = isAllCanSeeMyWishList;
+        this.userAvatarPhotoURL = userAvatarPhotoURL;
+        this.readyReceiveUpdates = readyReceiveUpdates;
+        this.allCanSeeMyWishList = allCanSeeMyWishList;
         this.botUserStatus = botUserStatus;
         this.botUserRole = botUserRole;
-        this.isEnabled = isEnabled;
+        this.enabled = enabled;
+        this.giftLimit = giftLimit;
     }
 
-    public BotUser(String userName, String firstName, String lastName, long tgAccountId, WishList wishList, List<BotUser> subscribers, boolean isReadyReceiveUpdates, boolean isAllCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId, int carryingMessageId, String carryingInlineMessageId) {
+    public BotUser(String userName, String firstName, String lastName, long tgAccountId,
+                   WishList wishList, List<BotUser> subscribers, boolean readyReceiveUpdates,
+                   boolean allCanSeeMyWishList, BotUserStatus botUserStatus, int updateGiftId,
+                   int carryingMessageId, String carryingInlineMessageId) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.tgAccountId = tgAccountId;
         this.wishList = wishList;
         this.subscribers = subscribers;
-        this.isReadyReceiveUpdates = isReadyReceiveUpdates;
-        this.isAllCanSeeMyWishList = isAllCanSeeMyWishList;
+        this.readyReceiveUpdates = readyReceiveUpdates;
+        this.allCanSeeMyWishList = allCanSeeMyWishList;
         this.botUserStatus = botUserStatus;
         this.updateGiftId = updateGiftId;
         this.carryingMessageId = carryingMessageId;
@@ -157,6 +181,22 @@ public class BotUser {
         this.tgAccountId = tgAccountId;
     }
 
+    public String getUserAvatarCloudinaryId() {
+        return userAvatarCloudinaryId;
+    }
+
+    public void setUserAvatarCloudinaryId(String userAvatarCloudinaryId) {
+        this.userAvatarCloudinaryId = userAvatarCloudinaryId;
+    }
+
+    public String getUserAvatarPhotoURL() {
+        return userAvatarPhotoURL;
+    }
+
+    public void setUserAvatarPhotoURL(String userAvatarPhotoURL) {
+        this.userAvatarPhotoURL = userAvatarPhotoURL;
+    }
+
     public WishList getWishList() {
         return wishList;
     }
@@ -182,19 +222,19 @@ public class BotUser {
     }
 
     public boolean isReadyReceiveUpdates() {
-        return isReadyReceiveUpdates;
+        return readyReceiveUpdates;
     }
 
     public void setReadyReceiveUpdates(boolean readyReceiveUpdates) {
-        isReadyReceiveUpdates = readyReceiveUpdates;
+        this.readyReceiveUpdates = readyReceiveUpdates;
     }
 
     public boolean isAllCanSeeMyWishList() {
-        return isAllCanSeeMyWishList;
+        return allCanSeeMyWishList;
     }
 
     public void setAllCanSeeMyWishList(boolean allCanSeeMyWishList) {
-        isAllCanSeeMyWishList = allCanSeeMyWishList;
+        this.allCanSeeMyWishList = allCanSeeMyWishList;
     }
 
     public BotUserStatus getBotUserStatus() {
@@ -214,11 +254,19 @@ public class BotUser {
     }
 
     public boolean isEnabled() {
-        return isEnabled;
+        return enabled;
     }
 
     public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+        this.enabled = enabled;
+    }
+
+    public int getGiftLimit() {
+        return giftLimit;
+    }
+
+    public void setGiftLimit(int giftLimit) {
+        this.giftLimit = giftLimit;
     }
 
     public int getUpdateGiftId() {
@@ -250,12 +298,27 @@ public class BotUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BotUser botUser = (BotUser) o;
-        return id == botUser.id && tgAccountId == botUser.tgAccountId && isReadyReceiveUpdates == botUser.isReadyReceiveUpdates && isAllCanSeeMyWishList == botUser.isAllCanSeeMyWishList && isEnabled == botUser.isEnabled && updateGiftId == botUser.updateGiftId && carryingMessageId == botUser.carryingMessageId && Objects.equals(userName, botUser.userName) && Objects.equals(firstName, botUser.firstName) && Objects.equals(lastName, botUser.lastName) && Objects.equals(password, botUser.password) && botUserStatus == botUser.botUserStatus && botUserRole == botUser.botUserRole && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
+        return id == botUser.id
+            && tgAccountId == botUser.tgAccountId
+            && readyReceiveUpdates == botUser.readyReceiveUpdates
+            && allCanSeeMyWishList == botUser.allCanSeeMyWishList
+            && enabled == botUser.enabled && giftLimit == botUser.giftLimit
+            && updateGiftId == botUser.updateGiftId
+            && carryingMessageId == botUser.carryingMessageId
+            && Objects.equals(userName, botUser.userName)
+            && Objects.equals(firstName, botUser.firstName)
+            && Objects.equals(lastName, botUser.lastName)
+            && Objects.equals(password, botUser.password)
+            && botUserStatus == botUser.botUserStatus
+            && botUserRole == botUser.botUserRole
+            && Objects.equals(carryingInlineMessageId, botUser.carryingInlineMessageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, password, tgAccountId, isReadyReceiveUpdates, isAllCanSeeMyWishList, botUserStatus, botUserRole, isEnabled, updateGiftId, carryingMessageId, carryingInlineMessageId);
+        return Objects.hash(id, userName, firstName, lastName, password, tgAccountId,
+            readyReceiveUpdates, allCanSeeMyWishList, botUserStatus, botUserRole,
+            enabled, giftLimit, updateGiftId, carryingMessageId, carryingInlineMessageId);
     }
 
     @Override
@@ -267,11 +330,11 @@ public class BotUser {
             ", lastName='" + lastName + '\'' +
             ", password='" + password + '\'' +
             ", tgAccountId=" + tgAccountId +
-            ", isReadyReceiveUpdates=" + isReadyReceiveUpdates +
-            ", isAllCanSeeMyWishList=" + isAllCanSeeMyWishList +
+            ", readyReceiveUpdates=" + readyReceiveUpdates +
+            ", allCanSeeMyWishList=" + allCanSeeMyWishList +
             ", botUserStatus=" + botUserStatus +
             ", botUserRole=" + botUserRole +
-            ", isEnabled=" + isEnabled +
+            ", enabled=" + enabled +
             ", updateGiftId=" + updateGiftId +
             ", carryingMessageId=" + carryingMessageId +
             ", carryingInlineMessageId='" + carryingInlineMessageId + '\'' +
@@ -284,11 +347,13 @@ public class BotUser {
         private String lastName;
         private String password;
         private long tgAccountId;
+        private String userAvatarPhotoURL;
         private boolean isReadyReceiveUpdates;
         private boolean isAllCanSeeMyWishList;
         private boolean isEnabled;
         private BotUserStatus botUserStatus;
         private BotUserRole botUserRole;
+        private int giftLimit;
 
         private UserBuilder() {
         }
@@ -322,6 +387,11 @@ public class BotUser {
             return this;
         }
 
+        public UserBuilder withAvatarPhotoURL(String userAvatarPhotoURL) {
+            this.userAvatarPhotoURL = userAvatarPhotoURL;
+            return this;
+        }
+
         public UserBuilder isReadyReceiveUpdates(boolean isReady) {
             this.isReadyReceiveUpdates = isReady;
             return this;
@@ -347,10 +417,15 @@ public class BotUser {
             return this;
         }
 
+        public UserBuilder withGiftLimit(int giftLimit) {
+            this.giftLimit = giftLimit;
+            return this;
+        }
+
 
         public BotUser build() {
-            return new BotUser(userName, firstName, lastName, password, tgAccountId, isReadyReceiveUpdates,
-                isAllCanSeeMyWishList, botUserStatus, botUserRole, isEnabled);
+            return new BotUser(userName, firstName, lastName, password, tgAccountId, userAvatarPhotoURL, isReadyReceiveUpdates,
+                isAllCanSeeMyWishList, botUserStatus, botUserRole, isEnabled, giftLimit);
         }
 
 

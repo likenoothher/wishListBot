@@ -20,31 +20,42 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
-        <h3>Список подписок пользователя <span th:text="${user.getUserName()}"></span></h3>
+        <h3 th:if="${subscriptions.isEmpty()}">Ты пока ни на кого не подписан</h3>
+        <h3 th:unless="${subscriptions.isEmpty()}">Список твоих подписок, <span th:text="${user.getUserName()}">!</span></h3>
       </div>
       <div class="row">
-        <div class="col-sm-3" th:each="subscription: ${subscriptions}">
+        <div class="col-sm-3" th:unless="${subscriptions.isEmpty()}" th:each="subscription: ${subscriptions}">
           <div class="row">
             <div class="col-lg-1 text-center">
             </div>
             <div class="col-lg-10 text-center">
               <div class="card">
-                <img src="/img/no_photo2.jpg" class="card-img-top" alt="no-photo">
+                <img th:if="${subscription.getUserAvatarPhotoURL() != null}" th:src="${subscription.getUserAvatarPhotoURL()}" />
+                <img th:unless="${subscription.getUserAvatarPhotoURL() != null}" th:src="@{/img/no_photo2.jpg}" />
                 <div class="card-body">
                   <h5 class="card-title">Имя пользователя: <span th:text="${subscription.getUserName()}"></span></h5>
-                  <p class="card-text">Имя: <span th:text="${subscription.getFirstName()}"></span>
+                  <p class="card-text">Имя:
+                    <span th:if="${subscription.getFirstName() != null}" th:text="${subscription.getFirstName()}"></span>
+                    <span th:unless="${subscription.getFirstName() != null}" > не указано</span>
                   </p>
-                  <p class="card-text">Фамилия: <span th:text="${subscription.getLastName()}"></span>
+                  <p class="card-text">Фамилия:
+                    <span th:if="${subscription.getLastName() != null}" th:text="${subscription.getLastName()}"></span>
+                    <span th:unless="${subscription.getLastName() != null}" > не указано</span>
                   </p>
-                  </p>
-                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="card-link">
-                    <span th:text="${subscription.getUserName()}"></span> wish list</a>
-                  </p>
+                  <div class="row">
+                    <div class="col-lg text-center">
+                      <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="btn btn-outline-info">WishList</a>
+                    </div>
+                  </div>
+<!--                  </p>-->
+<!--                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="card-link">-->
+<!--                    <span th:text="${subscription.getUserName()}"></span> wish list</a>-->
+<!--                  </p>-->
                   <div class="row">
                     <div class="col-lg text-center">
                       <form method="post" th:action="@{/subscriptions/unsubscribe}">
                         <input type="hidden" th:value="${user.getId()}" name="userId"/>
-                        <button type="submit" class="btn btn-danger" name="unsubscribedFrom"
+                        <button type="submit" class="btn btn-outline-danger" name="unsubscribedFrom"
                                 th:value="*{subscription.getTgAccountId()}">Отписаться</button>
                       </form>
                     </div>

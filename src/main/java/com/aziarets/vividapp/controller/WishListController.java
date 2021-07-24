@@ -4,13 +4,16 @@ import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.util.NotificationSender;
+import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.security.Principal;
 import java.util.List;
 
@@ -31,7 +34,7 @@ public class WishListController {
     @GetMapping({"", "/"})
     public String showWishList(Model model, Principal principal) {
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
-        List<Gift> userGifts = botService.getUserWishListGifts(botUser.getTgAccountId());
+        List<Gift> userGifts = botService.getUserWishListGifts(botUser.getId());
         model.addAttribute("user", botUser);
         model.addAttribute("gifts", userGifts);
         logger.info("Returning wish list page for " + principal.getName());
@@ -47,14 +50,26 @@ public class WishListController {
     }
 
     @PostMapping("/add_gift")
-    public String addGift(@ModelAttribute("gift") Gift gift, Principal principal) {
+    public String addGift(@ModelAttribute("gift") Gift gift,
+                          @RequestParam(value = "giftImage", required = false) MultipartFile file,
+                          Principal principal) {
         logger.info("Handling add gift request from user " + principal.getName());
+        if (gift.getDescription().isEmpty()) { //fix
+            gift.setDescription(null);
+        }
+        if (gift.getUrl().isEmpty()) { //fix
+            gift.setUrl(null);
+        }
+        if (file.getContentType().contains("image/")) {
+            botService.assignPhotoToGift(gift, file);
+        }
+
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
         boolean isAdded = botService.addGiftToUser(gift, botUser);
-        if(isAdded) {
+        if (isAdded) {
             notificationSender.sendUserAddGiftNotification(botUser);
         }
-        logger.info("Gift with name "+ gift.getName() +" added to user " + principal.getName());
+        logger.info("Gift with name " + gift.getName() + " added to user " + principal.getName());
         return "redirect:/wishlist";
     }
 
@@ -66,7 +81,6 @@ public class WishListController {
             model.addAttribute("giftHolderId", giftHolder.getId());
             Gift gift = botService.findGiftById(giftId).get();
             model.addAttribute("gift", gift);
-            System.out.println(gift.toString());
             return "updateGift";
         } else {
             logger.warn("User with name " + principal.getName() + " tried to update not his gift with id " + giftId);
@@ -78,13 +92,17 @@ public class WishListController {
     public String updateGift(@RequestParam(value = "giftId") long giftId,
                              @RequestParam("giftDescription") String giftDescription,
                              @RequestParam("giftURL") String giftURL,
+                             @RequestParam(value = "giftImage", required = false) MultipartFile file,
                              Principal principal) {
         logger.info("Handling updating gift request for user " + principal.getName() + ", updated gift id: " + giftId);
         Gift gift = botService.findGiftById(giftId).get();
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
         if (giftHolder.getUserName().equals(principal.getName())) {
-            gift.setDescription(giftDescription);
-            gift.setUrl(giftURL);
+            gift.setDescription(giftDescription.isEmpty() ? null : giftDescription);
+            gift.setUrl(giftURL.isEmpty() ? null : giftURL);
+            if (file.getContentType().contains("image/")) {
+                botService.assignPhotoToGift(gift, file);
+            }
             botService.updateGift(gift);
             logger.info("Gift with id " + giftId + " updated to user " + principal.getName());
             return "redirect:/wishlist";

@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Configuration
-@PropertySource(value= {"classpath:application.properties"})
+@PropertySource(value = {"classpath:application.properties"})
 @ComponentScan("com.aziarets.vividapp")
 public class BotConfig {
 
@@ -39,7 +39,7 @@ public class BotConfig {
 
     @Bean
     public Cloudinary cloudinary() {
-       return new Cloudinary(ObjectUtils.asMap(
+        return new Cloudinary(ObjectUtils.asMap(
             "cloud_name", cloud_name,
             "api_key", api_key,
             "api_secret", api_secret));
