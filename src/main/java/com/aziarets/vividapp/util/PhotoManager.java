@@ -119,9 +119,13 @@ public class PhotoManager {
         logger.info("Create link to avatar of user with telegram id : " + telegramId);
         Map uploadPhotoResponse = null;
         URL photoUrlInTelegram = null;
+        String userAvatarPhotoTelegramURL = photoTelegramUrlGenerator.getUserAvatarPhotoTelegramURL(telegramId);
+        if(userAvatarPhotoTelegramURL == null) {
+            return null;
+        }
 
         try {
-            photoUrlInTelegram = new URL(photoTelegramUrlGenerator.getUserAvatarPhotoTelegramURL(telegramId));
+            photoUrlInTelegram = new URL(userAvatarPhotoTelegramURL);
         } catch (MalformedURLException e) {
             logger.warn("Exception during creating avatar URL for user with telegram id : " + telegramId + ". Message:"
                 + e.getMessage());
