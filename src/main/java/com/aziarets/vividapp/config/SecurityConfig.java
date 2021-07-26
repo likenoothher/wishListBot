@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/js/**", "/css/**", "/").permitAll()
             .and()
             .formLogin()
+            .loginPage("/login")
             .defaultSuccessUrl("/wishlist")
             .permitAll()
             .and()

@@ -37,7 +37,8 @@
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Описание: <span th:text="${gift.getDescription()}"></span>
                                     </p>
-                                    <a th:href="${gift.getUrl()}" class="card-link">Ссылка</a>
+                                    <a th:if="${gift.getUrl() != null}" th:href="${gift.getUrl()}" class="card-link">Ссылка</a>
+                                    <span th:unless="${gift.getUrl() != null}">Ссылка: отсутствует</span>
                                     </p>
                                     <div class="row">
                                         <div class="col-lg text-center">
