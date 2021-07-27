@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_HOME" value="${catalina.home}/logs" />
+    <property name="LOG_HOME" value="${catalina.home}/logs"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <Pattern>%date %level [%thread] %logger %msg%n</Pattern>
@@ -25,7 +25,7 @@
 
     <!-- By default, the level of the root level is set to DEBUG -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

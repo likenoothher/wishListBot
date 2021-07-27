@@ -30,7 +30,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/users/{id}")
-    public BotUser searchUserById(@PathVariable(value = "id") long id){
+    public BotUser searchUserById(@PathVariable(value = "id") long id) {
         logger.info("Admin request for searching user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -42,7 +42,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/user_name/{userName}")
-    public BotUser searchUserByUserName(@PathVariable(value = "userName") String userName){
+    public BotUser searchUserByUserName(@PathVariable(value = "userName") String userName) {
         logger.info("Admin request for searching user with user name " + userName);
         Optional<BotUser> user = botService.findUserByUserName(userName);
         if (!user.isPresent()) {
@@ -55,7 +55,7 @@ public class AdminRestController {
 
     @PostMapping("/send_message")
     public ResponseEntity<String> sendMessage(@RequestParam(value = "id") long id,
-                                              @RequestParam (value = "message") String message){
+                                              @RequestParam(value = "message") String message) {
         logger.info("Admin request for sending message to user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -68,7 +68,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/block/{id}")
-    public ResponseEntity<String> block(@PathVariable(value = "id") long id){
+    public ResponseEntity<String> block(@PathVariable(value = "id") long id) {
         logger.info("Admin request for blocking user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -92,7 +92,7 @@ public class AdminRestController {
     }
 
     @GetMapping("/unblock/{id}")
-    public ResponseEntity<String> unblock(@PathVariable(value = "id") long id){
+    public ResponseEntity<String> unblock(@PathVariable(value = "id") long id) {
         logger.info("Admin request for blocking user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {

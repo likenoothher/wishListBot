@@ -69,7 +69,7 @@ public class BotService {
         WishList wishList = wishListDao.getById(botUser.getWishList().getId());
         if (wishList != null) {
             giftDao.save(gift);
-            wishList.addGift(gift); //null check
+            wishList.addGift(gift);
             wishListDao.update(wishList);
             logger.info("Gift with id " + gift.getId() + " added to user with id:" + botUser.getId());
             return true;

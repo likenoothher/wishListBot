@@ -68,6 +68,5 @@ public class UserDetailServiceImpl implements UserDetailsService {
             };
         }
         return null;
-        //TO DO: remake whole stuff
     }
 }

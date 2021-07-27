@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundUserNameException.class)
-    public ResponseEntity<ApiResponse> handleNotFoundUserNameException(NotFoundUserNameException exception){
+    public ResponseEntity<ApiResponse> handleNotFoundUserNameException(NotFoundUserNameException exception) {
         ApiResponse apiResponse = new ApiResponse(exception.getMessage());
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NotFoundUserIdException.class)
-    public ResponseEntity<ApiResponse> handleNotFoundUserIdException(NotFoundUserIdException exception){
+    public ResponseEntity<ApiResponse> handleNotFoundUserIdException(NotFoundUserIdException exception) {
         ApiResponse apiResponse = new ApiResponse(exception.getMessage());
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalOperationException.class)
-    public ResponseEntity<ApiResponse> handleIllegalOperationException(IllegalOperationException exception){
+    public ResponseEntity<ApiResponse> handleIllegalOperationException(IllegalOperationException exception) {
         ApiResponse apiResponse = new ApiResponse(exception.getMessage());
         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }

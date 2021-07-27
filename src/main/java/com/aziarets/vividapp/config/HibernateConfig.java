@@ -37,10 +37,8 @@ public class HibernateConfig {
     @Bean
     public LocalSessionFactoryBean sessionFactory() throws PropertyVetoException {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-//        sessionFactory.setDataSource(dataSource("users" , "classpath:db/migration/V1__Initial_create.sql"));
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.aziarets.vividapp");
-//        sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;
     }
@@ -57,35 +55,11 @@ public class HibernateConfig {
         return dataSource;
     }
 
-//    @Bean
-//    public DataSource dataSource(
-//        @Value("${datasource.dbname}") String dbname,
-//        @Value("${datasource.script}") String script) {
-//
-//        return new EmbeddedDatabaseBuilder()
-//            .setType(EmbeddedDatabaseType.H2)
-//            .setName(dbname)
-//            .addScript(script)
-//            .build();
-//    }
-
     @Bean
     public PlatformTransactionManager transactionManager() throws PropertyVetoException {
-//        HibernateTransactionManager transactionManager
-//            = new HibernateTransactionManager();
-//        transactionManager.setSessionFactory(sessionFactory().getObject());
-//        return transactionManager;
-//
         JpaTransactionManager transactionManager
             = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(sessionFactory().getObject());
         return transactionManager;
-    }
-
-    private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-        properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-        return properties;
     }
 }

@@ -181,7 +181,6 @@ public class MessageHandler {
                 messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
                     chatId));
             }
-            //почему всё работает без update?
         } else {
             logger.warn("Exception  during adding photo to gift with id: " + gift.get().getId()
                 + ". Present isn't present");

@@ -3,7 +3,6 @@ package com.aziarets.vividapp.model;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum BotUserRole implements GrantedAuthority {
-
     ADMIN("ADMIN"),
     USER("USER");
 

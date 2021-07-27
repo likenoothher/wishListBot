@@ -69,8 +69,7 @@ public class PhotoManager {
             uploadPhotoResponse = uploadPhoto(file);
         } catch (IOException e) {
             logger.warn("Exception during copying photo from telegram: " + e.getMessage());
-        }
-        finally {
+        } finally {
             file.delete();
         }
         if (uploadPhotoResponse != null && uploadPhotoResponse.containsKey("url")
@@ -99,8 +98,7 @@ public class PhotoManager {
             uploadPhotoResponse = uploadPhoto(file);
         } catch (IOException e) {
             logger.warn("Exception during uploading photo to cloudinary: " + e.getMessage());
-        }
-        finally {
+        } finally {
             file.delete();
         }
         if (uploadPhotoResponse != null && uploadPhotoResponse.containsKey("url")
@@ -120,7 +118,7 @@ public class PhotoManager {
         Map uploadPhotoResponse = null;
         URL photoUrlInTelegram = null;
         String userAvatarPhotoTelegramURL = photoTelegramUrlGenerator.getUserAvatarPhotoTelegramURL(telegramId);
-        if(userAvatarPhotoTelegramURL == null) {
+        if (userAvatarPhotoTelegramURL == null) {
             return null;
         }
 
@@ -137,8 +135,7 @@ public class PhotoManager {
             uploadPhotoResponse = uploadPhoto(file);
         } catch (IOException e) {
             logger.warn("Exception during copying photo from telegram: " + e.getMessage());
-        }
-        finally {
+        } finally {
             file.delete();
         }
         if (uploadPhotoResponse != null && uploadPhotoResponse.containsKey("url")
