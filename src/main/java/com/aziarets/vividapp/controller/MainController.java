@@ -24,6 +24,6 @@ public class MainController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         logger.info("Redirecting to login page for " + userName);
-        return "redirect:/login";
+        return "redirect:/wishlist";
     }
 }
