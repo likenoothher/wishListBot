@@ -1,0 +1,81 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
+    <title>Доступные подарки</title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Подарки, которые можно подарить для <span th:text="${user.getUserName()}"></span></h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-3" th:each="gift: ${availableGifts}">
+                    <div class="row">
+                        <div class="col-lg-1 text-center">
+                        </div>
+                        <div class="col-lg-10 text-center">
+                            <div class="card">
+                                <img th:if="${gift.getGiftPhotoCloudinaryId() != null}"
+                                     th:src="${gift.getGiftPhotoURL()}"/>
+                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}"
+                                     th:src="@{/img/no_photo2.jpg}"/>
+                                <div class="card-body">
+                                    <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
+                                    <p class="card-text">Описание: <span th:text="${gift.getDescription()}"></span>
+                                    </p>
+                                    <a th:if="${gift.getUrl() != null}" th:href="${gift.getUrl()}" class="card-link">Ссылка</a>
+                                    <span th:unless="${gift.getUrl() != null}">Ссылка: отсутствует</span>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-lg text-center">
+                                            <form method="post" th:action="@{/subscriptions/donate}">
+                                                <input type="hidden" th:value="${user.getId()}" name="userId"/>
+                                                <div th:switch="${showIPresentButton}">
+                                                    <button type="submit" class="btn btn-success" name="giftId"
+                                                            th:case="true"
+                                                            th:value="*{gift.getId()}">Я подарю!
+                                                    </button>
+                                                    <span th:case="false" class="d-inline-block" tabindex="0" data-bs-toggle="popover"
+                                                          data-bs-trigger="hover focus"
+                                                          data-bs-content="Исчерпан лимит подарков для данного пользователя">
+                                                            <button type="submit" class="btn btn-success" disabled>Я подарю!
+                                                            </button>
+                                                    </span>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

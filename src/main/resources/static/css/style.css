@@ -1,0 +1,28 @@
+section{
+    margin-top: 120px;
+}
+
+h3{
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.row{
+    margin-bottom: 10px;
+}
+
+.col-md-2.btn{
+    width: 100px;
+}
+
+#formFile::before {
+    content: "Выбрать изображение";
+    position: absolute;
+    z-index: 2;
+    display: block;
+    background-color: #eee;
+    width: 80px;
+}
+
+
+
