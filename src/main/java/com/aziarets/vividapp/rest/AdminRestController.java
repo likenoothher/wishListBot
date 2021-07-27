@@ -29,8 +29,8 @@ public class AdminRestController {
         this.notificationSender = notificationSender;
     }
 
-    @GetMapping("/users/{userId}")
-    public BotUser searchUserById(@PathVariable(value = "userId") long id){
+    @GetMapping("/users/{id}")
+    public BotUser searchUserById(@PathVariable(value = "id") long id){
         logger.info("Admin request for searching user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -41,7 +41,7 @@ public class AdminRestController {
         return user.get();
     }
 
-    @GetMapping("/users/{userName}")
+    @GetMapping("/user_name/{userName}")
     public BotUser searchUserByUserName(@PathVariable(value = "userName") String userName){
         logger.info("Admin request for searching user with user name " + userName);
         Optional<BotUser> user = botService.findUserByUserName(userName);
@@ -67,8 +67,8 @@ public class AdminRestController {
         return new ResponseEntity<>("Message was sent to user with id " + id, HttpStatus.OK);
     }
 
-    @PostMapping("/block")
-    public ResponseEntity<String> block(@RequestParam(value = "id") long id){
+    @GetMapping("/block/{id}")
+    public ResponseEntity<String> block(@PathVariable(value = "id") long id){
         logger.info("Admin request for blocking user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -91,8 +91,8 @@ public class AdminRestController {
         }
     }
 
-    @PostMapping("/unblock")
-    public ResponseEntity<String> unblock(@RequestParam(value = "id") long id){
+    @GetMapping("/unblock/{id}")
+    public ResponseEntity<String> unblock(@PathVariable(value = "id") long id){
         logger.info("Admin request for blocking user with id " + id);
         Optional<BotUser> user = botService.findUserById(id);
         if (!user.isPresent()) {
@@ -113,20 +113,5 @@ public class AdminRestController {
             return new ResponseEntity<>("User with id " + id + " wasn't unblocked. Some error occurred",
                 HttpStatus.BAD_REQUEST);
         }
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleException(NotFoundUserIdException exception){
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleException(NotFoundUserNameException exception){
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleException(IllegalOperationException exception){
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

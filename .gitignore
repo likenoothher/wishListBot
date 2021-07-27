@@ -26,5 +26,8 @@ target/
 *.iml
 out
 
+# Logs
+catalina.home_IS_UNDEFINED
+
 
 

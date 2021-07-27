@@ -87,20 +87,22 @@ public class BotService {
         logger.info("Deleting gift with id: " + giftId);
         Gift gift = giftDao.getById(giftId);
         photoManager.deletePhoto(gift);
-        boolean isRemoved = giftDao.remove(giftId);
-
-        return isRemoved;
+        return giftDao.remove(giftId);
     }
 
     public boolean assignPhotoToGift(Gift gift, List<PhotoSize> photoSizes) {
+        logger.info("Assigning photo to gift with id: " + gift.getId());
         if (gift.getGiftPhotoURL() != null) {
+            logger.info("Deleting existed photo of gift with id " + gift.getId());
             photoManager.deletePhoto(gift);
         }
         return photoManager.assignGiftPhotoParameters(gift, photoSizes);
     }
 
     public boolean assignPhotoToGift(Gift gift, MultipartFile file) {
+        logger.info("Assigning photo to gift with id: " + gift.getId());
         if (gift.getGiftPhotoURL() != null) {
+            logger.info("Deleting existed photo of gift with id " + gift.getId());
             photoManager.deletePhoto(gift);
         }
         return photoManager.assignGiftPhotoParameters(gift, file);
@@ -196,8 +198,7 @@ public class BotService {
         return false;
     }
 
-
-    public boolean removeSubscriptionFromSubscriber(BotUser subscriber, BotUser subscribedTo) { //evict this method
+    public boolean removeSubscriptionFromSubscriber(BotUser subscriber, BotUser subscribedTo) {
         return removeSubscriberFromSubscriptions(subscribedTo, subscriber);
     }
 

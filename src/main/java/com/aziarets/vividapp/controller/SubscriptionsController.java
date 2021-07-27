@@ -37,7 +37,9 @@ public class SubscriptionsController {
     }
 
     @GetMapping("/{userId}")
-    public String showSubscriptionWishList(@PathVariable(value = "userId") Long wishListHolderId, Model model, Principal principal) {
+    public String showSubscriptionWishList(@PathVariable(value = "userId") Long wishListHolderId,
+                                           Model model,
+                                           Principal principal) {
         BotUser currentUser = botService.findUserByUserName(principal.getName()).get();
         if (botService.isUserSubscribedTo(wishListHolderId, currentUser.getId())) {
             BotUser wishListHolder = botService.findUserById(wishListHolderId).get();
