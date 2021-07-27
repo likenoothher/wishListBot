@@ -15,5 +15,14 @@ h3{
     width: 100px;
 }
 
+#formFile::before {
+    content: "Выбрать изображение";
+    position: absolute;
+    z-index: 2;
+    display: block;
+    background-color: #eee;
+    width: 80px;
+}
+
 
 

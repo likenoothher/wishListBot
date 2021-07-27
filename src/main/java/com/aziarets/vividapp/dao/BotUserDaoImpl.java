@@ -49,8 +49,6 @@ public class BotUserDaoImpl implements BotUserDao {
         logger.info("Get user by telegram id: " + telegramId);
         Query query = factory.getCurrentSession().createQuery("select  botuser from BotUser botuser " +
             " left join fetch botuser.wishList \n" +
-//            " left join fetch botuser.subscribers\n" +
-//            " left join fetch botuser.subscriptions\n" +
             " where botuser.tgAccountId = :telegramId")
             .setParameter("telegramId", telegramId);
         try {
@@ -76,7 +74,6 @@ public class BotUserDaoImpl implements BotUserDao {
             logger.warn("Exception during searching user with user name " + userName + ":" + e.getLocalizedMessage());
             return null;
         }
-
     }
 
     @Override
@@ -125,7 +122,7 @@ public class BotUserDaoImpl implements BotUserDao {
             "where botuser.id = :id ");
         query.setParameter("id", id);
         List<BotUser> users = query.getResultList();
-        logger.info("BotUserDao returning result of searching subscribers by bot user id : " + id);
+        logger.info("Returning result of searching subscribers by bot user id : " + id);
         return (List<BotUser>) users;
     }
 
@@ -137,7 +134,7 @@ public class BotUserDaoImpl implements BotUserDao {
             "where botuser.id = :subscribedToId and subscribers.id = :subscriberId");
         query.setParameter("subscribedToId", subscribedToId);
         query.setParameter("subscriberId", subscriberId);
-        boolean isSubscribed = query.getResultList().isEmpty();
+        boolean isSubscribed = !query.getResultList().isEmpty();
         logger.info("Returning result of searching is user with id "
             + subscriberId + " subscribed to user with id : " + subscribedToId + ". Result - " + isSubscribed);
         return isSubscribed;
