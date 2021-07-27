@@ -15,7 +15,7 @@ authorisation and role-based access rights.
 - Maven
 - SLF4J
 
-# API
+## API
 So far available only for users with admin status.
 
 

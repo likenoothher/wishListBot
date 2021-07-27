@@ -23,7 +23,7 @@ public class MainController {
     public String showWishList() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        logger.info("Returning main page for " + userName);
-        return "main";
+        logger.info("Redirecting to login page for " + userName);
+        return "redirect:/login";
     }
 }

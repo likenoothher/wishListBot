@@ -11,6 +11,13 @@
 
 </head>
 
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+
+<section>
 <body>
 <div class="container">
     <div class="row">
@@ -20,15 +27,14 @@
                     <h4>Авторизация</h4>
                     <div class="col-12">
                         <label><b>Имя пользователя</b></label>
-                        <input type="text" name="username" class="form-control" placeholder="@Telegram User Name">
+                        <input type="text" name="username" class="form-control" placeholder="@Telegram user name">
                     </div>
                     <div class="col-12">
                         <label><b>Пароль</b></label>
-                        <input type="password" name="password" class="form-control" placeholder="Пароль">
+                        <input type="password" name="password" class="form-control" placeholder="Пароль (устанавливается через меню бота)">
                     </div>
                     <div class="col-12">
-                        <a href="/" class="btn btn-primary">Назад</a>
-                        <button type="submit" class="btn btn-success float-end">Войти</button>
+                        <button type="submit" class="btn btn-success w-100">Войти</button>
                     </div>
                 </form>
             </div>
@@ -39,5 +45,6 @@
 <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
 </body>
+</section>
 
 </html>
