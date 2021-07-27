@@ -18,33 +18,34 @@
 
 
 <section>
-<body>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="login-form bg-light mt-4 p-4">
-                <form method="post" th:action="@{/login}" class="row g-3">
-                    <h4>Авторизация</h4>
-                    <div class="col-12">
-                        <label><b>Имя пользователя</b></label>
-                        <input type="text" name="username" class="form-control" placeholder="@Telegram user name">
-                    </div>
-                    <div class="col-12">
-                        <label><b>Пароль</b></label>
-                        <input type="password" name="password" class="form-control" placeholder="Пароль (устанавливается через меню бота)">
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success w-100">Войти</button>
-                    </div>
-                </form>
+    <body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="login-form bg-light mt-4 p-4">
+                    <form method="post" th:action="@{/login}" class="row g-3">
+                        <h4>Авторизация</h4>
+                        <div class="col-12">
+                            <label><b>Имя пользователя</b></label>
+                            <input type="text" name="username" class="form-control" placeholder="@Telegram user name">
+                        </div>
+                        <div class="col-12">
+                            <label><b>Пароль</b></label>
+                            <input type="password" name="password" class="form-control"
+                                   placeholder="Пароль (устанавливается через меню бота)">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success w-100">Войти</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
-<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
-</body>
+    <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+    </body>
 </section>
 
 </html>

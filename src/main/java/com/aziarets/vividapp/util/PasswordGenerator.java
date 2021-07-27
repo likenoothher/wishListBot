@@ -45,7 +45,7 @@ public class PasswordGenerator {
         return "def";
     }
 
-    public String getEncodedPassword(){
+    public String getEncodedPassword() {
         return passwordEncoder.encode(getRandomPassword());
     }
 }

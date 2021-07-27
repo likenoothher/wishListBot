@@ -41,7 +41,7 @@ public class GiftDaoImpl implements GiftDao {
     public boolean remove(long id) {
         logger.info("Deleting gift with gift id " + id);
         factory.getCurrentSession().remove(factory.getCurrentSession().get(Gift.class, id));
-        return true; // переделать
+        return true;
     }
 
     @Override

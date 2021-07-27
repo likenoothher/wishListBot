@@ -57,7 +57,7 @@ public class BotUserExtractor {
             .build();
     }
 
-    private User extractUserInfoFromUpdate(Update update) { // описаны не все типы ответа! доделать
+    private User extractUserInfoFromUpdate(Update update) {
         UpdateType updateType = getUpdateType(update);
         if (updateType.equals(UpdateType.CALLBACK)) {
             return update.getCallbackQuery().getFrom();
@@ -69,17 +69,6 @@ public class BotUserExtractor {
             return update.getEditedMessage().getFrom();
         }
         return update.getInlineQuery().getFrom();
-    }
-
-    private long extractChatIdFromUpdate(Update update) { // описаны не все типы ответа! доделать
-        UpdateType updateType = getUpdateType(update);
-        if (updateType.equals(UpdateType.CALLBACK)) {
-            return update.getCallbackQuery().getMessage().getChatId();
-        }
-        if (updateType.equals(UpdateType.MESSAGE)) {
-            return update.getMessage().getChatId();
-        }
-        return update.getEditedMessage().getChatId();
     }
 
     private UpdateType getUpdateType(Update update) {

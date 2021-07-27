@@ -35,29 +35,34 @@
                         </div>
                         <div class="col-lg-10 text-center">
                             <div class="card h-100">
-                                <img th:if="${gift.getGiftPhotoCloudinaryId() != null}" th:src="${gift.getGiftPhotoURL()}" />
-                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/gift.jpg}" />
+                                <img th:if="${gift.getGiftPhotoCloudinaryId() != null}"
+                                     th:src="${gift.getGiftPhotoURL()}"/>
+                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/gift.jpg}"/>
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Описание:
-                                        <span th:if="${gift.getDescription() != null}" th:text="${gift.getDescription()}"></span>
+                                        <span th:if="${gift.getDescription() != null}"
+                                              th:text="${gift.getDescription()}"></span>
                                         <span th:unless="${gift.getDescription() != null}"> отсутствует</span>
                                     </p>
                                     <p>
-                                    <a th:if="${gift.getUrl() != null}" th:href="${gift.getUrl()}" class="card-link">Ссылка</a>
-                                    <span th:unless="${gift.getUrl() != null}">Ссылка: отсутствует</span>
+                                        <a th:if="${gift.getUrl() != null}" th:href="${gift.getUrl()}"
+                                           class="card-link">Ссылка</a>
+                                        <span th:unless="${gift.getUrl() != null}">Ссылка: отсутствует</span>
                                     </p>
                                     <div class="row">
                                         <div class="col-xl-6 text-center">
                                             <form method="get" th:action="@{wishlist/update_gift}">
                                                 <button type="submit" class="btn btn-outline-primary" name="giftId"
-                                                        th:value="*{gift.getId()}">Изменить</button>
+                                                        th:value="*{gift.getId()}">Изменить
+                                                </button>
                                             </form>
                                         </div>
                                         <div class="col-xl-6 text-center">
                                             <form method="post" th:action="@{wishlist/delete_gift}">
                                                 <button type="submit" class="btn btn-outline-danger" name="giftId"
-                                                        th:value="*{gift.getId()}">Удалить</button>
+                                                        th:value="*{gift.getId()}">Удалить
+                                                </button>
                                             </form>
                                         </div>
                                     </div>

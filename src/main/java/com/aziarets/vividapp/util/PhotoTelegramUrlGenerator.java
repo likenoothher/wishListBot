@@ -69,7 +69,7 @@ public class PhotoTelegramUrlGenerator {
             ResponseEntity<String> avatarIDResponseEntity = restTemplate.getForEntity(telegramAvatarIdURL, String.class);
 
             ObjectNode avatarObjectNode = objectMapper.readValue(avatarIDResponseEntity.getBody(), ObjectNode.class);
-            if( avatarObjectNode.findValue("photos").isEmpty() ) {
+            if (avatarObjectNode.findValue("photos").isEmpty()) {
                 logger.info("User with telegram id " + userTelegramId + " doesn't have any photo. Return null");
                 return null;
             }
@@ -90,7 +90,7 @@ public class PhotoTelegramUrlGenerator {
 
         } catch (JsonProcessingException e) {
             logger.warn(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.warn(e.getMessage());
         }
 

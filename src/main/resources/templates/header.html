@@ -3,76 +3,77 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
 <body>
-    <nav class="navbar fixed-top navbar-expand-xl navbar-dark" style="background-color: #24134b">
-        <div class="container">
-            <a href="/" class="navbar-brand">
-                <img th:src="@{/img/favicon.png}" alt="" width="30" height="28" class="d-inline-block align-text-top">
-                Vivid WishList</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/wishlist">Мой WishList</a>
-                        </li>
-                        <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/i_present">Я дарю</a>
-                        </li>
-                        <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/subscribers">Подписчики</a>
-                        </li>
-                        <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/subscriptions">Подписки</a>
-                        </li>
-                        <li sec:authorize="isAuthenticated()" class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/settings">Настройки</a>
-                        </li>
-                        <li sec:authorize="hasAuthority('ADMIN')" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Админка
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark" role="menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" th:href="@{/admin/search_user}">Найти пользователя</a></li>
-                            </ul>
-                        </li>
+<nav class="navbar fixed-top navbar-expand-xl navbar-dark" style="background-color: #24134b">
+    <div class="container">
+        <a href="/" class="navbar-brand">
+            <img th:src="@{/img/favicon.png}" alt="" width="30" height="28" class="d-inline-block align-text-top">
+            Vivid WishList</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/wishlist">Мой WishList</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/i_present">Я дарю</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/subscribers">Подписчики</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/subscriptions">Подписки</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/settings">Настройки</a>
+                </li>
+                <li sec:authorize="hasAuthority('ADMIN')" class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Админка
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" role="menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" th:href="@{/admin/search_user}">Найти пользователя</a></li>
                     </ul>
-            </div>
-            <div sec:authorize="isAnonymous()">
-<!--                <a class="btn btn-success" href="/login" role="button">Войти</a>-->
-                <!-- Button trigger modal -->
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                        data-bs-target="#aboutRegistrationModal">
-                    О регистрации
-                </button>
-            </div>
-            <div sec:authorize="hasAnyAuthority('ADMIN', 'USER')">
-                <a class="btn btn-success" href="/logout" role="button">Выйти</a>
-            </div>
-
+                </li>
+            </ul>
         </div>
-    </nav>
+        <div sec:authorize="isAnonymous()">
+            <!--                <a class="btn btn-success" href="/login" role="button">Войти</a>-->
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#aboutRegistrationModal">
+                О регистрации
+            </button>
+        </div>
+        <div sec:authorize="hasAnyAuthority('ADMIN', 'USER')">
+            <a class="btn btn-success" href="/logout" role="button">Выйти</a>
+        </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="aboutRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">О регистрации</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Регистрация доступна только через <a th:href="@{https://t.me/vividwishlistbot}">Telegram бота</a>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
+    </div>
+</nav>
+
+<!-- Modal -->
+<div class="modal fade" id="aboutRegistrationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">О регистрации</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Регистрация доступна только через <a th:href="@{https://t.me/vividwishlistbot}">Telegram бота</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
+</div>
 
 </body>
 

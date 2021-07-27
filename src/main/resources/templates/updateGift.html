@@ -28,13 +28,15 @@
 
                 </div>
                 <div class="col-md-8">
-                    <form method="post" th:action="@{/wishlist/update_gift}" th:object="${gift}" enctype="multipart/form-data">
+                    <form method="post" th:action="@{/wishlist/update_gift}" th:object="${gift}"
+                          enctype="multipart/form-data">
                         <div class="form-group row">
 
                             <div class="col-md-12 mt-3">
                                 <label for="giftDescription">Описание подарка</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="giftDescription" id="giftDescription" autocomplete="off"
+                                    <input type="text" class="form-control" name="giftDescription" id="giftDescription"
+                                           autocomplete="off"
                                            th:value="*{description}"/>
                                 </div>
                             </div>
@@ -42,8 +44,9 @@
                             <div class="col-md-12 mt-3">
                                 <label for="giftURL">Ссылка на подарок</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="giftURL" id="giftURL" autocomplete="off"
-                                           th:value="*{url}" />
+                                    <input type="text" class="form-control" name="giftURL" id="giftURL"
+                                           autocomplete="off"
+                                           th:value="*{url}"/>
                                 </div>
                             </div>
 
@@ -51,7 +54,7 @@
                                 <label for="giftImage" class="form-label">Загрузить изображение подарка</label>
                                 <input class="form-control" type="file" name="giftImage" id="giftImage">
                                 <script>
-                                    $( "#giftImage" ).attr({
+                                    $("#giftImage").attr({
                                         title: "new content"
                                     });
                                 </script>

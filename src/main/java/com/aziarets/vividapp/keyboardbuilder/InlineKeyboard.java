@@ -99,11 +99,10 @@ public class InlineKeyboard {
                 this.keyboard.add(this.row);
                 this.row = null;
             }
-
             return this;
         }
 
-        public InlineKeyboardMarkupBuilder withCallBackButtonsFromUserList(List<BotUser> list, String icon, String callBackPrefix) {
+        public InlineKeyboardMarkupBuilder withCallBackButtonsFromUserList(List<BotUser> list, String callBackPrefix) {
             for (int i = 0; i < list.size(); i++) {
                 BotUser user = list.get(i);
                 this.row = new ArrayList<>();

@@ -17,55 +17,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableWebMvc
 @ComponentScan("com.aziarets.vividapp")
 public class WebConfig implements WebMvcConfigurer {
-    //
-//    private final ApplicationContext applicationContext;
-//
-//    @Autowired
-//    public WebConfig(ApplicationContext applicationContext) {
-//        this.applicationContext = applicationContext;
-//    }
-//
-//    @Bean
-//    public SpringResourceTemplateResolver templateResolver() {
-//        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-//        templateResolver.setApplicationContext(this.applicationContext);
-//        templateResolver.setPrefix("/resources/templates/");
-//        templateResolver.setSuffix(".html");
-//        templateResolver.setTemplateMode(TemplateMode.HTML);
-//        templateResolver.setCacheable(true);
-//        templateResolver.setCharacterEncoding("UTF-8");
-//
-//        return templateResolver;
-//    }
-//
-//    @Bean
-//    public ThymeleafViewResolver viewResolver() {
-//        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-//        viewResolver.setTemplateEngine(templateEngine());
-//        viewResolver.setOrder(1);
-//        viewResolver.setForceContentType(true);
-//        viewResolver.setViewNames(new String[]{".html", ".xhtml"});
-//        viewResolver.setContentType("text/html; charset=UTF-8");
-//        viewResolver.setCharacterEncoding("UTF-8");
-//        return viewResolver;
-//    }
-//
-//    @Bean
-//    public SpringTemplateEngine templateEngine() {
-//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-//        templateEngine.setTemplateResolver(templateResolver());
-//        templateEngine.setEnableSpringELCompiler(true);
-//        templateEngine.addDialect(new SpringSecurityDialect());
-//        return templateEngine;
-//    }
-//
-//    @Override
-//    public void configureViewResolvers(ViewResolverRegistry registry) {
-//        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-//        resolver.setTemplateEngine(templateEngine());
-//        registry.viewResolver(resolver);
-//    }
-//
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("loginPage");

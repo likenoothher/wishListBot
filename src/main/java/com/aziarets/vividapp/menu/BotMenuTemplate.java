@@ -263,7 +263,7 @@ public class BotMenuTemplate {
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
-                .withCallBackButtonsFromUserList(subscribers, ONE_GUY_ICON, "/my_subscribers/show/id")
+                .withCallBackButtonsFromUserList(subscribers, "/my_subscribers/show/id")
                 .withRow()
                 .buttonWithCallbackData("« Назад",
                     "/main_menu")
@@ -342,7 +342,7 @@ public class BotMenuTemplate {
 
             InlineKeyboardMarkup replyKeyboard = InlineKeyboard.InlineKeyboardMarkupBuilder
                 .newInlineKeyboardMarkup()
-                .withCallBackButtonsFromUserList(subscriptions, ONE_GUY_ICON, "/my_subscriptions/show/id")
+                .withCallBackButtonsFromUserList(subscriptions, "/my_subscriptions/show/id")
                 .withRow()
                 .buttonWithCallbackData("« Назад",
                     "/main_menu")
