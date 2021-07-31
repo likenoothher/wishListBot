@@ -43,9 +43,9 @@ public class SubscribersController {
     }
 
     @PostMapping("/delete")
-    public String showIPresentList(@RequestParam(value = "deletedUserId") long deletedUserId,
-                                   @RequestParam(value = "userId") long userId,
-                                   Principal principal) {
+    public String delete(@RequestParam(value = "deletedUserId") long deletedUserId,
+                         @RequestParam(value = "userId") long userId,
+                         Principal principal) {
         logger.info("Handling delete subscriber with id " + deletedUserId +
             "  request from user  " + principal.getName());
         BotUser subscribedTo = botService.findUserById(userId).get();

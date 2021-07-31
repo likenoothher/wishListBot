@@ -40,20 +40,20 @@ public class BotUserDaoImpl implements BotUserDao {
 
     @Override
     public BotUser getById(long id) {
-        logger.info("Get user by id: " + id);
+        logger.info("Get user by id " + id);
         return factory.getCurrentSession().get(BotUser.class, id);
     }
 
     @Override
     public BotUser getByTelegramId(long telegramId) {
-        logger.info("Get user by telegram id: " + telegramId);
+        logger.info("Get user by telegram id " + telegramId);
         Query query = factory.getCurrentSession().createQuery("select  botuser from BotUser botuser " +
             " left join fetch botuser.wishList \n" +
             " where botuser.tgAccountId = :telegramId")
             .setParameter("telegramId", telegramId);
         try {
             BotUser user = (BotUser) query.getSingleResult();
-            logger.info("Returning result - user with telegram id: " + telegramId);
+            logger.info("Returning result - user with telegram id " + telegramId);
             return user;
         } catch (NoResultException e) {
             logger.warn("Exception during searching user with telegram id " + telegramId + ":" + e.getLocalizedMessage());
@@ -94,11 +94,11 @@ public class BotUserDaoImpl implements BotUserDao {
         query.setParameter("giftId", giftId);
         List<BotUser> users = query.getResultList();
         if (!users.isEmpty()) {
-            logger.info("Returning gift holder by gift id: " + giftId + ", found user - "
+            logger.info("Returning gift holder by gift id " + giftId + ", found user - "
                 + users.get(0).getUserName());
             return users.get(0);
         }
-        logger.info("Returning null gift holder by gift id: " + giftId);
+        logger.info("Returning null gift holder by gift id " + giftId);
         return null;
     }
 

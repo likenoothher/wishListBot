@@ -3,6 +3,10 @@ package com.aziarets.vividapp.service;
 import com.aziarets.vividapp.dao.*;
 import com.aziarets.vividapp.exception.GiftsLimitReachedException;
 import com.aziarets.vividapp.exception.UserIsDisabled;
+import com.aziarets.vividapp.rest.dto.BotUserDTO;
+import com.aziarets.vividapp.rest.dto.GiftDTO;
+import com.aziarets.vividapp.rest.facade.BotUserFacade;
+import com.aziarets.vividapp.rest.facade.GiftFacade;
 import com.aziarets.vividapp.util.BotUserExtractor;
 import com.aziarets.vividapp.exception.NotFoundUserNameException;
 import com.aziarets.vividapp.exception.UserIsBotException;
@@ -21,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,16 +37,19 @@ public class BotService {
     private WishListDao wishListDao;
     private GiftDao giftDao;
     private PhotoManager photoManager;
-
+    private BotUserFacade botUserFacade;
+    private GiftFacade giftFacade;
 
     @Autowired
-    public BotService(BotUserExtractor botUserExtractor, BotUserDaoImpl userDao, WishListDaoImpl wishListRepo,
-                      GiftDao giftDao, PhotoManager photoManager) {
+    public BotService(BotUserExtractor botUserExtractor, BotUserDao userDao, WishListDao wishListDao,
+                      GiftDao giftDao, PhotoManager photoManager, BotUserFacade botUserFacade, GiftFacade giftFacade) {
         this.botUserExtractor = botUserExtractor;
         this.userDao = userDao;
-        this.wishListDao = wishListRepo;
+        this.wishListDao = wishListDao;
         this.giftDao = giftDao;
         this.photoManager = photoManager;
+        this.botUserFacade = botUserFacade;
+        this.giftFacade = giftFacade;
     }
 
     public BotUser identifyUser(Update update)
@@ -90,22 +98,32 @@ public class BotService {
         return giftDao.remove(giftId);
     }
 
-    public boolean assignPhotoToGift(Gift gift, List<PhotoSize> photoSizes) {
-        logger.info("Assigning photo to gift with id: " + gift.getId());
-        if (gift.getGiftPhotoURL() != null) {
+    public boolean assignPhotoURLToGift(Gift gift, List<PhotoSize> photoSizes) {
+        logger.info("Assigning photo url to gift with id: " + gift.getId());
+        if (gift.getGiftPhotoURL() != null && gift.getGiftPhotoCloudinaryId() != null) {
             logger.info("Deleting existed photo of gift with id " + gift.getId());
             photoManager.deletePhoto(gift);
         }
         return photoManager.assignGiftPhotoParameters(gift, photoSizes);
     }
 
-    public boolean assignPhotoToGift(Gift gift, MultipartFile file) {
-        logger.info("Assigning photo to gift with id: " + gift.getId());
-        if (gift.getGiftPhotoURL() != null) {
+    public boolean assignPhotoURLToGift(Gift gift, MultipartFile file) {
+        logger.info("Assigning photo url to gift with id: " + gift.getId());
+        if (gift.getGiftPhotoURL() != null && gift.getGiftPhotoCloudinaryId() != null) {
             logger.info("Deleting existed photo of gift with id " + gift.getId());
             photoManager.deletePhoto(gift);
         }
         return photoManager.assignGiftPhotoParameters(gift, file);
+    }
+
+    public boolean deleteGiftPhoto(Gift gift) {
+        logger.info("Deleting photo of gift with id " + gift.getId());
+        if (gift.getGiftPhotoURL() != null && gift.getGiftPhotoCloudinaryId() != null) {
+            logger.info("Deleting existed photo of gift with id " + gift.getId());
+            photoManager.deletePhoto(gift);
+            return true;
+        }
+        return false;
     }
 
     public Optional<BotUser> findUserById(long id) {
@@ -183,7 +201,7 @@ public class BotService {
         logger.info("Deleting subscriber with id: " + subscriber.getId() + " to user with id: "
             + subscribedTo.getId());
         if (subscriber != null && subscribedTo != null) {
-            List<Gift> subscribedToGifts = getUserWishListGifts(subscribedTo.getTgAccountId());
+            List<Gift> subscribedToGifts = getUserWishListGifts(subscribedTo.getId());
             for (Gift gift : subscribedToGifts) {
                 clearGiftOccupiedFrom(subscriber, gift);
             }
@@ -302,6 +320,40 @@ public class BotService {
 
     public boolean isUserEnabled(long userTelegramId) {
         return userDao.isUserEnabled(userTelegramId);
+    }
+
+    public Map<GiftDTO, BotUserDTO> convertIPresentMapToDTO(Map<Gift, BotUser> userGifts) {
+        logger.info("Starting converting I present map to DTO");
+        Map<GiftDTO, BotUserDTO> userGiftsDTO = new HashMap<>();
+        userGifts.entrySet()
+            .stream()
+            .forEach(entry -> {
+                GiftDTO giftDTO = giftFacade.giftToGiftDTO(entry.getKey());
+                BotUserDTO userDTO = botUserFacade.botUserToBotUserDTO(entry.getValue());
+                userGiftsDTO.put(giftDTO, userDTO);
+            });
+        logger.info("Returning converted I present map");
+        return userGiftsDTO;
+    }
+
+    public List<GiftDTO> convertGiftListToDTO(List<Gift> gifts) {
+        logger.info("Starting converting gift list to DTO");
+        return gifts
+            .stream()
+            .map(gift -> {
+                return giftFacade.giftToGiftDTO(gift);
+            })
+            .collect(Collectors.toList());
+    }
+
+    public List<BotUserDTO> convertBotUserListToDTO(List<BotUser> users) {
+        logger.info("Starting converting bot user list to DTO");
+        return users
+            .stream()
+            .map(user -> {
+                return botUserFacade.botUserToBotUserDTO(user);
+            })
+            .collect(Collectors.toList());
     }
 
     private void clearGiftOccupiedFrom(BotUser subscriber, Gift gift) {

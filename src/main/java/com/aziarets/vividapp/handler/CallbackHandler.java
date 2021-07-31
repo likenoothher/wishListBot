@@ -91,7 +91,7 @@ public class CallbackHandler {
             return messagesToSend;
         }
 
-        logger.info("Handling unknown call back request from user with id: " + updateSender.getId());
+        logger.info("Handling unknown call back request from user with id " + updateSender.getId());
         SendMessage unknownCommandMessage = new SendMessage(chatId, "Не знаю такой команды"
             + DISAPPOINTED_ICON);
         unknownCommandMessage.setChatId(chatId);
@@ -102,7 +102,7 @@ public class CallbackHandler {
 
     private void handleMyWishListRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_wish_list")) {
-            logger.info("Handling my wish list request from user with id: " + updateSender.getId());
+            logger.info("Handling my wish list request from user with id " + updateSender.getId());
             List<Gift> gifts = botService.getUserWishListGifts(updateSender.getId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMyWishListTemplate(gifts, chatId, messageId, inlineMessageId));
@@ -110,7 +110,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/my_wish_list/add_present")) {
-            logger.info("Handling add present request from user with id: " + updateSender.getId());
+            logger.info("Handling add present request from user with id " + updateSender.getId());
             updateBotUserCarriedParameters(updateSender, BotUserStatus.ADDING_GIFT_NAME);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши имя подарка и отправь"));
@@ -119,15 +119,15 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_wish_list/edit_my_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling edit present request from user with id: " + updateSender.getId()
-                + " edited gift id: " + updatedGiftId);
+            logger.info("Handling edit present request from user with id " + updateSender.getId()
+                + " edited gift id " + updatedGiftId);
             Optional<Gift> updatedGift = botService.findGiftById(updatedGiftId);
 
             if (updatedGift.isPresent()) {
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift.get(), chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling delete present request from user with id: " + updateSender.getId()
+                logger.warn("Exception  during handling delete present request from user with id " + updateSender.getId()
                     + " updated gift with id " + updatedGiftId + " wasn't found");
                 messagesToSend.add(callbackAnswer(update, "Подарок не удалён, т.к. не был найден"));
             }
@@ -136,8 +136,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("my_wish_list/edit_description_of_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling edit present(edit description) request from user with id: " + updateSender.getId()
-                + " edited gift id: " + updatedGiftId);
+            logger.info("Handling edit present(edit description) request from user with id " + updateSender.getId()
+                + " edited gift id " + updatedGiftId);
             updateBotUserCarriedParameters(updateSender, BotUserStatus.ADDING_GIFT_DESCRIPTION, updatedGiftId);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Напиши детальное описание подарка и отправь"));
@@ -146,8 +146,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("my_wish_list/edit_url_of_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling edit present(edit url) request from user with id: " + updateSender.getId()
-                + " edited gift id: " + updatedGiftId);
+            logger.info("Handling edit present(edit url) request from user with id " + updateSender.getId()
+                + " edited gift id " + updatedGiftId);
             updateBotUserCarriedParameters(updateSender, BotUserStatus.ADDING_GIFT_URl, updatedGiftId);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Вставь ссылку на подарок и отправь"));
@@ -157,8 +157,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("my_wish_list/edit_photo_of_present_under/id/")) {
             int updatedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling edit present(edit photo) request from user with id: " + updateSender.getId()
-                + " edited gift id: " + updatedGiftId);
+            logger.info("Handling edit present(edit photo) request from user with id " + updateSender.getId()
+                + " edited gift id " + updatedGiftId);
             updateBotUserCarriedParameters(updateSender, BotUserStatus.ADDING_GIFT_PHOTO, updatedGiftId);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Прикрепи изображение подарка и отправь"));
@@ -168,8 +168,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_wish_list/delete_my_present_under/id/")) {
             int giftIdForDelete = extractLastAfterSlashId(callbackData);
-            logger.info("Handling delete present request from user with id: " + updateSender.getId()
-                + " deleted gift id: " + giftIdForDelete);
+            logger.info("Handling delete present request from user with id " + updateSender.getId()
+                + " deleted gift id " + giftIdForDelete);
             Gift deletedGift = botService.findGiftById(giftIdForDelete).orElse(null);
 
             if (botService.deleteGift(giftIdForDelete) && deletedGift != null) {
@@ -182,7 +182,7 @@ public class CallbackHandler {
                     messagesToSend.add(menu.getUserDeletedPresentYouGoingToDonateTemplate(deletedGift, updateSender));
                 }
             } else {
-                logger.warn("Exception  during handling delete present request from user with id: " + updateSender.getId()
+                logger.warn("Exception  during handling delete present request from user with id " + updateSender.getId()
                     + " deleted gift with id " + giftIdForDelete + " wasn't found");
                 messagesToSend.add(callbackAnswer(update, "Подарок не удалён, т.к. не был найден"));
             }
@@ -192,7 +192,7 @@ public class CallbackHandler {
 
     private void handleIPresentRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/i_present")) {
-            logger.info("Handling I present request from user with id: " + updateSender.getId());
+            logger.info("Handling I present request from user with id " + updateSender.getId());
             Map<Gift, BotUser> iPresentList = botService.getUserPresentsMap(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
@@ -201,8 +201,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/i_present/show_gift_under/id")) {
             int requestedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling I present request(show gift) from user with id: " + updateSender.getId()
-                + "showing present id: " + requestedGiftId);
+            logger.info("Handling I present request(show gift) from user with id " + updateSender.getId()
+                + "showing present id " + requestedGiftId);
             Gift requestedGift = botService.findGiftById(requestedGiftId).get();
             BotUser giftHolder = botService.findGiftHolderByGiftId(requestedGiftId).get();
             messagesToSend.add(callbackAnswer(update));
@@ -212,14 +212,14 @@ public class CallbackHandler {
 
         if (callbackData.contains("/i_present/delete_gift_under/id/")) {
             int refusedGiftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling I present request(refuse from donate) from user with id: " + updateSender.getId()
-                + "refused present id: " + refusedGiftId);
+            logger.info("Handling I present request(refuse from donate) from user with id " + updateSender.getId()
+                + "refused present id " + refusedGiftId);
             if (botService.refuseFromDonate(refusedGiftId, updateSender)) {
                 Map<Gift, BotUser> iPresentList = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Подарок был удалён"));
                 messagesToSend.add(menu.getIPresentTemplate(iPresentList, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling I present request(refuse from donate) from user with id: " +
+                logger.warn("Exception  during handling I present request(refuse from donate) from user with id " +
                     +updateSender.getId() + ", false result refuse from donate method");
                 Map<Gift, BotUser> iPresentList = botService.getUserPresentsMap(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не был удалён"));
@@ -231,7 +231,7 @@ public class CallbackHandler {
 
     private void handleMySubscribersRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscribers")) {
-            logger.info("Handling my subscribers request from user with id: " + updateSender.getId());
+            logger.info("Handling my subscribers request from user with id " + updateSender.getId());
             List<BotUser> userSubscribers = botService.getUserSubscribers(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscribersListTemplate(userSubscribers, chatId, messageId, inlineMessageId));
@@ -240,8 +240,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscribers/show/id")) {
             int subscriberId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscribers request(show subscriber) from user with id: " + updateSender.getId()
-                + "showing user id: " + subscriberId);
+            logger.info("Handling my subscribers request(show subscriber) from user with id " + updateSender.getId()
+                + "showing user id " + subscriberId);
             BotUser subscriber = botService.findUserByTelegramId(subscriberId).get();
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getSubscriberRepresentationTemplate(subscriber, chatId, messageId, inlineMessageId));
@@ -251,8 +251,8 @@ public class CallbackHandler {
         if (callbackData.contains("/my_subscribers/delete_under/id")) {
             long deletedUserId = extractLastAfterSlashId(callbackData);
             long byUserDeletedId = updateSender.getTgAccountId();
-            logger.info("Handling my subscribers request(delete subscriber) from user with id: " + updateSender.getId()
-                + "deleting user id: " + deletedUserId);
+            logger.info("Handling my subscribers request(delete subscriber) from user with id " + updateSender.getId()
+                + "deleting user id " + deletedUserId);
 
             BotUser deletedUser = botService.findUserByTelegramId(deletedUserId).orElse(null);
             BotUser byUserDeleted = botService.findUserByTelegramId(byUserDeletedId).orElse(null);
@@ -266,7 +266,7 @@ public class CallbackHandler {
                     messagesToSend.add(menu.getAlertToDeletedSubscriberTemplate(deletedUser, byUserDeleted));
                 }
             } else {
-                logger.warn("Exception  during handling my subscribers request(delete subscriber) from user with id: " +
+                logger.warn("Exception  during handling my subscribers request(delete subscriber) from user with id " +
                     +updateSender.getId() + ", false result during remove subscriber method");
                 List<BotUser> userSubscribers = botService.getUserSubscribers(updateSender);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
@@ -279,7 +279,7 @@ public class CallbackHandler {
 
     private void handleMySubscriptionsRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/my_subscriptions")) {
-            logger.info("Handling my subscriptions request from user with id: " + updateSender.getId());
+            logger.info("Handling my subscriptions request from user with id " + updateSender.getId());
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
@@ -288,8 +288,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/show_representation/gift_id")) {
             int giftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscriptions request(show gift representation) from user with id: " + updateSender.getId()
-                + "showing gift id: " + giftId);
+            logger.info("Handling my subscriptions request(show gift representation) from user with id " + updateSender.getId()
+                + "showing gift id " + giftId);
             Gift gift = botService.findGiftById(giftId).get();
             BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
             messagesToSend.add(callbackAnswer(update));
@@ -299,8 +299,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/show/id")) {
             int wishListHolderId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscriptions request(show subscription) from user with id: " + updateSender.getId()
-                + "showing user id: " + wishListHolderId);
+            logger.info("Handling my subscriptions request(show subscription) from user with id " + updateSender.getId()
+                + "showing user id " + wishListHolderId);
             Optional<BotUser> wishListHolder = botService.findUserByTelegramId(wishListHolderId);
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             List<Gift> gifts = botService.getAvailableToDonateGifts(wishListHolder.get().getId());
@@ -310,7 +310,7 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder.get(), chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling my subscriptions request(show subscription) from user with id: " +
+                logger.warn("Exception  during handling my subscriptions request(show subscription) from user with id " +
                     +updateSender.getId() + ", user with id " + wishListHolderId + " isn't present");
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Возникла какая то ошибка, не смогли найти " +
                     "WishList пользователя"));
@@ -321,8 +321,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/going_donate/gift_id/")) {
             int giftId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscriptions request(going donate) from user with id: " + updateSender.getId()
-                + "going donate gift id: " + giftId);
+            logger.info("Handling my subscriptions request(going donate) from user with id " + updateSender.getId()
+                + "going donate gift id " + giftId);
             BotUser wishListHolder;
             boolean isDonated = false;
             try {
@@ -340,7 +340,7 @@ public class CallbackHandler {
                     + " Подарок добавлен в твою секцию \"Я дарю \"" + I_PRESENT_ICON));
                 messagesToSend.add(menu.getUserWishListTemplate(wishListHolder, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling my subscriptions request(going donate) from user with id: " +
+                logger.warn("Exception  during handling my subscriptions request(going donate) from user with id " +
                     +updateSender.getId() + ", false result during donate method");
                 wishListHolder = botService.findGiftHolderByGiftId(giftId).get();
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Подарок не добавлен. Произошла ошибка"));
@@ -351,8 +351,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_anonymously/id/")) {
             int userRequestedToId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscriptions request(ask add gift anonymously) from user with id: " + updateSender.getId()
-                + "requested user id: " + userRequestedToId);
+            logger.info("Handling my subscriptions request(ask add gift anonymously) from user with id " + updateSender.getId()
+                + "requested user id " + userRequestedToId);
             Optional<BotUser> userRequestedTo = botService.findUserByTelegramId(userRequestedToId);
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
@@ -363,9 +363,9 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling my subscriptions request(ask add gift anonymously) from user with id: " +
-                    +updateSender.getId() + ", user requested to add gift isn't present or user with id:"
-                    + updateSender.getId() + " is not in the subscribers list of user with id: "
+                logger.warn("Exception  during handling my subscriptions request(ask add gift anonymously) from user with id " +
+                    +updateSender.getId() + ", user requested to add gift isn't present or user with id"
+                    + updateSender.getId() + " is not in the subscribers list of user with id "
                     + userRequestedTo.get().getId());
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Запрос не отправлен. Возможно ты был удалён из списка друзей или пользователь отключил " +
@@ -377,8 +377,8 @@ public class CallbackHandler {
 
         if (callbackData.contains("/my_subscriptions/ask_add_gift_explicitly/id/")) {
             int userRequestedToId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling my subscriptions request(ask add gift explicitly) from user with id: " + updateSender.getId()
-                + "requested user id: " + userRequestedToId);
+            logger.info("Handling my subscriptions request(ask add gift explicitly) from user with id " + updateSender.getId()
+                + "requested user id " + userRequestedToId);
             Optional<BotUser> userRequestedTo = botService.findUserByTelegramId(userRequestedToId);
             List<BotUser> userSubscriptions = botService.getUserSubscriptions(updateSender);
             List<BotUser> userSubscribers = botService.getUserSubscribers(userRequestedTo.get());
@@ -389,9 +389,9 @@ public class CallbackHandler {
                 messagesToSend.add(callbackAnswer(update, CHECK_MARK_ICON + " Запрос отправлен"));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling my subscriptions request(ask add gift explicitly) from user with id: " +
-                    +updateSender.getId() + ", user requested to add gift isn't present or user with id:"
-                    + updateSender.getId() + " is not in the subscribers list of user with id: "
+                logger.warn("Exception  during handling my subscriptions request(ask add gift explicitly) from user with id " +
+                    +updateSender.getId() + ", user requested to add gift isn't present or user with id"
+                    + updateSender.getId() + " is not in the subscribers list of user with id "
                     + userRequestedTo.get().getId());
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Запрос не отправлен. Возможно ты был удалён из списка друзей или пользователь отключил " +
@@ -404,8 +404,8 @@ public class CallbackHandler {
         if (callbackData.contains("/my_subscriptions/delete_under/id")) {
             long deletedUserId = extractLastAfterSlashId(callbackData);
             long byUserDeletedId = updateSender.getTgAccountId();
-            logger.info("Handling my subscriptions request(delete subscriptions) from user with id: " + updateSender.getId()
-                + "deleted user id: " + deletedUserId);
+            logger.info("Handling my subscriptions request(delete subscriptions) from user with id " + updateSender.getId()
+                + "deleted user id " + deletedUserId);
 
             BotUser deletedUser = botService.findUserByTelegramId(deletedUserId).orElse(null);
             BotUser byUserDeleted = botService.findUserByTelegramId(byUserDeletedId).orElse(null);
@@ -416,9 +416,9 @@ public class CallbackHandler {
                     + deletedUser.getUserName()));
                 messagesToSend.add(menu.getMySubscriptionsTemplate(userSubscriptions, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling my subscriptions request(delete subscriptions) from user with id: " +
-                    +updateSender.getId() + ", couldn't remove subscription with id: " + deletedUserId
-                    + " from user with id: " + byUserDeletedId);
+                logger.warn("Exception  during handling my subscriptions request(delete subscriptions) from user with id " +
+                    +updateSender.getId() + ", couldn't remove subscription with id " + deletedUserId
+                    + " from user with id " + byUserDeletedId);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON + " Возникла ошибка, не смогли отписать @"
                     + deletedUser.getUserName() + " от тебя"));
             }
@@ -428,7 +428,7 @@ public class CallbackHandler {
 
     private void handleFindFriendRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/find_friend")) {
-            logger.info("Handling find friend request from user with id: " + updateSender.getId());
+            logger.info("Handling find friend request from user with id " + updateSender.getId());
             updateSender.setBotUserStatus(BotUserStatus.SEARCHING_FRIEND);
             botService.updateUser(updateSender);
             messagesToSend.add(callbackAnswer(update));
@@ -440,7 +440,7 @@ public class CallbackHandler {
             long requestedToId = extractLastAfterSlashId(callbackData);
             BotUser requestedUser = botService.findUserByTelegramId(requestedToId).orElse(null);
             BotUser byUserRequested = botService.findUserByTelegramId(updateSender.getTgAccountId()).orElse(null);
-            logger.info("Handling mutual friendship request from user with id: " + updateSender.getId());
+            logger.info("Handling mutual friendship request from user with id " + updateSender.getId());
 
             messagesToSend.add(callbackAnswer(update));
             if (requestedUser != null && byUserRequested != null) {
@@ -458,8 +458,8 @@ public class CallbackHandler {
         if (callbackData.contains("/find_friend/accept_friendship/")) {
             long requestedUserId = extractSecondLastAfterSlashId(callbackData);
             long byUserAcceptedId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling find friend request(accept friendship) from user with id: " + updateSender.getId()
-                + "accepted user id: " + requestedUserId);
+            logger.info("Handling find friend request(accept friendship) from user with id " + updateSender.getId()
+                + "accepted user id " + requestedUserId);
 
             BotUser requestedUser = botService.findUserByTelegramId(requestedUserId).orElse(null);
             BotUser byUserAccepted = botService.findUserByTelegramId(byUserAcceptedId).orElse(null);
@@ -482,8 +482,8 @@ public class CallbackHandler {
         if (callbackData.contains("/find_friend/deny_friendship/")) {
             long requestedUserId = extractSecondLastAfterSlashId(callbackData);
             long byUserDeniedId = extractLastAfterSlashId(callbackData);
-            logger.info("Handling find friend request(denied friendship) from user with id: " + updateSender.getId()
-                + "denied user id: " + requestedUserId);
+            logger.info("Handling find friend request(denied friendship) from user with id " + updateSender.getId()
+                + "denied user id " + requestedUserId);
 
 
             BotUser requestedUser = botService.findUserByTelegramId(requestedUserId).orElse(null);
@@ -507,7 +507,7 @@ public class CallbackHandler {
 
     private void handleSettingsRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/settings")) {
-            logger.info("Handling settings request from user with id: " + updateSender.getId());
+            logger.info("Handling settings request from user with id " + updateSender.getId());
 
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
@@ -515,7 +515,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/contact_developer")) {
-            logger.info("Handling settings request(contact developer) from user with id: " + updateSender.getId());
+            logger.info("Handling settings request(contact developer) from user with id " + updateSender.getId());
 
             updateSender.setBotUserStatus(BotUserStatus.CONTACTING_DEVELOPER);
             botService.updateUser(updateSender);
@@ -525,7 +525,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update")) {
-            logger.info("Handling settings request(is ready to receive updates) from user with id: "
+            logger.info("Handling settings request(is ready to receive updates) from user with id "
                 + updateSender.getId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getUpdatesSettingsTemplate(chatId, messageId, inlineMessageId));
@@ -533,7 +533,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/true")) {
-            logger.info("Handling settings request(is ready to receive updates) from user with id: "
+            logger.info("Handling settings request(is ready to receive updates) from user with id "
                 + updateSender.getId() + ", value - true");
             updateSender.setReadyReceiveUpdates(true);
             if (botService.updateUser(updateSender)) {
@@ -541,7 +541,7 @@ public class CallbackHandler {
                     + " Уведомления об обновлениях друзей включены"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling settings request(is ready to receive updates) from user with id: " +
+                logger.warn("Exception  during handling settings request(is ready to receive updates) from user with id " +
                     +updateSender.getId() + ", value - true");
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Произошла ошибка. Настройки не сохранены"));
@@ -551,7 +551,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_is_ready_receive_update/false")) {
-            logger.info("Handling settings request(is ready to receive updates) from user with id: "
+            logger.info("Handling settings request(is ready to receive updates) from user with id "
                 + updateSender.getId() + ", value - false");
             updateSender.setReadyReceiveUpdates(false);
             if (botService.updateUser(updateSender)) {
@@ -559,7 +559,7 @@ public class CallbackHandler {
                     + " Уведомления об обновлениях друзей отключены"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling settings request(is ready to receive updates) from user with id: " +
+                logger.warn("Exception  during handling settings request(is ready to receive updates) from user with id " +
                     +updateSender.getId() + ", value - false");
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Произошла ошибка. Настройки не сохранены"));
@@ -569,7 +569,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_visibility")) {
-            logger.info("Handling settings request(set visibility) from user with id: "
+            logger.info("Handling settings request(set visibility) from user with id "
                 + updateSender.getId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getVisibilitySettingsTemplate(chatId, messageId, inlineMessageId));
@@ -577,7 +577,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/true")) {
-            logger.info("Handling settings request(set visibility) from user with id: "
+            logger.info("Handling settings request(set visibility) from user with id "
                 + updateSender.getId() + ", value - true");
             updateSender.setAllCanSeeMyWishList(false);
             if (botService.updateUser(updateSender)) {
@@ -585,7 +585,7 @@ public class CallbackHandler {
                     + " Видимость твоего WishList'а - только подписчики"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling settings request(set visibility) from user with id: " +
+                logger.warn("Exception  during handling settings request(set visibility) from user with id " +
                     +updateSender.getId() + ", value - true");
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Произошла ошибка. Настройки не сохранены"));
@@ -595,7 +595,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_visibility_subscribers_only/false")) {
-            logger.info("Handling settings request(set visibility) from user with id: "
+            logger.info("Handling settings request(set visibility) from user with id "
                 + updateSender.getId() + ", value - false");
             updateSender.setAllCanSeeMyWishList(true);
             if (botService.updateUser(updateSender)) {
@@ -603,7 +603,7 @@ public class CallbackHandler {
                     + " Видимость твоего WishList'а - все пользователи"));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling settings request(set visibility) from user with id: " +
+                logger.warn("Exception  during handling settings request(set visibility) from user with id " +
                     +updateSender.getId() + ", value - false");
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Произошла ошибка.Настройки не сохранены"));
@@ -612,7 +612,7 @@ public class CallbackHandler {
         }
 
         if (callbackData.equals("/settings/set_limit")) {
-            logger.info("Handling settings request(set gift limit) from user with id: "
+            logger.info("Handling settings request(set gift limit) from user with id "
                 + updateSender.getId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getGiftLimitTemplate(chatId, messageId, inlineMessageId, updateSender));
@@ -621,7 +621,7 @@ public class CallbackHandler {
 
         if (callbackData.contains("/settings/set_limit")) {
             int giftLimit = extractLastAfterSlashId(callbackData);
-            logger.info("Handling settings request(set gift limit) from user with id: "
+            logger.info("Handling settings request(set gift limit) from user with id "
                 + updateSender.getId() + ", value - " + giftLimit);
             updateSender.setGiftLimit(giftLimit);
             if (botService.updateUser(updateSender)) {
@@ -629,7 +629,7 @@ public class CallbackHandler {
                     + " Лимит подарков - " + giftLimit));
                 messagesToSend.add(menu.getSettingsTemplate(chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during handling settings request(set gift limit) from user with id: " +
+                logger.warn("Exception  during handling settings request(set gift limit) from user with id " +
                     +updateSender.getId() + ", value - " + giftLimit);
                 messagesToSend.add(callbackAnswer(update, CROSS_MARK_ICON
                     + " Произошла ошибка.Настройки не сохранены"));
@@ -641,14 +641,14 @@ public class CallbackHandler {
 
     private void handleWebRequests(Update update, BotUser updateSender) {
         if (callbackData.equals("/web")) {
-            logger.info("Handling web request from user with id: " + updateSender.getId());
+            logger.info("Handling web request from user with id " + updateSender.getId());
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(menu.getWebTemplate(chatId, messageId, inlineMessageId, updateSender));
             return;
         }
 
         if (callbackData.equals("/web/set_password")) {
-            logger.info("Handling web request(set password) from user with id: " + updateSender.getId());
+            logger.info("Handling web request(set password) from user with id " + updateSender.getId());
             updateBotUserCarriedParameters(updateSender, BotUserStatus.SETTING_PASSWORD);
             messagesToSend.add(callbackAnswer(update));
             messagesToSend.add(new SendMessage(chatId, KEYBOARD_ICON + " Введи пароль(не короче 4 символов) и отправь"));
