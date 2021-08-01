@@ -39,7 +39,7 @@ public class PhotoTelegramUrlGenerator {
     }
 
     public String getGiftPhotoTelegramURL(String photoIdInTelegram) {
-        logger.info("Start to create link for gift's picture with telegram id: " +
+        logger.info("Start to create link for gift's picture with telegram id " +
             photoIdInTelegram);
         String telegramGetPhotoPathURL = this.telegramPhotoPathURL + photoIdInTelegram;
 
@@ -48,21 +48,21 @@ public class PhotoTelegramUrlGenerator {
             ObjectNode objectNode = objectMapper.readValue(responseEntity.getBody(), ObjectNode.class);
 
             if (objectNode.has("result")) {
-                logger.info("Return link of gift's picture with telegram id: " +
+                logger.info("Return link of gift's picture with telegram id " +
                     photoIdInTelegram);
                 return this.telegramDownloadFileURL + objectNode.findValue("file_path").asText();
             }
         } catch (IOException e) {
-            logger.warn("Exception during creating link of gift's picture with telegram id: " + photoIdInTelegram
+            logger.warn("Exception during creating link of gift's picture with telegram id " + photoIdInTelegram
                 + "\n" + e.getMessage());
         }
-        logger.warn("Exception during creating link of gift's picture with telegram id: " + photoIdInTelegram
+        logger.warn("Exception during creating link of gift's picture with telegram id " + photoIdInTelegram
             + ". JSON answer doesn't contain \"result\" field");
         return null;
     }
 
     public String getUserAvatarPhotoTelegramURL(long userTelegramId) {
-        logger.info("Start to create link for user's avatar with telegram id: " + userTelegramId);
+        logger.info("Start to create link for user's avatar with telegram id " + userTelegramId);
 
         try {
             String telegramAvatarIdURL = telegramGetAvatarIdURL + userTelegramId;
@@ -83,7 +83,7 @@ public class PhotoTelegramUrlGenerator {
                 objectMapper.readValue(avatarPathsResponseEntity.getBody(), ObjectNode.class);
 
             if (avatarPathsObjectNode.has("result")) {
-                logger.info("Return link for user's avatar with telegram id: " +
+                logger.info("Return link for user's avatar with telegram id " +
                     userTelegramId);
                 return this.telegramDownloadFileURL + avatarPathsObjectNode.findValue("file_path").asText();
             }
@@ -94,7 +94,7 @@ public class PhotoTelegramUrlGenerator {
             logger.warn(e.getMessage());
         }
 
-        logger.warn("Exception during creating link of avatar's picture for user with telegram id: " + userTelegramId);
+        logger.warn("Exception during creating link of avatar's picture for user with telegram id " + userTelegramId);
         return null;
 
     }

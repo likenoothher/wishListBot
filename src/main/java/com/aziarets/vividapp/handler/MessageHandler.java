@@ -106,10 +106,10 @@ public class MessageHandler {
     private void handleSearchingFriendRequest(BotUser updateSender) {
         Optional<BotUser> searchedUser = botService.findUserByUserName(getTelegramUserNameFromMessage(messageText));
         Optional<BotUser> userSearchedTo = botService.findUserByTelegramId(updateSender.getTgAccountId());
-        logger.info("Handling searching friend request from user with id: " + updateSender.getId());
+        logger.info("Handling searching friend request from user with id " + updateSender.getId());
 
         if (!searchedUser.isPresent()) {
-            logger.info("Handling searching friend request(requested user wasn't found) from user with id: "
+            logger.info("Handling searching friend request(requested user wasn't found) from user with id "
                 + updateSender.getId());
             messagesToSend.add(new SendMessage(chatId, "Мы не смогли найти данного пользователя"
                 + DISAPPOINTED_ICON));
@@ -117,7 +117,7 @@ public class MessageHandler {
         }
 
         if (searchedUser.isPresent() && searchedUser.get().isEnabled() == false) {
-            logger.info("Handling searching friend request(requested was found, but blocked) from user with id: "
+            logger.info("Handling searching friend request(requested was found, but blocked) from user with id "
                 + updateSender.getId());
             messagesToSend.add(new SendMessage(chatId, "Данный пользователь заблокирован"
                 + DISAPPOINTED_ICON));
@@ -128,16 +128,16 @@ public class MessageHandler {
             if (!isRequestedUserAlreadyFriend(userSearchedTo.get(), searchedUser.get())) {
                 messagesToSend.add(menu.getFriendShipRequestToTemplate(searchedUser.get(), userSearchedTo.get()));
                 messagesToSend.add(menu.getSendFriendshipRequestTemplate(chatId));
-                logger.info("Handling searching friend request(successful) from user with id: "
+                logger.info("Handling searching friend request(successful) from user with id "
                     + updateSender.getId());
             } else {
-                logger.info("Handling searching friend request(already friend) from user with id: "
+                logger.info("Handling searching friend request(already friend) from user with id "
                     + updateSender.getId());
                 messagesToSend.add(new SendMessage(chatId, "Ты уже подписан на данного пользователя"
                     + UPSIDE_DOWN_FACE_ICON));
             }
         } else {
-            logger.info("Handling searching friend request(attempt to subscribe to myself) from user with id: "
+            logger.info("Handling searching friend request(attempt to subscribe to myself) from user with id "
                 + updateSender.getId());
             messagesToSend.add(new SendMessage(chatId,
                 "Ты не можешь подписаться сам на себя" + UPSIDE_DOWN_FACE_ICON));
@@ -145,7 +145,7 @@ public class MessageHandler {
     }
 
     private void handleContactDeveloperRequest(BotUser updateSender) {
-        logger.info("Handling contacting developer request from user with id: " + updateSender.getId());
+        logger.info("Handling contacting developer request from user with id " + updateSender.getId());
         messagesToSend.add(new SendMessage("988800148", "Сообщение от @" + updateSender.getUserName() +
             ": " + messageText));
         messagesToSend.add(new SendMessage(chatId, CHECK_MARK_ICON + " Твоё сообщение отправлено разработчику"));
@@ -153,7 +153,7 @@ public class MessageHandler {
     }
 
     private void handleSetPasswordRequest(BotUser updateSender) {
-        logger.info("Handling set password request from user with id: " + updateSender.getId());
+        logger.info("Handling set password request from user with id " + updateSender.getId());
         updateSender.setBotUserStatus(BotUserStatus.WITHOUT_STATUS);
         if (messageText.length() <= 3) {
             messagesToSend.add(new SendMessage(chatId, CROSS_MARK_ICON + " Пароль не может быть короче 4 символов"));
@@ -165,7 +165,7 @@ public class MessageHandler {
     }
 
     private void handleAddingPhotoRequest(Update update, BotUser updateSender) { // to do : add check for photo manager actions
-        logger.info("Handling adding photo request from user with id: " + updateSender.getId());
+        logger.info("Handling adding photo request from user with id " + updateSender.getId());
         String inlineMessageId = updateSender.getCarryingInlineMessageId();
         int messageId = updateSender.getCarryingMessageId();
 
@@ -173,16 +173,16 @@ public class MessageHandler {
         List<PhotoSize> photoSizes = update.getMessage().getPhoto();
         if (gift.isPresent()) {
             Gift updatedGift = gift.get();
-            if (botService.assignPhotoToGift(updatedGift, photoSizes)) {
+            if (botService.assignPhotoURLToGift(updatedGift, photoSizes)) {
                 messagesToSend.add(menu.getGiftRepresentationTemplate(updatedGift, chatId, messageId, inlineMessageId));
             } else {
-                logger.warn("Exception  during adding photo to gift with id: " + gift.get().getId()
+                logger.warn("Exception  during adding photo to gift with id " + gift.get().getId()
                     + ". Error in bot service");
                 messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
                     chatId));
             }
         } else {
-            logger.warn("Exception  during adding photo to gift with id: " + gift.get().getId()
+            logger.warn("Exception  during adding photo to gift with id " + gift.get().getId()
                 + ". Present isn't present");
             messagesToSend.add(menu.getErrorStatusTemplate("Фотография не изменёна, произошла ошибка",
                 chatId));

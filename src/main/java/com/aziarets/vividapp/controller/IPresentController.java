@@ -40,9 +40,9 @@ public class IPresentController {
     }
 
     @PostMapping("/refuse")
-    public String showIPresentList(@RequestParam(value = "giftId") long giftId,
-                                   @RequestParam(value = "userId") long userId,
-                                   Principal principal) {
+    public String refuse(@RequestParam(value = "giftId") long giftId,
+                         @RequestParam(value = "userId") long userId,
+                         Principal principal) {
         logger.info("Handling refuse from donate gift request from user " + principal.getName());
         BotUser botUser = botService.findUserById(userId).get();
         boolean isRefused = botService.refuseFromDonate(giftId, botUser);

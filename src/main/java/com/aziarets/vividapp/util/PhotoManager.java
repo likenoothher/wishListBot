@@ -39,9 +39,9 @@ public class PhotoManager {
     }
 
     public Map deletePhoto(Gift gift) {
-        logger.info("Deleting photo of gift with id: " + gift.getId());
+        logger.info("Deleting photo of gift with id " + gift.getId());
         if (gift.getGiftPhotoCloudinaryId() == null) {
-            logger.info("Gift with id: " + gift.getId() + " doesn't have a photo. Return");
+            logger.info("Gift with id " + gift.getId() + " doesn't have a photo. Return");
             return Collections.emptyMap();
         }
         try {

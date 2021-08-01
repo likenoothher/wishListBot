@@ -166,6 +166,7 @@ public class Gift {
             return this;
         }
 
+
         public Gift build() {
             return new Gift(name, url, occupiedBy, description);
         }

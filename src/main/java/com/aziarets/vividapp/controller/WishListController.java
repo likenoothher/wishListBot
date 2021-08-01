@@ -61,7 +61,7 @@ public class WishListController {
             gift.setUrl(null);
         }
         if (file.getContentType().contains("image/")) {
-            botService.assignPhotoToGift(gift, file);
+            botService.assignPhotoURLToGift(gift, file);
         }
 
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
@@ -75,7 +75,7 @@ public class WishListController {
 
     @GetMapping("/update_gift")
     public String updateGift(@RequestParam(value = "giftId") long giftId, Model model, Principal principal) {
-        logger.info("Returning update gift form for user " + principal.getName() + ", updated gift id: " + giftId);
+        logger.info("Returning update gift form for user " + principal.getName() + ", updated gift id " + giftId);
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
         if (giftHolder.getUserName().equals(principal.getName())) {
             model.addAttribute("giftHolderId", giftHolder.getId());
@@ -94,14 +94,14 @@ public class WishListController {
                              @RequestParam("giftURL") String giftURL,
                              @RequestParam(value = "giftImage", required = false) MultipartFile file,
                              Principal principal) {
-        logger.info("Handling updating gift request for user " + principal.getName() + ", updated gift id: " + giftId);
+        logger.info("Handling updating gift request for user " + principal.getName() + ", updated gift id " + giftId);
         Gift gift = botService.findGiftById(giftId).get();
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
         if (giftHolder.getUserName().equals(principal.getName())) {
             gift.setDescription(giftDescription.isEmpty() ? null : giftDescription);
             gift.setUrl(giftURL.isEmpty() ? null : giftURL);
             if (file.getContentType().contains("image/")) {
-                botService.assignPhotoToGift(gift, file);
+                botService.assignPhotoURLToGift(gift, file);
             }
             botService.updateGift(gift);
             logger.info("Gift with id " + giftId + " updated to user " + principal.getName());
@@ -114,7 +114,7 @@ public class WishListController {
 
     @PostMapping("/delete_gift")
     public String deleteGift(@RequestParam(value = "giftId") long giftId, Principal principal) {
-        logger.info("Handling deleting gift request for user " + principal.getName() + ", deleted gift id: " + giftId);
+        logger.info("Handling deleting gift request for user " + principal.getName() + ", deleted gift id " + giftId);
         Gift gift = botService.findGiftById(giftId).get();
         BotUser giftHolder = botService.findGiftHolderByGiftId(giftId).get();
         if (giftHolder.getUserName().equals(principal.getName())) {
@@ -129,4 +129,5 @@ public class WishListController {
             return "forbidden";
         }
     }
+
 }
