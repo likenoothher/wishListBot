@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.security.Principal;
@@ -35,11 +34,11 @@ public class SettingsRestController {
         this.notificationSender = notificationSender;
     }
 
-    @PostMapping({"","/"})
+    @PostMapping({"", "/"})
     public ResponseEntity<ApiResponse> setSettings(@RequestParam(value = "updateReady") boolean updateReady,
                                                    @RequestParam(value = "allCanSeeMyWishList") boolean allCanSeeMyWishList,
                                                    @RequestParam(value = "giftLimit") @Min(1) @Max(10) Integer giftLimit,
-                                                   Principal principal){
+                                                   Principal principal) {
         logger.info("User {} updates settings", principal.getName());
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
 
@@ -48,7 +47,7 @@ public class SettingsRestController {
         botUser.setGiftLimit(giftLimit);
 
         boolean isUpdated = botService.updateUser(botUser);
-        if(isUpdated) {
+        if (isUpdated) {
             return new ResponseEntity<>(new ApiResponse("Settings was updated"), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ApiResponse("Settings wasn't updated"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,14 +55,14 @@ public class SettingsRestController {
 
     @PostMapping("/send_message")
     public ResponseEntity<ApiResponse> sendMessage(@RequestParam(value = "message") String message,
-                                                   Principal principal){
+                                                   Principal principal) {
         logger.info("User {} sends message to admin", principal.getName());
         BotUser botUser = botService.findUserByUserName(principal.getName()).get();
 
         notificationSender.sendMessageToDeveloper(botUser, message);
 
         return new ResponseEntity<>(new ApiResponse("Message was sent"), HttpStatus.OK);
-        }
+    }
 
 
 }

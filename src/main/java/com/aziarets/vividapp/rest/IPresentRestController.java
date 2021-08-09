@@ -1,30 +1,25 @@
 package com.aziarets.vividapp.rest;
 
-import com.aziarets.vividapp.controller.WishListController;
 import com.aziarets.vividapp.exception.IllegalOperationException;
 import com.aziarets.vividapp.exceptionhandling.ApiResponse;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.rest.dto.BotUserDTO;
 import com.aziarets.vividapp.rest.dto.GiftDTO;
-import com.aziarets.vividapp.rest.facade.BotUserFacade;
-import com.aziarets.vividapp.rest.facade.GiftFacade;
 import com.aziarets.vividapp.service.BotService;
-import com.aziarets.vividapp.util.NotificationSender;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/present")

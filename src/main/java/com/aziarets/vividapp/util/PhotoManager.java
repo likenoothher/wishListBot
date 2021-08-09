@@ -1,6 +1,5 @@
 package com.aziarets.vividapp.util;
 
-import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

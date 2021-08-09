@@ -8,11 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -20,18 +15,22 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
-import java.util.Properties;
 
 @Configuration
-@ComponentScan("com.aziarets.vividapp")
-@EnableTransactionManagement
 @PropertySource(value = "classpath:application.properties")
 public class HibernateConfig {
-    Environment environment;
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String user_name;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     @Autowired
-    public HibernateConfig(Environment environment) {
-        this.environment = environment;
+    public HibernateConfig() {
     }
 
     @Bean
@@ -46,10 +45,10 @@ public class HibernateConfig {
     @Bean
     public DataSource dataSource() throws PropertyVetoException {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass(environment.getRequiredProperty("spring.datasource.driver-class-name"));
-        dataSource.setJdbcUrl(environment.getRequiredProperty("spring.datasource.url"));
-        dataSource.setUser(environment.getRequiredProperty("spring.datasource.username"));
-        dataSource.setPassword(environment.getRequiredProperty("spring.datasource.password"));
+        dataSource.setDriverClass("org.postgresql.Driver");
+        dataSource.setJdbcUrl(url);
+        dataSource.setUser(user_name);
+        dataSource.setPassword(password);
         dataSource.setMaxPoolSize(10);
 
         return dataSource;

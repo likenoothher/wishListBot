@@ -1,7 +1,6 @@
 package com.aziarets.vividapp.controller;
 
 import com.aziarets.vividapp.model.BotUser;
-import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.util.NotificationSender;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
 
 @Controller

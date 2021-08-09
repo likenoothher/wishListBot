@@ -1,13 +1,11 @@
 package com.aziarets.vividapp.dao;
 
 import com.aziarets.vividapp.model.BotUser;
-import com.aziarets.vividapp.model.Gift;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BotUserDao {
-    public boolean save(BotUser botUser);
+    public long save(BotUser botUser);
 
     public boolean update(BotUser botUser);
 

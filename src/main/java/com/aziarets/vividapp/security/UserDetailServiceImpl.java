@@ -2,7 +2,6 @@ package com.aziarets.vividapp.security;
 
 import com.aziarets.vividapp.dao.BotUserDaoImpl;
 import com.aziarets.vividapp.model.BotUser;
-import com.aziarets.vividapp.service.BotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Transactional

@@ -1,14 +1,11 @@
 package com.aziarets.vividapp.dao;
 
-import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.model.WishList;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import javax.persistence.Query;
 
 
 @Repository

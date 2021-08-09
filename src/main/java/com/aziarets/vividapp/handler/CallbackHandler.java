@@ -1,11 +1,11 @@
 package com.aziarets.vividapp.handler;
 
 import com.aziarets.vividapp.exception.GiftsLimitReachedException;
-import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserStatus;
 import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.service.BotService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,9 @@
 package com.aziarets.vividapp.controller;
 
-import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.util.NotificationSender;
-import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.security.Principal;
 import java.util.List;
 

@@ -8,7 +8,6 @@ import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.rest.dto.BotUserDTO;
 import com.aziarets.vividapp.rest.dto.GiftDTO;
 import com.aziarets.vividapp.service.BotService;
-import com.aziarets.vividapp.util.NotificationSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

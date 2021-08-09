@@ -5,7 +5,6 @@ import com.aziarets.vividapp.exceptionhandling.ApiResponse;
 import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.Gift;
 import com.aziarets.vividapp.rest.dto.GiftDTO;
-import com.aziarets.vividapp.rest.facade.GiftFacade;
 import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.util.NotificationSender;
 import org.slf4j.Logger;

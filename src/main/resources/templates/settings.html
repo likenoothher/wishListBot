@@ -1,10 +1,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
     <title>Настройки</title>
 
 </head>
@@ -33,10 +33,10 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="form-check form-switch">
-                                            <input th:type="checkbox" class="form-check-input"
-                                                   id="isReadyReceiveUpdates"
+                                            <input class="form-check-input" id="isReadyReceiveUpdates"
                                                    name="readyReceiveUpdates"
-                                                   th:checked="${user.isReadyReceiveUpdates()}"/>
+                                                   th:checked="${user.isReadyReceiveUpdates()}"
+                                                   th:type="checkbox"/>
                                             <span class="custom-control-label"></span>
                                         </div>
                                     </div>
@@ -52,9 +52,9 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="form-check form-switch">
-                                            <input th:type="checkbox" class="form-check-input" id="isAllCanSeeWishlist"
-                                                   name="allCanSeeWishlist"
-                                                   th:checked="${user.isAllCanSeeMyWishList()}"/>
+                                            <input class="form-check-input" id="isAllCanSeeWishlist" name="allCanSeeWishlist"
+                                                   th:checked="${user.isAllCanSeeMyWishList()}"
+                                                   th:type="checkbox"/>
                                             <span class="custom-control-label"></span>
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@
                                             одним пользователем</p>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select" aria-label="select gift's limit"
+                                        <select aria-label="select gift's limit" class="form-select"
                                                 id="giftLimit" name="giftLimit">
                                             <option selected th:text="${user.getGiftLimit()}"></option>
                                             <option value="1">1</option>
@@ -88,8 +88,8 @@
                                 </div>
                             </div>
 
-                            <input th:if="${user != null}" type="hidden" th:value="${user.getId()}" name="userId">
-                            <button type="submit" class="btn btn-success">Сохранить</button>
+                            <input name="userId" th:if="${user != null}" th:value="${user.getId()}" type="hidden">
+                            <button class="btn btn-success" type="submit">Сохранить</button>
                         </div>
                     </form>
 
@@ -98,34 +98,34 @@
                     <p>Если ты хочешь оставить отзыв, либо сообщить о каких-либо недоработках в работе бота/сайта,
                         то можешь воспользоваться кнопкой ниже</p>
                     <div class="list-group mb-5 shadow">
-                        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal"
-                                data-bs-whatever="@mdo">Написать разработчику
+                        <button class="btn btn-outline-info" data-bs-target="#exampleModal" data-bs-toggle="modal"
+                                data-bs-whatever="@mdo"
+                                type="button">Написать разработчику
                         </button>
                     </div>
                 </div>
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
+                <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal"
+                     tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Сообщение для разработчика</a></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                        type="button"></button>
                             </div>
                             <div class="modal-body">
                                 <form method="post" th:action="@{/settings/send_message}">
                                     <div class="mb-3">
-                                        <label for="message-text" class="col-form-label">Сообщение:</label>
+                                        <label class="col-form-label" for="message-text">Сообщение:</label>
                                         <textarea class="form-control" id="message-text" name="message"
                                                   type="text"></textarea>
-                                        <input th:if="${user != null}" type="hidden" th:value="${user.getId()}"
-                                               name="userId">
+                                        <input name="userId" th:if="${user != null}" th:value="${user.getId()}"
+                                               type="hidden">
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Назад
+                                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Назад
                                         </button>
-                                        <button type="submit" class="btn btn-success">Отправить</button>
+                                        <button class="btn btn-success" type="submit">Отправить</button>
                                     </div>
                                 </form>
                             </div>

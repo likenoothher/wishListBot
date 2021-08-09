@@ -7,7 +7,6 @@ import com.aziarets.vividapp.model.BotUser;
 import com.aziarets.vividapp.model.BotUserRole;
 import com.aziarets.vividapp.model.BotUserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;

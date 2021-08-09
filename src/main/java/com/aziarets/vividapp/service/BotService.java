@@ -1,18 +1,20 @@
 package com.aziarets.vividapp.service;
 
-import com.aziarets.vividapp.dao.*;
+import com.aziarets.vividapp.dao.BotUserDao;
+import com.aziarets.vividapp.dao.GiftDao;
+import com.aziarets.vividapp.dao.WishListDao;
 import com.aziarets.vividapp.exception.GiftsLimitReachedException;
+import com.aziarets.vividapp.exception.NotFoundUserNameException;
+import com.aziarets.vividapp.exception.UserIsBotException;
 import com.aziarets.vividapp.exception.UserIsDisabled;
+import com.aziarets.vividapp.model.BotUser;
+import com.aziarets.vividapp.model.Gift;
+import com.aziarets.vividapp.model.WishList;
 import com.aziarets.vividapp.rest.dto.BotUserDTO;
 import com.aziarets.vividapp.rest.dto.GiftDTO;
 import com.aziarets.vividapp.rest.facade.BotUserFacade;
 import com.aziarets.vividapp.rest.facade.GiftFacade;
 import com.aziarets.vividapp.util.BotUserExtractor;
-import com.aziarets.vividapp.exception.NotFoundUserNameException;
-import com.aziarets.vividapp.exception.UserIsBotException;
-import com.aziarets.vividapp.model.BotUser;
-import com.aziarets.vividapp.model.Gift;
-import com.aziarets.vividapp.model.WishList;
 import com.aziarets.vividapp.util.PhotoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -253,7 +254,8 @@ public class BotService {
         WishList wishList = new WishList();
         wishListDao.save(wishList);
         user.setWishList(wishList);
-        return userDao.save(user);
+        long id = userDao.save(user);
+        return id == 0 ? false : true;
     }
 
     public boolean updateUser(BotUser user) {

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -34,7 +33,7 @@ public class GiftDaoImpl implements GiftDao {
     public boolean update(Gift gift) {
         logger.info("Updating gift with gift id " + gift.getId());
         factory.getCurrentSession().merge(gift);
-        return gift.getId() == 0 ? false : true;
+        return true;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class GiftDaoImpl implements GiftDao {
 
     @Override
     public List<Gift> getAvailableToDonatePresents(long userId) {
-        logger.info("Get presents available to donate of user with  id " + userId);
+        logger.info("Get presents available to donate of user with id " + userId);
         Query query = factory.getCurrentSession().createQuery("select gifts from BotUser as botuser\n" +
             "            join botuser.wishList.giftList as gifts\n" +
             "            where gifts.occupiedBy =null and botuser.id = :userId ");

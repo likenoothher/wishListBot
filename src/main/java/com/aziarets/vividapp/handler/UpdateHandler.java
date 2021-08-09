@@ -1,20 +1,18 @@
 package com.aziarets.vividapp.handler;
 
 import com.aziarets.vividapp.exception.NotFoundUserNameException;
-import com.aziarets.vividapp.exception.UserIsDisabled;
-import com.aziarets.vividapp.service.BotService;
 import com.aziarets.vividapp.exception.UserIsBotException;
+import com.aziarets.vividapp.exception.UserIsDisabled;
 import com.aziarets.vividapp.menu.BotMenuTemplate;
 import com.aziarets.vividapp.menu.Icon;
 import com.aziarets.vividapp.model.BotUser;
+import com.aziarets.vividapp.service.BotService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;

@@ -1,6 +1,5 @@
 package com.aziarets.vividapp.dao;
 
-import com.aziarets.vividapp.handler.CallbackHandler;
 import com.aziarets.vividapp.model.BotUser;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -25,10 +24,10 @@ public class BotUserDaoImpl implements BotUserDao {
 
 
     @Override
-    public boolean save(BotUser botUser) {
+    public long save(BotUser botUser) {
         logger.info("Saving user with user name " + botUser.getUserName());
         factory.getCurrentSession().saveOrUpdate(botUser);
-        return botUser.getId() == 0 ? false : true;
+        return botUser.getId();
     }
 
     @Override
@@ -92,14 +91,16 @@ public class BotUserDaoImpl implements BotUserDao {
             "left join botuser.wishList.giftList as gifts " +
             "where gifts.id = :giftId");
         query.setParameter("giftId", giftId);
-        List<BotUser> users = query.getResultList();
-        if (!users.isEmpty()) {
+        try {
+            BotUser user = (BotUser)query.getSingleResult();
             logger.info("Returning gift holder by gift id " + giftId + ", found user - "
-                + users.get(0).getUserName());
-            return users.get(0);
+                + user.getUserName());
+            return user;
         }
-        logger.info("Returning null gift holder by gift id " + giftId);
-        return null;
+        catch (NoResultException e) {
+            logger.warn("Exception during searching  gift holder by gift id " + giftId + ":" + e.getLocalizedMessage());
+            return null;
+        }
     }
 
     @Override

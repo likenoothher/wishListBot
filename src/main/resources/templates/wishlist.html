@@ -1,11 +1,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
     <link rel="stylesheet"
           th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="shortcut icon" href="/img/favicon.png" type="image/png">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
     <title>WishList</title>
 
 </head>
@@ -26,10 +26,10 @@
                 <h3 th:unless="${gifts.isEmpty()}">Твой WishList, <span th:text="${user.getUserName()}"></span>!</h3>
             </div>
             <div class="col-md-2 text-center">
-                <a class="btn btn-success" th:href="@{/wishlist/add_gift}" role="button">Добавить подарок</a>
+                <a class="btn btn-success" role="button" th:href="@{/wishlist/add_gift}">Добавить подарок</a>
             </div>
             <div class="row">
-                <div th:unless="${gifts.isEmpty()}" class="col-md-3" th:each="gift: ${gifts}">
+                <div class="col-md-3" th:each="gift: ${gifts}" th:unless="${gifts.isEmpty()}">
                     <div class="row">
                         <div class="col-lg-1 text-center">
                         </div>
@@ -37,7 +37,7 @@
                             <div class="card h-100">
                                 <img th:if="${gift.getGiftPhotoCloudinaryId() != null}"
                                      th:src="${gift.getGiftPhotoURL()}"/>
-                                <img th:unless="${gift.getGiftPhotoCloudinaryId() != null}" th:src="@{/img/gift.jpg}"/>
+                                <img th:src="@{/img/gift.jpg}" th:unless="${gift.getGiftPhotoCloudinaryId() != null}"/>
                                 <div class="card-body">
                                     <h5 class="card-title"><span th:text="${gift.getName()}"></span></h5>
                                     <p class="card-text">Описание:
@@ -46,22 +46,22 @@
                                         <span th:unless="${gift.getDescription() != null}"> отсутствует</span>
                                     </p>
                                     <p>
-                                        <a th:if="${gift.getUrl() != null}" th:href="${gift.getUrl()}"
-                                           class="card-link">Ссылка</a>
+                                        <a class="card-link" th:href="${gift.getUrl()}"
+                                           th:if="${gift.getUrl() != null}">Ссылка</a>
                                         <span th:unless="${gift.getUrl() != null}">Ссылка: отсутствует</span>
                                     </p>
                                     <div class="row">
                                         <div class="col-xl-6 text-center">
                                             <form method="get" th:action="@{wishlist/update_gift}">
-                                                <button type="submit" class="btn btn-outline-primary" name="giftId"
-                                                        th:value="*{gift.getId()}">Изменить
+                                                <button class="btn btn-outline-primary" name="giftId" th:value="*{gift.getId()}"
+                                                        type="submit">Изменить
                                                 </button>
                                             </form>
                                         </div>
                                         <div class="col-xl-6 text-center">
                                             <form method="post" th:action="@{wishlist/delete_gift}">
-                                                <button type="submit" class="btn btn-outline-danger" name="giftId"
-                                                        th:value="*{gift.getId()}">Удалить
+                                                <button class="btn btn-outline-danger" name="giftId" th:value="*{gift.getId()}"
+                                                        type="submit">Удалить
                                                 </button>
                                             </form>
                                         </div>

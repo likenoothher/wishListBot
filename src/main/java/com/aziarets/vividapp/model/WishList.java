@@ -55,12 +55,12 @@ public class WishList {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WishList wishList = (WishList) o;
-        return id == wishList.id;
+        return id == wishList.id && Objects.equals(giftList, wishList.giftList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, giftList);
     }
 
     @Override
