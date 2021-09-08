@@ -1,0 +1,80 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
+    <title>Подписчики</title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 th:if="${subscribers.isEmpty()}">На тебя пока никто не подписан</h3>
+                <h3 th:unless="${subscribers.isEmpty()}">Список твоих подписчиков, <span
+                        th:text="${user.getUserName()}">!</span></h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-3" th:each="subscriber: ${subscribers}" th:unless="${subscribers.isEmpty()}">
+                    <div class="row">
+                        <div class="col-lg-1 text-center">
+                        </div>
+                        <div class="col-lg-10 text-center">
+                            <div class="card">
+                                <img th:if="${subscriber.getUserAvatarPhotoURL() != null}"
+                                     th:src="${subscriber.getUserAvatarPhotoURL()}"/>
+                                <img th:src="@{/img/no_photo2.jpg}"
+                                     th:unless="${subscriber.getUserAvatarPhotoURL() != null}"/>
+                                <div class="card-body">
+                                    <h5 class="card-title">Имя пользователя: <span
+                                            th:text="${subscriber.getUserName()}"></span></h5>
+                                    <p class="card-text">Имя:
+                                        <span th:if="${subscriber.getFirstName() != null}"
+                                              th:text="${subscriber.getFirstName()}"></span>
+                                        <span th:unless="${subscriber.getFirstName() != null}"> не указано</span>
+                                    </p>
+                                    <p class="card-text">Фамилия:
+                                        <span th:if="${subscriber.getLastName() != null}"
+                                              th:text="${subscriber.getLastName()}"></span>
+                                        <span th:unless="${subscriber.getLastName() != null}"> не указано</span>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-lg text-center">
+                                            <form method="post" th:action="@{/subscribers/delete}">
+                                                <input name="userId" th:value="${user.getId()}" type="hidden"/>
+                                                <button class="btn btn-outline-danger" name="deletedUserId"
+                                                        th:value="*{subscriber.getTgAccountId()}"
+                                                        type="submit">Удалить подписчика
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

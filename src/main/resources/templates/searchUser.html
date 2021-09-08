@@ -1,0 +1,115 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
+    <title>Поиск</title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+
+<section>
+    <div class="container">
+        <form method="post" th:action="@{/admin/search_user}">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input aria-describedby="basic-addon1" aria-label="Username" class="form-control"
+                       name="userName" placeholder="Имя пользователя" type="text">
+                <button class="btn btn-success" name="userId" type="submit">Найти</button>
+            </div>
+        </form>
+
+        <div th:if="${user == null}">
+            <h3> Пользователь не найден</h3>
+        </div>
+
+        <div class="table-responsive-md" th:if="${user != null}">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Имя пользователя</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Telegram ID</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td th:text="${user.getUserName()}"></td>
+                    <td th:if="${user.getFirstName() != null}" th:text="${user.getFirstName()}"></td>
+                    <td th:text="Отсутствует" th:unless="${user.getFirstName() != null}"></td>
+                    <td th:if="${user.getLastName() != null}" th:text="${user.getLastName()}"></td>
+                    <td th:text="Отсутствует" th:unless="${user.getLastName() != null}"></td>
+                    <td th:text="${user.getTgAccountId()}"></td>
+                    <td>
+                        <button class="btn btn-outline-info" data-bs-target="#exampleModal" data-bs-toggle="modal"
+                                data-bs-whatever="@mdo"
+                                type="button">Сообщение
+                        </button>
+                    </td>
+
+                    <td class="align-middle" th:if="${user.isEnabled() == true}">
+                        <form method="post" th:action="@{/admin/block}">
+                            <button class="btn btn-outline-danger" name="userId" th:value="*{user.getId()}"
+                                    type="submit">Заблокировать
+                            </button>
+                        </form>
+                    </td>
+
+                    <td th:unless="${user.isEnabled() == true}">
+                        <form method="post" th:action="@{/admin/unblock}">
+                            <button class="btn btn-outline-success" name="userId" th:value="*{user.getId()}"
+                                    type="submit">Разблокировать
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Сообщение для
+                        <a th:if="${user != null}" th:text="${user.getUserName()}"></a></h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" th:action="@{/admin/send_message}">
+                        <div class="mb-3">
+                            <label class="col-form-label" for="message-text">Сообщение:</label>
+                            <textarea class="form-control" id="message-text" name="message" type="text"></textarea>
+                            <input name="userId" th:if="${user != null}" th:value="${user.getId()}" type="hidden">
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Назад</button>
+                            <button class="btn btn-primary" type="submit">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</section>
+
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

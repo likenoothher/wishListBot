@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
+    <title>Обновить подарок </title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+<section>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Изменение подарка: <span th:text="${gift.getName()}"></span></h3>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-8">
+                    <form enctype="multipart/form-data" method="id" th:action="@{/wishlist/update_gift}"
+                          th:object="${gift}">
+                        <div class="form-group row">
+
+                            <div class="col-md-12 mt-3">
+                                <label for="giftDescription">Описание подарка</label>
+                                <div class="input-group">
+                                    <input autocomplete="off" class="form-control" id="giftDescription" name="giftDescription"
+                                           th:value="*{description}"
+                                           type="text"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <label for="giftURL">Ссылка на подарок</label>
+                                <div class="input-group">
+                                    <input autocomplete="off" class="form-control" id="giftURL" name="giftURL"
+                                           th:value="*{url}"
+                                           type="text"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <label class="form-label" for="giftImage">Загрузить изображение подарка</label>
+                                <input class="form-control" id="giftImage" name="giftImage" type="file">
+                                <script>
+                                    $("#giftImage").attr({
+                                        title: "new content"
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                        <input id="giftId" name="giftId" th:value="*{id}" type="hidden"/>
+                        <input id="giftName" name="giftName" th:value="*{name}" type="hidden"/>
+
+                        <a class="btn btn-primary" href="/wishlist">Назад</a>
+                        <button class="btn btn-success" type="submit">Обновить</button>
+                    </form>
+                </div>
+
+                <div class="col-md-2">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
+    <title>Я дарю</title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 th:if="${gifts.isEmpty()}">Ты пока ничего не собираешься подарить</h3>
+                <h3 th:unless="${gifts.isEmpty()}">Список подарков, которые ты собираешься подарить</span></h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-3" th:each="entry: ${gifts}" th:unless="${gifts.isEmpty()}">
+                    <div class="row">
+                        <div class="col-lg-1 text-center">
+                        </div>
+                        <div class="col-lg-10 text-center">
+                            <div class="card">
+                                <img th:if="${entry.key.getGiftPhotoCloudinaryId() != null}"
+                                     th:src="${entry.key.getGiftPhotoURL()}"/>
+                                <img th:src="@{/img/gift.jpg}"
+                                     th:unless="${entry.key.getGiftPhotoCloudinaryId() != null}"/>
+                                <div class="card-body">
+                                    <h5 class="card-title"><span th:text="${entry.key.getName()}"></span></h5>
+                                    <p class="card-text">Описание:
+                                        <span th:if="${entry.key.getDescription() != null}"
+                                              th:text="${entry.key.getDescription()}"></span>
+                                        <span th:unless="${entry.key.getDescription() != null}"> отсутствует</span>
+                                    </p>
+                                    <a class="card-link" th:href="${entry.key.getUrl()}"
+                                       th:if="${entry.key.getUrl() != null}">Ссылка</a>
+                                    <span th:unless="${entry.key.getUrl() != null}">Ссылка: отсутствует</span>
+                                    </p>
+                                    <p class="card-text">Для пользователя: <span
+                                            th:text="${entry.value.getUserName()}"></span>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-lg text-center">
+                                            <form method="post" th:action="@{/i_present/refuse}">
+                                                <input name="userId" th:value="${user.getId()}" type="hidden"/>
+                                                <button class="btn btn-danger" name="giftId" th:value="*{entry.key.getId()}"
+                                                        type="submit">Передумал дарить
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>

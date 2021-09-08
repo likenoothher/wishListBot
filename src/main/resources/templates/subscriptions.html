@@ -1,0 +1,91 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'/>
+    <link rel="stylesheet"
+          th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css} "/>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="/img/favicon.png" rel="shortcut icon" type="image/png">
+    <title>Подписки</title>
+
+</head>
+
+<body>
+<header>
+    <div th:insert="header">
+    </div>
+</header>
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 th:if="${subscriptions.isEmpty()}">Ты пока ни на кого не подписан</h3>
+                <h3 th:unless="${subscriptions.isEmpty()}">Список твоих подписок, <span th:text="${user.getUserName()}">!</span>
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-sm-3" th:each="subscription: ${subscriptions}" th:unless="${subscriptions.isEmpty()}">
+                    <div class="row">
+                        <div class="col-lg-1 text-center">
+                        </div>
+                        <div class="col-lg-10 text-center">
+                            <div class="card">
+                                <img th:if="${subscription.getUserAvatarPhotoURL() != null}"
+                                     th:src="${subscription.getUserAvatarPhotoURL()}"/>
+                                <img th:src="@{/img/no_photo2.jpg}"
+                                     th:unless="${subscription.getUserAvatarPhotoURL() != null}"/>
+                                <div class="card-body">
+                                    <h5 class="card-title">Имя пользователя: <span
+                                            th:text="${subscription.getUserName()}"></span></h5>
+                                    <p class="card-text">Имя:
+                                        <span th:if="${subscription.getFirstName() != null}"
+                                              th:text="${subscription.getFirstName()}"></span>
+                                        <span th:unless="${subscription.getFirstName() != null}"> не указано</span>
+                                    </p>
+                                    <p class="card-text">Фамилия:
+                                        <span th:if="${subscription.getLastName() != null}"
+                                              th:text="${subscription.getLastName()}"></span>
+                                        <span th:unless="${subscription.getLastName() != null}"> не указано</span>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-lg text-center">
+                                            <a class="btn btn-outline-info"
+                                               th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}">WishList</a>
+                                        </div>
+                                    </div>
+                                    <!--                  </p>-->
+                                    <!--                  <a th:href="@{subscriptions/{Id}(Id=${subscription.getId()})}" class="card-link">-->
+                                    <!--                    <span th:text="${subscription.getUserName()}"></span> wish list</a>-->
+                                    <!--                  </p>-->
+                                    <div class="row">
+                                        <div class="col-lg text-center">
+                                            <form method="post" th:action="@{/subscriptions/unsubscribe}">
+                                                <input name="userId" th:value="${user.getId()}" type="hidden"/>
+                                                <button class="btn btn-outline-danger" name="unsubscribedFrom"
+                                                        th:value="*{subscription.getTgAccountId()}"
+                                                        type="submit">Отписаться
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 text-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</section>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
+</body>
+
+</html>
